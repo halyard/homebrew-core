@@ -11,8 +11,7 @@ class Luarocks < Formula
     regex(%r{/luarocks[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
-  depends_on "lua@5.1" => :test
-  depends_on "lua@5.3" => :test
+  depends_on "lua" => :test
   depends_on "luajit" => :test
   depends_on "lua"
 
@@ -25,21 +24,9 @@ class Luarocks < Formula
     system "make", "install"
   end
 
-  def caveats
-    <<~EOS
-      LuaRocks supports multiple versions of Lua. By default it is configured
-      to use Lua#{Formula["lua"].version.major_minor}, but you can require it to use another version at runtime
-      with the `--lua-dir` flag, like this:
-
-        luarocks --lua-dir=#{Formula["lua@5.1"].opt_prefix} install say
-    EOS
-  end
-
   test do
     luas = [
       Formula["lua"],
-      Formula["lua@5.3"],
-      Formula["lua@5.1"],
     ]
 
     luas.each do |lua|
