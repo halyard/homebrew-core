@@ -5,11 +5,12 @@ class Docutils < Formula
   sha256 "33995a6753c30b7f577febfc2c50411fec6aac7f7ffeb7c4cfe5991072dcf9e6"
   license all_of: [:public_domain, "BSD-2-Clause", "GPL-3.0-or-later", "Python-2.0"]
 
-  depends_on "python" => [:build, :test]
+  depends_on "python@3.10" => [:build, :test]
+  depends_on "python@3.11" => [:build, :test]
 
   def pythons
-    deps.select { |dep| dep.name.start_with?("python") }
-        .map(&:to_formula)
+    deps.map(&:to_formula)
+        .select { |f| f.name.match?(/^python@3\.\d+$/) }
   end
 
   def install

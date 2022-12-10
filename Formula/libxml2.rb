@@ -24,7 +24,9 @@ class Libxml2 < Formula
 
   keg_only :provided_by_macos
 
-  depends_on "python" => [:build, :test]
+  depends_on "python@3.10" => [:build, :test]
+  depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.9" => [:build, :test]
   depends_on "pkg-config" => :test
   depends_on "icu4c"
   depends_on "readline"
@@ -42,7 +44,7 @@ class Libxml2 < Formula
 
   def pythons
     deps.map(&:to_formula)
-        .select { |f| f.name.match?(/^python$/) }
+        .select { |f| f.name.match?(/^python@\d\.\d+$/) }
         .map { |f| f.opt_libexec/"bin/python" }
   end
 

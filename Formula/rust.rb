@@ -25,7 +25,7 @@ class Rust < Formula
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
-  depends_on "python" => :build
+  depends_on "python@3.10" => :build
   depends_on "libssh2"
   depends_on "openssl@1.1"
   depends_on "pkg-config"
@@ -54,7 +54,7 @@ class Rust < Formula
   end
 
   def install
-    ENV.prepend_path "PATH", Formula["python"].opt_libexec/"bin"
+    ENV.prepend_path "PATH", Formula["python@3.10"].opt_libexec/"bin"
 
     # Ensure that the `openssl` crate picks up the intended library.
     # https://crates.io/crates/openssl#manual-configuration
