@@ -9,7 +9,7 @@ class Apr < Formula
 
   keg_only :provided_by_macos, "Apple's CLT provides apr"
 
-  depends_on "autoconf@2.69" => :build
+  depends_on "autoconf" => :build
 
   uses_from_macos "libxcrypt"
 
