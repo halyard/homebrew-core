@@ -1,13 +1,23 @@
 class Openjdk < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.java.net/"
-  url "https://github.com/openjdk/jdk19u/archive/refs/tags/jdk-19.0.1-ga.tar.gz"
-  sha256 "26ebf4d182a0d4bba7a0387a931af576a538745a98ef6eb2c70e22655e846a45"
+  url "https://github.com/openjdk/jdk19u/archive/jdk-19+36.tar.gz"
+  version "19"
+  sha256 "e79d5f9cde685a28d7afe9ee13107a11d1a183bbbea973b2c1d9981400a3cb36"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
 
   livecheck do
     url :stable
     regex(/^jdk[._-]v?(\d+(?:\.\d+)*)-ga$/i)
+  end
+
+  bottle do
+    sha256 cellar: :any, arm64_monterey: "ba371cdb94f89e982cf618ed58ef072bea8f0a2443bd3491e1ac4468c175a4c7"
+    sha256 cellar: :any, arm64_big_sur:  "82d55455d8610b4da15846a5c625f4f5cb6d18a256f90cd9ea138b733ce48041"
+    sha256 cellar: :any, monterey:       "a9fedd58720ae480e00e6ef31b89ab4ebf51b6f9bcf9bb9d7f6ffa837ecb9bd1"
+    sha256 cellar: :any, big_sur:        "cc1224e743cbb982536d1fa1e1bafb9a532af1690781543da27c461842ee0dfb"
+    sha256 cellar: :any, catalina:       "b17cc986984e1b0d5cd8e853872aceca90a02fc24b5e77c69eed04033d54e3ff"
+    sha256               x86_64_linux:   "6b702951f8829ba9d992cd43c939b51a6f7615aa2704b080535975ec7a04b6bc"
   end
 
   keg_only :shadowed_by_macos
@@ -37,6 +47,11 @@ class Openjdk < Formula
     depends_on "libxrender"
     depends_on "libxt"
     depends_on "libxtst"
+
+    # FIXME: This should not be needed because of the `-rpath` flag
+    #        we set in `--with-extra-ldflags`, but this configuration
+    #        does not appear to have made it to the linker.
+    ignore_missing_libraries "libjvm.so"
   end
 
   fails_with gcc: "5"
@@ -104,7 +119,7 @@ class Openjdk < Formula
       --with-zlib=system
     ]
 
-    ldflags = ["-Wl,-rpath,#{loader_path.gsub("$", "\\$$")}/server"]
+    ldflags = ["-Wl,-rpath,#{loader_path}/server"]
     args += if OS.mac?
       ldflags << "-headerpad_max_install_names"
 
