@@ -11,15 +11,6 @@ class Openjdk < Formula
     regex(/^jdk[._-]v?(\d+(?:\.\d+)*)-ga$/i)
   end
 
-  bottle do
-    sha256 cellar: :any, arm64_monterey: "ba371cdb94f89e982cf618ed58ef072bea8f0a2443bd3491e1ac4468c175a4c7"
-    sha256 cellar: :any, arm64_big_sur:  "82d55455d8610b4da15846a5c625f4f5cb6d18a256f90cd9ea138b733ce48041"
-    sha256 cellar: :any, monterey:       "a9fedd58720ae480e00e6ef31b89ab4ebf51b6f9bcf9bb9d7f6ffa837ecb9bd1"
-    sha256 cellar: :any, big_sur:        "cc1224e743cbb982536d1fa1e1bafb9a532af1690781543da27c461842ee0dfb"
-    sha256 cellar: :any, catalina:       "b17cc986984e1b0d5cd8e853872aceca90a02fc24b5e77c69eed04033d54e3ff"
-    sha256               x86_64_linux:   "6b702951f8829ba9d992cd43c939b51a6f7615aa2704b080535975ec7a04b6bc"
-  end
-
   keg_only :shadowed_by_macos
 
   depends_on "autoconf" => :build
