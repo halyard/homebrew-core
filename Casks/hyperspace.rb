@@ -1,9 +1,9 @@
 cask 'hyperspace' do
-  version '2.1'
-  sha256 'bde396b7a3f2b136db4bee76943689f4dfa894829dd2ff162bac71409a86ece7'
+  version '2.3.1'
+  sha256 '1d5f0fccc1c8a507a16d66be49569fceea291ed7d7bbaa05ff43bc43536229fa'
 
-  url "https://github.com/halyard/hyperspace/releases/download/v#{version}/Hyperspace#{version}.dmg"
-  homepage 'https://github.com/halyard/hyperspace'
+  url "https://github.com/nickzman/hyperspace/releases/download/v#{version}/Hyperspace#{version}.dmg"
+  homepage 'https://github.com/nickzman/hyperspace'
   name 'Hyperspace'
 
   screen_saver 'Hyperspace.saver'
