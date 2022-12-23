@@ -7,7 +7,9 @@ class Podman < Formula
   head "https://github.com/containers/podman.git", branch: "main"
 
   depends_on "go-md2man" => :build
-  depends_on "go" => :build
+  # Required latest gvisor.dev/gvisor/pkg/gohacks
+  # Try to switch to the latest go on the next release
+  depends_on "go@1.18" => :build
 
   on_macos do
     depends_on "qemu"
