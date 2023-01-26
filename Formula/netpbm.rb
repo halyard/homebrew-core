@@ -3,10 +3,9 @@ class Netpbm < Formula
   homepage "https://netpbm.sourceforge.io/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4436"
-  version "10.86.35"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4482"
+  version "10.86.37"
   license "GPL-3.0-or-later"
-  revision 1
   version_scheme 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
 
