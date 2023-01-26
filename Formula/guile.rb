@@ -1,11 +1,10 @@
 class Guile < Formula
   desc "GNU Ubiquitous Intelligent Language for Extensions"
   homepage "https://www.gnu.org/software/guile/"
-  url "https://ftp.gnu.org/gnu/guile/guile-3.0.8.tar.xz"
-  mirror "https://ftpmirror.gnu.org/guile/guile-3.0.8.tar.xz"
-  sha256 "daa7060a56f2804e9b74c8d7e7fe8beed12b43aab2789a38585183fcc17b8a13"
+  url "https://ftp.gnu.org/gnu/guile/guile-3.0.9.tar.xz"
+  mirror "https://ftpmirror.gnu.org/guile/guile-3.0.9.tar.xz"
+  sha256 "1a2625ac72b2366e95792f3fe758fd2df775b4044a90a4a9787326e66c0d750d"
   license "LGPL-3.0-or-later"
-  revision 2
 
   head do
     url "https://git.savannah.gnu.org/git/guile.git", branch: "main"
@@ -16,6 +15,11 @@ class Guile < Formula
     uses_from_macos "flex" => :build
   end
 
+  # Remove with Guile 3.0.9 release.
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "gettext" => :build
+
   depends_on "gnu-sed" => :build
   depends_on "bdw-gc"
   depends_on "gmp"
@@ -23,6 +27,9 @@ class Guile < Formula
   depends_on "libunistring"
   depends_on "pkg-config" # guile-config is a wrapper around pkg-config.
   depends_on "readline"
+
+  # Remove with Guile 3.0.9 release.
+  uses_from_macos "flex" => :build
 
   uses_from_macos "gperf"
   uses_from_macos "libffi", since: :catalina
@@ -34,16 +41,13 @@ class Guile < Formula
 
     system "./autogen.sh" unless build.stable?
 
-    # Disable JIT on Apple Silicon, as it is not yet supported
-    # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=44505
-    extra_args = []
-    extra_args << "--enable-jit=no" if Hardware::CPU.arm?
+    # Remove with Guile 3.0.9 release.
+    system "autoreconf", "-vif" if OS.mac? && build.stable?
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
+    system "./configure", *std_configure_args,
                           "--with-libreadline-prefix=#{Formula["readline"].opt_prefix}",
                           "--with-libgmp-prefix=#{Formula["gmp"].opt_prefix}",
-                          *extra_args
+                          "--disable-nls"
     system "make", "install"
 
     # A really messed up workaround required on macOS --mkhl
