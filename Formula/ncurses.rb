@@ -1,11 +1,11 @@
 class Ncurses < Formula
   desc "Text-based UI library"
   homepage "https://invisible-island.net/ncurses/announce.html"
-  url "https://ftp.gnu.org/gnu/ncurses/ncurses-6.3.tar.gz"
-  mirror "https://invisible-mirror.net/archives/ncurses/ncurses-6.3.tar.gz"
-  mirror "ftp://ftp.invisible-island.net/ncurses/ncurses-6.3.tar.gz"
-  mirror "https://ftpmirror.gnu.org/ncurses/ncurses-6.3.tar.gz"
-  sha256 "97fc51ac2b085d4cde31ef4d2c3122c21abc217e9090a43a30fc5ec21684e059"
+  url "https://ftp.gnu.org/gnu/ncurses/ncurses-6.4.tar.gz"
+  mirror "https://invisible-mirror.net/archives/ncurses/ncurses-6.4.tar.gz"
+  mirror "ftp://ftp.invisible-island.net/ncurses/ncurses-6.4.tar.gz"
+  mirror "https://ftpmirror.gnu.org/ncurses/ncurses-6.4.tar.gz"
+  sha256 "6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159"
   license "MIT"
 
   keg_only :provided_by_macos
@@ -86,8 +86,6 @@ class Ncurses < Formula
                                     "--with-curses-dir=#{prefix}"
     system "make", "install"
 
-    system testpath/"test/bin/keynames"
-    system testpath/"test/bin/test_arrays"
-    system testpath/"test/bin/test_vidputs"
+    system testpath/"test/bin/ncurses-examples"
   end
 end
