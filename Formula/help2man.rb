@@ -1,17 +1,14 @@
 class Help2man < Formula
   desc "Automatically generate simple man pages"
   homepage "https://www.gnu.org/software/help2man/"
-  url "https://ftp.gnu.org/gnu/help2man/help2man-1.49.2.tar.xz"
-  mirror "https://ftpmirror.gnu.org/help2man/help2man-1.49.2.tar.xz"
-  sha256 "9e2e0e213a7e0a36244eed6204d902b6504602a578b6ecd15268b1454deadd36"
+  url "https://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz"
+  mirror "https://ftpmirror.gnu.org/help2man/help2man-1.49.3.tar.xz"
+  sha256 "4d7e4fdef2eca6afe07a2682151cea78781e0a4e8f9622142d9f70c083a2fd4f"
   license "GPL-3.0-or-later"
   revision 1
 
-  uses_from_macos "perl", since: :mojave
-
-  on_intel do
-    depends_on "gettext"
-  end
+  depends_on "gettext"
+  depends_on "perl"
 
   resource "Locale::gettext" do
     url "https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/gettext-1.07.tar.gz"
@@ -21,11 +18,9 @@ class Help2man < Formula
   def install
     ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
 
-    if Hardware::CPU.intel?
-      resource("Locale::gettext").stage do
-        system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}"
-        system "make", "install"
-      end
+    resource("Locale::gettext").stage do
+      system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}", "NO_MYMETA=1"
+      system "make", "install"
     end
 
     # install is not parallel safe
@@ -42,11 +37,7 @@ class Help2man < Formula
   end
 
   test do
-    out = if Hardware::CPU.intel?
-      shell_output("#{bin}/help2man --locale=en_US.UTF-8 #{bin}/help2man")
-    else
-      shell_output("#{bin}/help2man #{bin}/help2man")
-    end
+    out = shell_output("#{bin}/help2man --locale=en_US.UTF-8 #{bin}/help2man")
 
     assert_match "help2man #{version}", out
   end
