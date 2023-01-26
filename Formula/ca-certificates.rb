@@ -1,8 +1,8 @@
 class CaCertificates < Formula
   desc "Mozilla CA certificate store"
   homepage "https://curl.se/docs/caextract.html"
-  url "https://curl.se/ca/cacert-2022-10-11.pem"
-  sha256 "2cff03f9efdaf52626bd1b451d700605dc1ea000c5da56bd0fc59f8f43071040"
+  url "https://curl.se/ca/cacert-2023-01-10.pem"
+  sha256 "fb1ecd641d0a02c01bc9036d513cb658bbda62a75e246bedbc01764560a639f0"
   license "MPL-2.0"
 
   livecheck do
@@ -86,14 +86,14 @@ class CaCertificates < Formula
     end
 
     # Get SHA256 fingerprints for all trusted certs
-    fingerprints = trusted_certs.map do |cert|
+    fingerprints = trusted_certs.to_set do |cert|
       Utils.safe_popen_write("/usr/bin/openssl", "x509", "-inform", "pem",
                                                          "-fingerprint",
                                                          "-sha256",
                                                          "-noout") do |openssl_io|
         openssl_io.write(cert)
       end
-    end.to_set
+    end
 
     # Now process Mozilla certs we downloaded.
     pem_certs_list = File.read(pkgshare/"cacert.pem")
