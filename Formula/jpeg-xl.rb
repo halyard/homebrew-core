@@ -1,10 +1,9 @@
 class JpegXl < Formula
   desc "New file format for still image compression"
   homepage "https://jpeg.org/jpegxl/index.html"
-  url "https://github.com/libjxl/libjxl/archive/v0.7.0.tar.gz"
-  sha256 "3114bba1fabb36f6f4adc2632717209aa6f84077bc4e93b420e0d63fa0455c5e"
+  url "https://github.com/libjxl/libjxl/archive/v0.8.0.tar.gz"
+  sha256 "6b4c140c1738acbed6b7d22858e0526373f0e9938e3f6c0a6b8943189195aad1"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,13 +11,16 @@ class JpegXl < Formula
   end
 
   depends_on "cmake" => :build
+  depends_on "doxygen" => :build
   depends_on "pkg-config" => :build
+  depends_on "sphinx-doc" => :build
   depends_on "brotli"
   depends_on "giflib"
   depends_on "highway"
   depends_on "imath"
   depends_on "jpeg-turbo"
   depends_on "libpng"
+  depends_on "little-cms2"
   depends_on "openexr"
   depends_on "webp"
 
@@ -30,11 +32,6 @@ class JpegXl < Formula
 
   # These resources are versioned according to the script supplied with jpeg-xl to download the dependencies:
   # https://github.com/libjxl/libjxl/tree/v#{version}/third_party
-  resource "lodepng" do
-    url "https://github.com/lvandeve/lodepng.git",
-        revision: "48e5364ef48ec2408f44c727657ac1b6703185f8"
-  end
-
   resource "sjpeg" do
     url "https://github.com/webmproject/sjpeg.git",
         revision: "868ab558fad70fcbe8863ba4e85179eeb81cc840"
@@ -42,7 +39,7 @@ class JpegXl < Formula
 
   resource "skcms" do
     url "https://skia.googlesource.com/skcms.git",
-        revision: "64374756e03700d649f897dbd98c95e78c30c7da"
+        revision: "b25b07b4b07990811de121c0356155b2ba0f4318"
   end
 
   def install
@@ -50,6 +47,7 @@ class JpegXl < Formula
     # disable manpages due to problems with asciidoc 10
     system "cmake", "-S", ".", "-B", "build",
                     "-DJPEGXL_FORCE_SYSTEM_BROTLI=ON",
+                    "-DJPEGXL_FORCE_SYSTEM_LCMS2=ON",
                     "-DJPEGXL_FORCE_SYSTEM_HWY=ON",
                     "-DJPEGXL_ENABLE_JNI=OFF",
                     "-DJPEGXL_VERSION=#{version}",
