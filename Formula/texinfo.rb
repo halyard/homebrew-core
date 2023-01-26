@@ -1,9 +1,9 @@
 class Texinfo < Formula
   desc "Official documentation format of the GNU project"
   homepage "https://www.gnu.org/software/texinfo/"
-  url "https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/texinfo/texinfo-7.0.1.tar.xz"
-  sha256 "bcd221fdb2d807a8a09938a0f8d5e010ebd2b58fca16075483d6fcb78db2c6b2"
+  url "https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/texinfo/texinfo-7.0.2.tar.xz"
+  sha256 "f211ec3261383e1a89e4555a93b9d017fe807b9c3992fb2dff4871dae6da54ad"
   license "GPL-3.0-or-later"
 
   uses_from_macos "ncurses"
