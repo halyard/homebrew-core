@@ -5,7 +5,7 @@ class Aom < Formula
       tag:      "v3.5.0",
       revision: "bcfe6fbfed315f83ee8a95465c654ee8078dbff9"
   license "BSD-2-Clause"
-  revision 1
+  revision 2
 
   depends_on "cmake" => :build
 
@@ -28,13 +28,15 @@ class Aom < Formula
   def install
     ENV.runtime_cpu_detection unless Hardware::CPU.arm?
 
-    args = std_cmake_args.concat(["-DCMAKE_INSTALL_RPATH=#{rpath}",
-                                  "-DENABLE_DOCS=off",
-                                  "-DENABLE_EXAMPLES=on",
-                                  "-DENABLE_TESTDATA=off",
-                                  "-DENABLE_TESTS=off",
-                                  "-DENABLE_TOOLS=off",
-                                  "-DBUILD_SHARED_LIBS=on"])
+    args = std_cmake_args + [
+      "-DCMAKE_INSTALL_RPATH=#{rpath}",
+      "-DENABLE_DOCS=off",
+      "-DENABLE_EXAMPLES=on",
+      "-DENABLE_TESTDATA=off",
+      "-DENABLE_TESTS=off",
+      "-DENABLE_TOOLS=off",
+      "-DBUILD_SHARED_LIBS=on",
+    ]
     # Runtime CPU detection is not currently enabled for ARM on macOS.
     args << "-DCONFIG_RUNTIME_CPU_DETECT=0" if Hardware::CPU.arm?
 
