@@ -1,8 +1,8 @@
 class Node < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v19.2.0/node-v19.2.0.tar.xz"
-  sha256 "0956b0ff01f2f6383827e916a6048159ce2bdb05217f654a8fff54e8116dc17e"
+  url "https://nodejs.org/dist/v19.5.0/node-v19.5.0.tar.xz"
+  sha256 "281317bdc7ba8952138bf8f0f5f076495f79f86e851a659be1f983dec33ca577"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Node < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.10" => :build
+  depends_on "python@3.11" => :build
   depends_on "brotli"
   depends_on "c-ares"
   depends_on "icu4c"
@@ -39,15 +39,15 @@ class Node < Formula
   # We track major/minor from upstream Node releases.
   # We will accept *important* npm patch releases when necessary.
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-8.19.3.tgz"
-    sha256 "634bf4e0dc87be771ebf48a058629960e979a209c20a51ebdbc4897ca6a25260"
+    url "https://registry.npmjs.org/npm/-/npm-9.3.1.tgz"
+    sha256 "41caa26a340b0562bc5429d28792049c980fe3e872b42b82cad94e8f70e37f40"
   end
 
   def install
     ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
 
     # make sure subprocesses spawned by make are using our Python 3
-    ENV["PYTHON"] = which("python3.10")
+    ENV["PYTHON"] = which("python3.11")
 
     # Never install the bundled "npm", always prefer our
     # installation from tarball for better packaging control.
