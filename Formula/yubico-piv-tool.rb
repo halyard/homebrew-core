@@ -1,8 +1,8 @@
 class YubicoPivTool < Formula
   desc "Command-line tool for the YubiKey PIV application"
   homepage "https://developers.yubico.com/yubico-piv-tool/"
-  url "https://developers.yubico.com/yubico-piv-tool/Releases/yubico-piv-tool-2.3.0.tar.gz"
-  sha256 "a02a12d9545d1ef7a1b998606d89b7b655a5f5a1437736cf51db083f876f55a9"
+  url "https://developers.yubico.com/yubico-piv-tool/Releases/yubico-piv-tool-2.3.1.tar.gz"
+  sha256 "da89dafd8b6185aa635346753f9ddb29af29bc4abd92dd81f37d9d6560b5d64e"
   license "BSD-2-Clause"
 
   livecheck do
@@ -17,7 +17,7 @@ class YubicoPivTool < Formula
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "check"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "pcsc-lite"
 
   def install
