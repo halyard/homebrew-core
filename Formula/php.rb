@@ -2,11 +2,10 @@ class Php < Formula
   desc "General-purpose scripting language"
   homepage "https://www.php.net/"
   # Should only be updated if the new version is announced on the homepage, https://www.php.net/
-  url "https://www.php.net/distributions/php-8.2.1.tar.xz"
-  mirror "https://fossies.org/linux/www/php-8.2.1.tar.xz"
-  sha256 "650d3bd7a056cabf07f6a0f6f1dd8ba45cd369574bbeaa36de7d1ece212c17af"
+  url "https://www.php.net/distributions/php-8.2.4.tar.xz"
+  mirror "https://fossies.org/linux/www/php-8.2.4.tar.xz"
+  sha256 "bc7bf4ca7ed0dd17647e3ea870b6f062fcb56b243bfdef3f59ff7f94e96176a8"
   license "PHP-3.01"
-  revision 1
 
   livecheck do
     url "https://www.php.net/downloads"
@@ -55,7 +54,7 @@ class Php < Formula
 
   on_macos do
     # PHP build system incorrectly links system libraries
-    # see https://github.com/php/php-src/pull/3472
+    # see https://github.com/php/php-src/issues/10680
     patch :DATA
   end
 
@@ -107,6 +106,10 @@ class Php < Formula
     # sdk path or it won't find the headers
     headers_path = "=#{MacOS.sdk_path_if_needed}/usr" if OS.mac?
 
+    # `_www` only exists on macOS.
+    fpm_user = OS.mac? ? "_www" : "www-data"
+    fpm_group = OS.mac? ? "_www" : "www-data"
+
     args = %W[
       --prefix=#{prefix}
       --localstatedir=#{var}
@@ -140,8 +143,8 @@ class Php < Formula
       --with-external-gd
       --with-external-pcre
       --with-ffi
-      --with-fpm-user=_www
-      --with-fpm-group=_www
+      --with-fpm-user=#{fpm_user}
+      --with-fpm-group=#{fpm_group}
       --with-gettext=#{Formula["gettext"].opt_prefix}
       --with-gmp=#{Formula["gmp"].opt_prefix}
       --with-iconv#{headers_path}
