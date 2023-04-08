@@ -133,7 +133,6 @@ class PythonAT311 < Formula
       --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
       --enable-optimizations
       --with-system-expat
-      --with-system-ffi
       --with-system-libmpdec
       --with-readline=editline
     ]
