@@ -1,13 +1,17 @@
 class LibgpgError < Formula
   desc "Common error values for all GnuPG components"
   homepage "https://www.gnupg.org/related_software/libgpg-error/"
-  url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.46.tar.bz2"
-  sha256 "b7e11a64246bbe5ef37748de43b245abd72cfcd53c9ae5e7fc5ca59f1c81268d"
+  url "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.bz2"
+  sha256 "9e3c670966b96ecc746c28c2c419541e3bcb787d1a73930f5e5f5e1bcbbb9bdb"
   license "LGPL-2.1-or-later"
 
   livecheck do
     url "https://gnupg.org/ftp/gcrypt/libgpg-error/"
     regex(/href=.*?libgpg-error[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
+  on_macos do
+    depends_on "gettext"
   end
 
   def install
