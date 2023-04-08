@@ -1,8 +1,9 @@
 class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.39.1.tar.xz"
-  sha256 "40a38a0847b30c371b35873b3afcf123885dd41ea3ecbbf510efa97f3ce5c161"
+  # Don't forget to update the documentation resources along with the url!
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.40.0.tar.xz"
+  sha256 "b17a598fbf58729ef13b577465eb93b2d484df1201518b708b5044ff623bf46d"
   license "GPL-2.0-only"
   head "https://github.com/git/git.git", branch: "master"
 
@@ -24,13 +25,13 @@ class Git < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.39.1.tar.xz"
-    sha256 "032de9396c907383c8236e094a038191d54822a212390c2ce2fcd749db90dfd0"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.40.0.tar.xz"
+    sha256 "3da9fbe542e7d565b4168ea15872e8e1b13324e4bb5ab65604ca9a333dfe37bb"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.39.1.tar.xz"
-    sha256 "b522a58e963fd5137f660802ec5a93283abfa3eaa0f069ebb6e7f00e529cc775"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.40.0.tar.xz"
+    sha256 "5766aecf137370015e3fd72e355b83c73dc2aa2ee14a42546049346442c3356e"
   end
 
   resource "Net::SMTP::SSL" do
@@ -164,6 +165,9 @@ class Git < Formula
   end
 
   test do
+    assert_equal version, resource("html").version, "`html` resource needs updating!"
+    assert_equal version, resource("man").version, "`man` resource needs updating!"
+
     system bin/"git", "init"
     %w[haunted house].each { |f| touch testpath/f }
     system bin/"git", "add", "haunted", "house"
