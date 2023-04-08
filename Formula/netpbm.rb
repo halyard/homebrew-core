@@ -3,16 +3,16 @@ class Netpbm < Formula
   homepage "https://netpbm.sourceforge.io/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4482"
-  version "10.86.37"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4534"
+  version "10.86.38"
   license "GPL-3.0-or-later"
   version_scheme 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
 
   livecheck do
     url "https://sourceforge.net/p/netpbm/code/HEAD/tree/stable/"
-    strategy :page_match
     regex(/Release v?(\d+(?:\.\d+)+)/i)
+    strategy :page_match
   end
 
   depends_on "jasper"
