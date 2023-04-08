@@ -1,6 +1,6 @@
 cask "bettertouchtool" do
-  version "3.9995,2196"
-  sha256 "45a2f1f7b984f6c2fed320e5cff7ab82660caa63a97e61b3a3176fe0f93af8b4"
+  version "4.070,2285"
+  sha256 "1c552a139a14a5c1ee56eb4c480a7085bb750cf414938e1060d440381bccfa48"
 
   url "https://folivora.ai/releases/btt#{version.csv.first}-#{version.csv.second}.zip"
   name "BetterTouchTool"
@@ -11,7 +11,16 @@ cask "bettertouchtool" do
     url "https://folivora.ai/releases/"
     regex(/btt(\d+(?:[._-]\d+)*)\.zip.*?(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})/i)
     strategy :page_match do |page, regex|
-      page.scan(regex).max_by { |match| Time.parse(match[1]) }&.first&.tr("-", ",")
+      current_version, current_build = version.csv
+      version, build = page.scan(regex).max_by { |match| Time.parse(match[1]) }&.first&.split("-", 2)
+
+      # Throttle updates to every 5th release.
+      if build && current_build.to_i + 5 > build.to_i
+        version = current_version
+        build = current_build
+      end
+
+      "#{version},#{build}"
     end
   end
 
