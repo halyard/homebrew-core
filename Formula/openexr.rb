@@ -2,8 +2,8 @@ class Openexr < Formula
   desc "High dynamic-range image file format"
   homepage "https://www.openexr.com/"
   # NOTE: Please keep these values in sync with imath.rb when updating.
-  url "https://github.com/AcademySoftwareFoundation/openexr/archive/v3.1.5.tar.gz"
-  sha256 "93925805c1fc4f8162b35f0ae109c4a75344e6decae5a240afdfce25f8a433ec"
+  url "https://github.com/AcademySoftwareFoundation/openexr/archive/v3.1.7.tar.gz"
+  sha256 "78dbca39115a1c526e6728588753955ee75fa7f5bb1a6e238bed5b6d66f91fd7"
   license "BSD-3-Clause"
 
   depends_on "cmake" => :build
@@ -19,8 +19,8 @@ class Openexr < Formula
   link_overwrite "lib/libIlmThread.dylib"
   link_overwrite "lib/libIlmThread.so"
 
-  resource "exr" do
-    url "https://github.com/AcademySoftwareFoundation/openexr-images/raw/master/TestImages/AllHalfValues.exr"
+  resource "homebrew-exr" do
+    url "https://github.com/AcademySoftwareFoundation/openexr-images/raw/f17e353fbfcde3406fe02675f4d92aeae422a560/TestImages/AllHalfValues.exr"
     sha256 "eede573a0b59b79f21de15ee9d3b7649d58d8f2a8e7787ea34f192db3b3c84a4"
   end
 
@@ -32,7 +32,7 @@ class Openexr < Formula
   end
 
   test do
-    resource("exr").stage do
+    resource("homebrew-exr").stage do
       system bin/"exrheader", "AllHalfValues.exr"
     end
   end
