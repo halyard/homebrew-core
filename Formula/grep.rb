@@ -1,11 +1,10 @@
 class Grep < Formula
   desc "GNU grep, egrep and fgrep"
   homepage "https://www.gnu.org/software/grep/"
-  url "https://ftp.gnu.org/gnu/grep/grep-3.8.tar.xz"
-  mirror "https://ftpmirror.gnu.org/grep/grep-3.8.tar.xz"
-  sha256 "498d7cc1b4fb081904d87343febb73475cf771e424fb7e6141aff66013abc382"
+  url "https://ftp.gnu.org/gnu/grep/grep-3.10.tar.xz"
+  mirror "https://ftpmirror.gnu.org/grep/grep-3.10.tar.xz"
+  sha256 "24efa5b595fb5a7100879b51b8868a0bb87a71c183d02c4c602633b88af6855b"
   license "GPL-3.0-or-later"
-  revision 1
 
   depends_on "pkg-config" => :build
   depends_on "pcre2"
