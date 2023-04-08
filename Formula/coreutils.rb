@@ -1,9 +1,9 @@
 class Coreutils < Formula
   desc "GNU File, Shell, and Text utilities"
   homepage "https://www.gnu.org/software/coreutils"
-  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.1.tar.xz"
-  sha256 "61a1f410d78ba7e7f37a5a4f50e6d1320aca33375484a3255eddf17a38580423"
+  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.2.tar.xz"
+  sha256 "6885ff47b9cdb211de47d368c17853f406daaf98b148aaecdf10de29cc04b0b3"
   license "GPL-3.0-or-later"
 
   head do
@@ -21,6 +21,10 @@ class Coreutils < Formula
   depends_on "gmp"
   uses_from_macos "gperf" => :build
 
+  on_macos do
+    conflicts_with "uutils-coreutils", because: "coreutils and uutils-coreutils install the same binaries"
+  end
+
   on_linux do
     depends_on "attr"
   end
@@ -32,7 +36,6 @@ class Coreutils < Formula
   conflicts_with "idutils", because: "both install `gid` and `gid.1`"
   conflicts_with "md5sha1sum", because: "both install `md5sum` and `sha1sum` binaries"
   conflicts_with "truncate", because: "both install `truncate` binaries"
-  conflicts_with "uutils-coreutils", because: "coreutils and uutils-coreutils install the same binaries"
 
   # https://github.com/Homebrew/homebrew-core/pull/36494
   def breaks_macos_users
