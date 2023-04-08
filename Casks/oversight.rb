@@ -1,14 +1,14 @@
 cask "oversight" do
-  version "2.1.5"
-  sha256 "795286f8fa94d7c25c7ea4ab8e6004ac824e48f1fc140f82a74030bbb394f680"
+  version "2.1.6"
+  sha256 "a2911647a02d57bcedf6d71297a3ed281a601ad262fa0acec5e847c4ae1e609e"
 
   url "https://github.com/objective-see/OverSight/releases/download/v#{version}/OverSight_#{version}.zip",
-      verified: "github.com/objective-see/OverSight"
+      verified: "github.com/objective-see/OverSight/"
   name "OverSight"
   desc "Monitors computer mic and webcam"
   homepage "https://objective-see.com/products/oversight.html"
 
-  depends_on macos: ">= :catalina"
+  depends_on macos: ">= :monterey"
 
   installer script: {
     executable: "#{staged_path}/OverSight Installer.app/Contents/MacOS/OverSight Installer",
