@@ -26,7 +26,6 @@ class Libxml2 < Formula
 
   depends_on "python@3.10" => [:build, :test]
   depends_on "python@3.11" => [:build, :test]
-  depends_on "python@3.9" => [:build, :test]
   depends_on "pkg-config" => :test
   depends_on "icu4c"
   depends_on "readline"
