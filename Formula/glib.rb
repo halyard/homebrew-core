@@ -3,8 +3,8 @@ class Glib < Formula
 
   desc "Core application library for C"
   homepage "https://developer.gnome.org/glib/"
-  url "https://download.gnome.org/sources/glib/2.74/glib-2.74.5.tar.xz"
-  sha256 "ceba83a5999ceb31a4c4fc9921207cb9ffffd2ab1d6ec03c162d3f608a5c14c8"
+  url "https://download.gnome.org/sources/glib/2.76/glib-2.76.1.tar.xz"
+  sha256 "43dc0f6a126958f5b454136c4398eab420249c16171a769784486e25f2fda19f"
   license "LGPL-2.1-or-later"
 
   depends_on "gettext" => :build
@@ -36,16 +36,18 @@ class Glib < Formula
 
   def install
     inreplace %w[gio/xdgmime/xdgmime.c glib/gutils.c], "@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX
+    # Avoid the sandbox violation when an empty directory is created outside of the formula prefix.
+    inreplace "gio/meson.build", "install_emptydir(glib_giomodulesdir)", ""
 
     # Disable dtrace; see https://trac.macports.org/ticket/30413
     # and https://gitlab.gnome.org/GNOME/glib/-/issues/653
     args = %W[
       --default-library=both
       --localstatedir=#{var}
-      -Diconv=auto
       -Dgio_module_dir=#{HOMEBREW_PREFIX}/lib/gio/modules
       -Dbsymbolic_functions=false
       -Ddtrace=false
+      -Druntime_dir=#{var}/run
     ]
 
     system "meson", "setup", "build", *args, *std_meson_args
