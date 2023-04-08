@@ -1,24 +1,14 @@
 class Openjdk < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.java.net/"
-  url "https://github.com/openjdk/jdk19u/archive/refs/tags/jdk-19.0.1-ga.tar.gz"
-  sha256 "26ebf4d182a0d4bba7a0387a931af576a538745a98ef6eb2c70e22655e846a45"
+  url "https://github.com/openjdk/jdk20u/archive/refs/tags/jdk-20+36.tar.gz"
+  version "20"
+  sha256 "215767be88a18af00440d5241960a3937237e77b938db4485bdb1c9bb414972e"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
 
   livecheck do
     url :stable
     regex(/^jdk[._-]v?(\d+(?:\.\d+)*)-ga$/i)
-  end
-
-  bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_ventura:  "f8f4e322438b1f12f221dfa2456988e9438287585f242fba15e53a9a254dbc48"
-    sha256 cellar: :any, arm64_monterey: "0e6b0f8b09b57242adf280ec452d2695d596d3108eadfad78e793e0c9f65d2a7"
-    sha256 cellar: :any, arm64_big_sur:  "5ded901b7ed751d62f12b1123d6ef3631e681c2f70da490b1bcd8e2420a97d20"
-    sha256 cellar: :any, ventura:        "119cb96b8a9e6ab61a6dbaabb391f4f5f45ce64e41dbbcdd38fc8366452a31a5"
-    sha256 cellar: :any, monterey:       "8380eef4472205fdc0b3968c1241bfc616efaea90aef325198d767a74d2f78ee"
-    sha256 cellar: :any, big_sur:        "7f8144e91c53df5a413d03a7dc72db16fb98116185e2cae3c499715032bbf731"
-    sha256               x86_64_linux:   "f9ea52dd1f656ed210a56095ba42f8e54dfe230ccf7a55e3539ae36f72a130f0"
   end
 
   keg_only :shadowed_by_macos
@@ -56,31 +46,24 @@ class Openjdk < Formula
   resource "boot-jdk" do
     on_macos do
       on_arm do
-        url "https://download.java.net/java/GA/jdk18.0.2.1/db379da656dc47308e138f21b33976fa/1/GPL/openjdk-18.0.2.1_macos-aarch64_bin.tar.gz"
-        sha256 "c05aec589f55517b8bedd01463deeba80f666da3fb193be024490c9d293097a8"
+        url "https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_macos-aarch64_bin.tar.gz"
+        sha256 "915054b18fc17216410cea7aba2321c55b82bd414e1ef3c7e1bafc7beb6856c8"
       end
       on_intel do
-        url "https://download.java.net/java/GA/jdk18.0.2.1/db379da656dc47308e138f21b33976fa/1/GPL/openjdk-18.0.2.1_macos-x64_bin.tar.gz"
-        sha256 "604ba4b3ccb594973a3a73779a367363c53dd91e5a9de743f4fbfae89798f93a"
+        url "https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_macos-x64_bin.tar.gz"
+        sha256 "469af195906979f96c1dc862c2f539a5e280d0daece493a95ebeb91962512161"
       end
     end
     on_linux do
       on_arm do
-        url "https://download.java.net/java/GA/jdk18.0.2.1/db379da656dc47308e138f21b33976fa/1/GPL/openjdk-18.0.2.1_linux-aarch64_bin.tar.gz"
-        sha256 "79900237a5912045f8c9f1065b5204a474803cbbb4d075ab9620650fb75dfc1b"
+        url "https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_linux-aarch64_bin.tar.gz"
+        sha256 "88cadc91d5c7c540ea9df5d23678bb65dc2092fe4e00650b39d87f24f2328e17"
       end
       on_intel do
-        url "https://download.java.net/java/GA/jdk18.0.2.1/db379da656dc47308e138f21b33976fa/1/GPL/openjdk-18.0.2.1_linux-x64_bin.tar.gz"
-        sha256 "3bfdb59fc38884672677cebca9a216902d87fe867563182ae8bc3373a65a2ebd"
+        url "https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_linux-x64_bin.tar.gz"
+        sha256 "7a466882c7adfa369319fe4adeb197ee5d7f79e75d641e9ef94abee1fc22b1fa"
       end
     end
-  end
-
-  # Fix build failure on Monterey with Clang 14+ due to function warning attribute.
-  # Remove if backported to JDK 19.
-  patch do
-    url "https://github.com/openjdk/jdk/commit/0599a05f8c7e26d4acae0b2cc805a65bdd6c6f67.patch?full_index=1"
-    sha256 "6a645cedccb54b4409f4226ba672b50687e18a3f5dfa0485ce1db6f5bc35f3d0"
   end
 
   # Patch to restore build on macOS 13
