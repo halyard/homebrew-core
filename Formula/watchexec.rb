@@ -1,14 +1,14 @@
 class Watchexec < Formula
   desc "Execute commands when watched files change"
   homepage "https://github.com/watchexec/watchexec"
-  url "https://github.com/watchexec/watchexec/archive/cli-v1.20.6.tar.gz"
-  sha256 "fa490944bbc8eafdc585454d27ec6f75988ce7d159db8ee1244b1fc5bbd86935"
+  url "https://github.com/watchexec/watchexec/archive/refs/tags/v1.22.2.tar.gz"
+  sha256 "af12016b1ee1f64feb1514872279326f72b1061c85f3add32997f89a1816dd74"
   license "Apache-2.0"
   head "https://github.com/watchexec/watchexec.git", branch: "main"
 
   livecheck do
     url :stable
-    regex(/^cli[._-]v?(\d+(?:\.\d+)+)$/i)
+    regex(/^(?:cli[._-])?v?(\d+(?:\.\d+)+)$/i)
   end
 
   depends_on "rust" => :build
