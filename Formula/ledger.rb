@@ -1,10 +1,9 @@
 class Ledger < Formula
   desc "Command-line, double-entry accounting tool"
   homepage "https://ledger-cli.org/"
-  url "https://github.com/ledger/ledger/archive/v3.2.1.tar.gz"
-  sha256 "92bf09bc385b171987f456fe3ee9fa998ed5e40b97b3acdd562b663aa364384a"
+  url "https://github.com/ledger/ledger/archive/v3.3.2.tar.gz"
+  sha256 "555296ee1e870ff04e2356676977dcf55ebab5ad79126667bc56464cb1142035"
   license "BSD-3-Clause"
-  revision 10
   head "https://github.com/ledger/ledger.git", branch: "master"
 
   livecheck do
@@ -13,11 +12,12 @@ class Ledger < Formula
   end
 
   depends_on "cmake" => :build
+  depends_on "texinfo" => :build # for makeinfo
   depends_on "boost"
   depends_on "gmp"
+  depends_on "gpgme"
   depends_on "mpfr"
-  depends_on "python@3.10"
-  depends_on "texinfo"
+  depends_on "python@3.11"
 
   uses_from_macos "libedit"
 
@@ -25,17 +25,9 @@ class Ledger < Formula
     depends_on "groff" => :build
   end
 
-  # Compatibility with Boost 1.76
-  # https://github.com/ledger/ledger/issues/2030
-  # https://github.com/ledger/ledger/pull/2036
-  patch do
-    url "https://github.com/ledger/ledger/commit/e60717ccd78077fe4635315cb2657d1a7f539fca.patch?full_index=1"
-    sha256 "edba1dd7bde707f510450db3197922a77102d5361ed7a5283eb546fbf2221495"
-  end
-
   def install
     ENV.cxx11
-    ENV.prepend_path "PATH", Formula["python@3.10"].opt_libexec/"bin"
+    ENV.prepend_path "PATH", Formula["python@3.11"].opt_libexec/"bin"
 
     args = %W[
       --jobs=#{ENV.make_jobs}
@@ -47,6 +39,7 @@ class Ledger < Formula
       -DBUILD_WEB_DOCS=1
       -DBoost_NO_BOOST_CMAKE=ON
       -DPython_FIND_VERSION_MAJOR=3
+      -DUSE_GPGME=1
     ] + std_cmake_args
     system "./acprep", "opt", "make", *args
     system "./acprep", "opt", "make", "doc", *args
