@@ -1,15 +1,13 @@
 class Apr < Formula
   desc "Apache Portable Runtime library"
   homepage "https://apr.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=apr/apr-1.7.0.tar.bz2"
-  mirror "https://archive.apache.org/dist/apr/apr-1.7.0.tar.bz2"
-  sha256 "e2e148f0b2e99b8e5c6caa09f6d4fb4dd3e83f744aa72a952f94f5a14436f7ea"
+  # TODO: Remove `libexec` symlinks in `install` when we no longer have a Big Sur bottle.
+  url "https://www.apache.org/dyn/closer.lua?path=apr/apr-1.7.3.tar.bz2"
+  mirror "https://archive.apache.org/dist/apr/apr-1.7.3.tar.bz2"
+  sha256 "455e218c060c474f2c834816873f6ed69c0cf0e4cfee54282cc93e8e989ee59e"
   license "Apache-2.0"
-  revision 3
 
   keg_only :provided_by_macos, "Apple's CLT provides apr"
-
-  depends_on "autoconf" => :build
 
   uses_from_macos "libxcrypt"
 
@@ -17,37 +15,22 @@ class Apr < Formula
     depends_on "util-linux"
   end
 
-  # Apply r1871981 which fixes a compile error on macOS 11.0.
-  # Remove with the next release, along with the autoconf call & dependency.
-  patch :p0 do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/7e2246542543bbd3111a4ec29f801e6e4d538f88/apr/r1871981-macos11.patch"
-    sha256 "8754b8089d0eb53a7c4fd435c9a9300560b675a8ff2c32315a5e9303408447fe"
-  end
-
-  # Apply r1882980+1882981 to fix implicit exit() declaration
-  # Remove with the next release, along with the autoconf call & dependency.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/fa29e2e398c638ece1a72e7a4764de108bd09617/apr/r1882980%2B1882981-configure.patch"
-    sha256 "24189d95ab1e9523d481694859b277c60ca29bfec1300508011794a78dfed127"
-  end
-
   # Fix -flat_namespace being used on Big Sur and later.
-  # We patch `libtool.m4` directly because we call `autoconf`.
-  patch :DATA
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     # https://bz.apache.org/bugzilla/show_bug.cgi?id=57359
     # The internal libtool throws an enormous strop if we don't do...
     ENV.deparallelize
 
-    # Needed to apply the patch.
-    system "autoconf"
-
     system "./configure", *std_configure_args
     system "make", "install"
 
     # Install symlinks so that linkage doesn't break for reverse dependencies.
-    # Remove at version/revision bump from version 1.7.0 revision 2.
+    # Remove when we no longer have a Big Sur bottle.
     (libexec/"lib").install_symlink lib.glob(shared_library("*"))
 
     rm lib.glob("*.{la,exp}")
@@ -73,30 +56,3 @@ class Apr < Formula
     assert_equal version.to_s, shell_output("./test")
   end
 end
-
-__END__
-diff --git a/build/libtool.m4 b/build/libtool.m4
-index e86a682..c1c342f 100644
---- a/build/libtool.m4
-+++ b/build/libtool.m4
-@@ -1067,16 +1067,11 @@ _LT_EOF
-       _lt_dar_allow_undefined='$wl-undefined ${wl}suppress' ;;
-     darwin1.*)
-       _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
--    darwin*) # darwin 5.x on
--      # if running on 10.5 or later, the deployment target defaults
--      # to the OS version, if on x86, and 10.4, the deployment
--      # target defaults to 10.4. Don't you love it?
--      case ${MACOSX_DEPLOYMENT_TARGET-10.0},$host in
--	10.0,*86*-darwin8*|10.0,*-darwin[[91]]*)
--	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
--	10.[[012]][[,.]]*)
-+    darwin*)
-+      case ${MACOSX_DEPLOYMENT_TARGET},$host in
-+	10.[[012]],*|,*powerpc*)
- 	  _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
--	10.*)
-+	*)
- 	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
-       esac
-     ;;
