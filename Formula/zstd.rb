@@ -1,12 +1,17 @@
 class Zstd < Formula
   desc "Zstandard is a real-time compression algorithm"
   homepage "https://facebook.github.io/zstd/"
-  url "https://github.com/facebook/zstd/archive/v1.5.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/zstd-1.5.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/zstd-1.5.2.tar.gz"
-  sha256 "f7de13462f7a82c29ab865820149e778cbfe01087b3a55b5332707abf9db4a6e"
+  url "https://github.com/facebook/zstd/archive/v1.5.5.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/zstd-1.5.5.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/zstd-1.5.5.tar.gz"
+  sha256 "98e9c3d949d1b924e28e01eccb7deed865eefebf25c2f21c702e5cd5b63b85e1"
   license "BSD-3-Clause"
   head "https://github.com/facebook/zstd.git", branch: "dev"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   depends_on "cmake" => :build
   depends_on "lz4"
@@ -25,6 +30,7 @@ class Zstd < Formula
                     "-DZSTD_ZLIB_SUPPORT=ON",
                     "-DZSTD_LZMA_SUPPORT=ON",
                     "-DZSTD_LZ4_SUPPORT=ON",
+                    "-DCMAKE_CXX_STANDARD=11",
                     *std_cmake_args
     system "cmake", "--build", "builddir"
     system "cmake", "--install", "builddir"
