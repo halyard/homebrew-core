@@ -3,8 +3,8 @@ class GobjectIntrospection < Formula
 
   desc "Generate introspection data for GObject libraries"
   homepage "https://gi.readthedocs.io/en/latest/"
-  url "https://download.gnome.org/sources/gobject-introspection/1.74/gobject-introspection-1.74.0.tar.xz"
-  sha256 "347b3a719e68ba4c69ff2d57ee2689233ea8c07fc492205e573386779e42d653"
+  url "https://download.gnome.org/sources/gobject-introspection/1.76/gobject-introspection-1.76.1.tar.xz"
+  sha256 "196178bf64345501dcdc4d8469b36aa6fe80489354efe71cb7cb8ab82a3738bf"
   license all_of: ["GPL-2.0-or-later", "LGPL-2.0-or-later", "MIT"]
 
   depends_on "bison" => :build
@@ -19,7 +19,7 @@ class GobjectIntrospection < Formula
   uses_from_macos "flex" => :build
   uses_from_macos "libffi", since: :catalina
 
-  resource "tutorial" do
+  resource "homebrew-tutorial" do
     url "https://gist.github.com/7a0023656ccfe309337a.git",
         revision: "499ac89f8a9ad17d250e907f74912159ea216416"
   end
@@ -55,7 +55,7 @@ class GobjectIntrospection < Formula
   end
 
   test do
-    resource("tutorial").stage testpath
+    resource("homebrew-tutorial").stage testpath
     system "make"
     assert_predicate testpath/"Tut-0.1.typelib", :exist?
   end
