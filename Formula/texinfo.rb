@@ -1,9 +1,9 @@
 class Texinfo < Formula
   desc "Official documentation format of the GNU project"
   homepage "https://www.gnu.org/software/texinfo/"
-  url "https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.2.tar.xz"
-  mirror "https://ftpmirror.gnu.org/texinfo/texinfo-7.0.2.tar.xz"
-  sha256 "f211ec3261383e1a89e4555a93b9d017fe807b9c3992fb2dff4871dae6da54ad"
+  url "https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
+  mirror "https://ftpmirror.gnu.org/texinfo/texinfo-7.0.3.tar.xz"
+  sha256 "74b420d09d7f528e84f97aa330f0dd69a98a6053e7a4e01767eed115038807bf"
   license "GPL-3.0-or-later"
 
   uses_from_macos "ncurses"
@@ -24,6 +24,14 @@ class Texinfo < Formula
                           "--prefix=#{prefix}"
     system "make", "install"
     doc.install Dir["doc/refcard/txirefcard*"]
+  end
+
+  def post_install
+    info_dir = HOMEBREW_PREFIX/"share/info/dir"
+    info_dir.delete if info_dir.exist?
+    info_dir.dirname.glob("*.info") do |f|
+      quiet_system("#{bin}/install-info", "--quiet", f, info_dir)
+    end
   end
 
   test do
