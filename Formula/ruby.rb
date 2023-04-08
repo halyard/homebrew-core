@@ -4,15 +4,15 @@ class Ruby < Formula
   license "Ruby"
 
   stable do
-    url "https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.0.tar.gz"
-    sha256 "daaa78e1360b2783f98deeceb677ad900f3a36c0ffa6e2b6b19090be77abc272"
+    url "https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.gz"
+    sha256 "96c57558871a6748de5bc9f274e93f4b5aad06cd8f37befa0e8d94e7b8a423bc"
 
     # Should be updated only when Ruby is updated (if an update is available).
     # The exception is Rubygem security fixes, which mandate updating this
     # formula & the versioned equivalents and bumping the revisions.
     resource "rubygems" do
-      url "https://rubygems.org/rubygems/rubygems-3.4.2.tgz"
-      sha256 "619a61177dfbe219dd159f7790058b1829bcabcfc433727154600e337b31d01a"
+      url "https://rubygems.org/rubygems/rubygems-3.4.10.tgz"
+      sha256 "55f1c67fa2ae96c9751b81afad5c0f2b3792c5b19cbba6d54d8df9fd821460d3"
     end
   end
 
