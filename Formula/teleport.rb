@@ -1,8 +1,8 @@
 class Teleport < Formula
   desc "Modern SSH server for teams managing distributed infrastructure"
   homepage "https://gravitational.com/teleport"
-  url "https://github.com/gravitational/teleport/archive/v11.2.3.tar.gz"
-  sha256 "27e540b558c96bbf5352d6f682cde921d9fe6d68cd54d5f0f72fa6d46259e99c"
+  url "https://github.com/gravitational/teleport/archive/v12.2.1.tar.gz"
+  sha256 "ba53679c08ce3d63bcf3ffe384a862ea6774996d36b6bf3fbe88257ce4555765"
   license "Apache-2.0"
   head "https://github.com/gravitational/teleport.git", branch: "master"
 
@@ -17,7 +17,9 @@ class Teleport < Formula
 
   depends_on "go" => :build
   depends_on "pkg-config" => :build
+  depends_on "yarn" => :build
   depends_on "libfido2"
+  depends_on "node"
 
   uses_from_macos "curl" => :test
   uses_from_macos "netcat" => :test
@@ -25,21 +27,12 @@ class Teleport < Formula
 
   conflicts_with "etsh", because: "both install `tsh` binaries"
 
-  # Keep this in sync with https://github.com/gravitational/teleport/tree/v#{version}
-  resource "webassets" do
-    url "https://github.com/gravitational/webassets/archive/cbddcfda9d5ccba11f02ee61bd305c1f600ee6b0.tar.gz"
-    sha256 "7ce987ffb160fe9bf27f1021613216273a531849a42a773947b947e772d3ec45"
-  end
-
   def install
-    (buildpath/"webassets").install resource("webassets")
     ENV.deparallelize { system "make", "full", "FIDO2=dynamic" }
     bin.install Dir["build/*"]
   end
 
   test do
-    curl_output = shell_output("curl \"https://api.github.com/repos/gravitational/teleport/contents/webassets?ref=v#{version}\"")
-    assert_match JSON.parse(curl_output)["sha"], resource("webassets").url
     assert_match version.to_s, shell_output("#{bin}/teleport version")
     assert_match version.to_s, shell_output("#{bin}/tsh version")
     assert_match version.to_s, shell_output("#{bin}/tctl version")
