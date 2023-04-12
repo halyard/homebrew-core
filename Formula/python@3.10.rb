@@ -115,7 +115,6 @@ class PythonAT310 < Formula
       --with-dbmliborder=gdbm:ndbm
       --enable-optimizations
       --with-system-expat
-      --with-system-ffi
       --with-system-libmpdec
     ]
 
