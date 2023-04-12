@@ -15,6 +15,16 @@ class Netpbm < Formula
     strategy :page_match
   end
 
+  bottle do
+    sha256 arm64_ventura:  "054cfb909cb0fea808266665ac223c9a9ed36ee9251fc229861da599b9b7c120"
+    sha256 arm64_monterey: "21929c81ac82a2252c12542a365a2e768295d9bd70c04f0aa4cd6b01ba10a1db"
+    sha256 arm64_big_sur:  "0a632031ca0508e0948e4ce5cb0109ffab3b87d4c29cfefd603b0f3120d170ed"
+    sha256 ventura:        "da752b8a5e482ca4c7d3dde2e4849dfb9e949796c86fa9c57e92b4221ff8b432"
+    sha256 monterey:       "17f70522e011337410440abf0b9cfcb762567b6311a45fa17fc4209c18e7ad32"
+    sha256 big_sur:        "18f29aec18785031a0260641e6a81178c4bb79d50cfb02e97121ad3ea6f7cac2"
+    sha256 x86_64_linux:   "b9a1d7243bc1980ec25896704aafd44372f2bc920394d2588ef0d440879f7c3f"
+  end
+
   depends_on "jasper"
   depends_on "jpeg-turbo"
   depends_on "libpng"
