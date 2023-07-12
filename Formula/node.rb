@@ -1,8 +1,8 @@
 class Node < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v19.8.1/node-v19.8.1.tar.xz"
-  sha256 "2411e58e1d4644c4d4a82bcf3061b95e672c9f214de017d42f032cfae07461cb"
+  url "https://nodejs.org/dist/v20.4.0/node-v20.4.0.tar.xz"
+  sha256 "09bd0b73c526b63c029d5ddfd885d10962e7ad87c975b94583c1f8ce90ee5348"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
 
@@ -18,7 +18,7 @@ class Node < Formula
   depends_on "icu4c"
   depends_on "libnghttp2"
   depends_on "libuv"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   uses_from_macos "python", since: :catalina
   uses_from_macos "zlib"
@@ -39,8 +39,8 @@ class Node < Formula
   # We track major/minor from upstream Node releases.
   # We will accept *important* npm patch releases when necessary.
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-9.5.1.tgz"
-    sha256 "f5f0cbf0d054e604bf9497b94f095f892702e9259361a6577b0a0fd49755cfbf"
+    url "https://registry.npmjs.org/npm/-/npm-9.7.2.tgz"
+    sha256 "d34dcbd0e4f2de422cb3402bdfdd89ff69b6d906dcd848b5de002eaff88ac7ca"
   end
 
   def install
@@ -66,8 +66,8 @@ class Node < Formula
       --shared-libuv-libpath=#{Formula["libuv"].lib}
       --shared-nghttp2-includes=#{Formula["libnghttp2"].include}
       --shared-nghttp2-libpath=#{Formula["libnghttp2"].lib}
-      --shared-openssl-includes=#{Formula["openssl@1.1"].include}
-      --shared-openssl-libpath=#{Formula["openssl@1.1"].lib}
+      --shared-openssl-includes=#{Formula["openssl@3"].include}
+      --shared-openssl-libpath=#{Formula["openssl@3"].lib}
       --shared-brotli-includes=#{Formula["brotli"].include}
       --shared-brotli-libpath=#{Formula["brotli"].lib}
       --shared-cares-includes=#{Formula["c-ares"].include}
