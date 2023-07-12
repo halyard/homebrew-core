@@ -6,7 +6,7 @@ class Swig < Formula
   license "GPL-3.0-or-later"
 
   head do
-    url "https://github.com/swig/swig.git"
+    url "https://github.com/swig/swig.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
