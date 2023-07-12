@@ -6,6 +6,7 @@ class Openssh < Formula
   version "9.3p1"
   sha256 "e9baba7701a76a51f3d85a62c383a3c9dcd97fa900b859bc7db114c1868af8a8"
   license "SSH-OpenSSH"
+  revision 2
 
   livecheck do
     url "https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/"
@@ -18,7 +19,7 @@ class Openssh < Formula
   depends_on "pkg-config" => :build
   depends_on "ldns"
   depends_on "libfido2"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   uses_from_macos "lsof" => :test
   uses_from_macos "krb5"
@@ -57,6 +58,13 @@ class Openssh < Formula
       # Ensure sandbox profile prefix is correct.
       # We introduce this issue with patching, it's not an upstream bug.
       inreplace "sandbox-darwin.c", "@PREFIX@/share/openssh", etc/"ssh"
+
+      # FIXME: `ssh-keygen` errors out when this is built with optimisation.
+      # Reported upstream at https://bugzilla.mindrot.org/show_bug.cgi?id=3584
+      # Also can segfault at runtime: https://github.com/Homebrew/homebrew-core/issues/135200
+      if Hardware::CPU.intel? && DevelopmentTools.clang_build_version == 1403
+        inreplace "configure", "-fzero-call-used-regs=all", "-fzero-call-used-regs=used"
+      end
     end
 
     args = *std_configure_args + %W[
@@ -65,7 +73,7 @@ class Openssh < Formula
       --with-libedit
       --with-kerberos5
       --with-pam
-      --with-ssl-dir=#{Formula["openssl@1.1"].opt_prefix}
+      --with-ssl-dir=#{Formula["openssl@3"].opt_prefix}
       --with-security-key-builtin
     ]
 
