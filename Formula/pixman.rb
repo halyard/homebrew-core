@@ -12,12 +12,15 @@ class Pixman < Formula
 
   depends_on "pkg-config" => :build
 
+  # Fix NEON intrinsic support build issue
+  # upstream PR ref, https://gitlab.freedesktop.org/pixman/pixman/-/merge_requests/71
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/46c7779/pixman/pixman-0.42.2.patch"
+    sha256 "391b56552ead4b3c6e75c0a482a6ab6a634ca250c00fb67b11899d16575f0686"
+  end
+
   def install
     args = ["--disable-gtk", "--disable-silent-rules"]
-    # Disable NEON intrinsic support on macOS
-    # Issue ref: https://gitlab.freedesktop.org/pixman/pixman/-/issues/59
-    # Issue ref: https://gitlab.freedesktop.org/pixman/pixman/-/issues/69
-    args << "--disable-arm-a64-neon" if OS.mac?
 
     system "./configure", *std_configure_args, *args
     system "make", "install"
