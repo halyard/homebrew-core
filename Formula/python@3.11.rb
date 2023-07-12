@@ -1,8 +1,8 @@
 class PythonAT311 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.11.2/Python-3.11.2.tgz"
-  sha256 "2411c74bda5bbcfcddaf4531f66d1adc73f247f529aee981b029513aefdbf849"
+  url "https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz"
+  sha256 "85c37a265e5c9dd9f75b35f954e31fbfc10383162417285e30ad25cc073a0d63"
   license "Python-2.0"
   revision 1
 
@@ -11,9 +11,13 @@ class PythonAT311 < Formula
     regex(%r{href=.*?v?(3\.11(?:\.\d+)*)/?["' >]}i)
   end
 
+  # setuptools remembers the build flags python is built with and uses them to
+  # build packages later. Xcode-only systems need different flags.
+  pour_bottle? only_if: :clt_installed
+
   depends_on "pkg-config" => :build
   depends_on "mpdecimal"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "sqlite"
   depends_on "xz"
 
@@ -53,19 +57,24 @@ class PythonAT311 < Formula
   link_overwrite "Frameworks/Python.framework/Versions/Current"
 
   # Always update to latest release
+  resource "flit-core" do
+    url "https://files.pythonhosted.org/packages/10/e5/be08751d07b30889af130cec20955c987a74380a10058e6e8856e4010afc/flit_core-3.8.0.tar.gz"
+    sha256 "b305b30c99526df5e63d6022dd2310a0a941a187bd3884f4c8ef0418df6c39f3"
+  end
+
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/b6/21/cb9a8d0b2c8597c83fce8e9c02884bce3d4951e41e807fc35791c6b23d9a/setuptools-65.6.3.tar.gz"
-    sha256 "a7620757bf984b58deaf32fc8a4577a9bbc0850cf92c20e1ce41c38c19e5fb75"
+    url "https://files.pythonhosted.org/packages/cb/46/22ec35f286a77e6b94adf81b4f0d59f402ed981d4251df0ba7b992299146/setuptools-67.6.1.tar.gz"
+    sha256 "257de92a9d50a60b8e22abfcbb771571fde0dbf3ec234463212027a4eeecbe9a"
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/a3/50/c4d2727b99052780aad92c7297465af5fe6eec2dbae490aa9763273ffdc1/pip-22.3.1.tar.gz"
-    sha256 "65fd48317359f3af8e593943e6ae1506b66325085ea64b706a998c6e83eeaf38"
+    url "https://files.pythonhosted.org/packages/6b/8b/0b16094553ecc680e43ded8f920c3873b01b1da79a54274c98f08cb29fca/pip-23.0.1.tar.gz"
+    sha256 "cd015ea1bfb0fcef59d8a286c1f8bebcb983f6317719d415dc5351efb7cd7024"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/a2/b8/6a06ff0f13a00fc3c3e7d222a995526cbca26c1ad107691b6b1badbbabf1/wheel-0.38.4.tar.gz"
-    sha256 "965f5259b566725405b05e7cf774052044b1ed30119b5d586b2703aafe8719ac"
+    url "https://files.pythonhosted.org/packages/fc/ef/0335f7217dd1e8096a9e8383e1d472aa14717878ffe07c4772e68b6e8735/wheel-0.40.0.tar.gz"
+    sha256 "cd1196f3faee2b31968d626e1731c94f99cbdb67cf5a46e4f5656cbee7738873"
   end
 
   # Modify default sysconfig to match the brew install layout.
@@ -130,7 +139,7 @@ class PythonAT311 < Formula
       --datadir=#{share}
       --without-ensurepip
       --enable-loadable-sqlite-extensions
-      --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
+      --with-openssl=#{Formula["openssl@3"].opt_prefix}
       --enable-optimizations
       --with-system-expat
       --with-system-libmpdec
@@ -196,7 +205,7 @@ class PythonAT311 < Formula
     # `brew install enchant && pip install pyenchant`
     inreplace "./Lib/ctypes/macholib/dyld.py" do |f|
       f.gsub! "DEFAULT_LIBRARY_FALLBACK = [",
-              "DEFAULT_LIBRARY_FALLBACK = [ '#{HOMEBREW_PREFIX}/lib', '#{Formula["openssl@1.1"].opt_lib}',"
+              "DEFAULT_LIBRARY_FALLBACK = [ '#{HOMEBREW_PREFIX}/lib', '#{Formula["openssl@3"].opt_lib}',"
       f.gsub! "DEFAULT_FRAMEWORK_FALLBACK = [", "DEFAULT_FRAMEWORK_FALLBACK = [ '#{HOMEBREW_PREFIX}/Frameworks',"
     end
 
@@ -275,6 +284,9 @@ class PythonAT311 < Formula
     ]
     whl_build = buildpath/"whl_build"
     system python3, "-m", "venv", whl_build
+    resource("flit-core").stage do
+      system whl_build/"bin/pip3", "install", *common_pip_args, "."
+    end
     resource("wheel").stage do
       system whl_build/"bin/pip3", "install", *common_pip_args, "."
       system whl_build/"bin/pip3", "wheel", *common_pip_args,
@@ -337,7 +349,7 @@ class PythonAT311 < Formula
     rm_rf Dir["#{site_packages}/pip[-_.][0-9]*", "#{site_packages}/pip"]
     rm_rf Dir["#{site_packages}/wheel[-_.][0-9]*", "#{site_packages}/wheel"]
 
-    system python3, "-m", "ensurepip"
+    system python3, "-Im", "ensurepip"
 
     # Install desired versions of setuptools, pip, wheel using the version of
     # pip bootstrapped by ensurepip.
@@ -345,7 +357,7 @@ class PythonAT311 < Formula
     # ensurepip actually used them, since other existing installations could
     # have been picked up (and we can't pass --ignore-installed).
     bundled = lib_cellar/"ensurepip/_bundled"
-    system python3, "-m", "pip", "install", "-v",
+    system python3, "-Im", "pip", "install", "-v",
            "--no-deps",
            "--no-index",
            "--upgrade",
@@ -424,7 +436,7 @@ class PythonAT311 < Formula
           if os.path.realpath(sys.base_exec_prefix).startswith('#{rack}'):
               new_exec_prefix = cellar_prefix.sub('#{opt_prefix}/', sys.base_exec_prefix)
               if sys.exec_prefix == sys.base_exec_prefix:
-                  site.PREFIXES[:] = [new_prefix if x == sys.exec_prefix else x for x in site.PREFIXES]
+                  site.PREFIXES[:] = [new_exec_prefix if x == sys.exec_prefix else x for x in site.PREFIXES]
                   sys.exec_prefix = new_exec_prefix
               sys.base_exec_prefix = new_exec_prefix
       # Check for and add the prefix of split Python formulae.
