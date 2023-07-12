@@ -3,31 +3,27 @@ class Awscli < Formula
 
   desc "Official Amazon AWS command-line interface"
   homepage "https://aws.amazon.com/cli/"
-  url "https://github.com/aws/aws-cli/archive/2.11.11.tar.gz"
-  sha256 "9ff209f28419e6bf2533ea117e457e9b7a09fbcc3b7449d8ca161d484e08e9dd"
+  url "https://github.com/aws/aws-cli/archive/2.13.0.tar.gz"
+  sha256 "85a7efe8786db2c459aba6b58e4dc49506f6a0982262be7726c277b64e66ba74"
   license "Apache-2.0"
   head "https://github.com/aws/aws-cli.git", branch: "v2"
 
-  # `pkg-config`, `rust`, and `openssl@1.1` are for cryptography.
+  # `pkg-config`, `rust`, and `openssl@3` are for cryptography.
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
   depends_on "cffi"
   depends_on "docutils"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "pycparser"
   depends_on "python@3.11"
   depends_on "six"
 
   uses_from_macos "mandoc"
 
-  # Python resources should be updated based on setup.cfg. One possible way is:
-  # 1. Run `pipgrip 'awscli @ #{url}' --sort`
-  # 2. Ignore `docutils` and `six`. Update all other PyPI packages
-
   resource "awscrt" do
-    url "https://files.pythonhosted.org/packages/d1/0f/b70b4ee10b4eff4c6db54cd7b9240c4fd47430b1abab3feea935f00463a3/awscrt-0.16.13.tar.gz"
-    sha256 "b7ec07435e178400369024450d118834a1c8b01ccfebe8140b82102fb161720d"
+    url "https://files.pythonhosted.org/packages/24/73/d656729a61eceabbbf4fcee3b51bf298c5edbb0a5578542121150e957ee0/awscrt-0.16.16.tar.gz"
+    sha256 "13075df2c1d7942fe22327b6483274517ee0f6ae765c4e6b6ae9ef5b4c43a827"
   end
 
   resource "colorama" do
@@ -71,8 +67,8 @@ class Awscli < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/21/79/6372d8c0d0641b4072889f3ff84f279b738cd8595b64c8e0496d4e848122/urllib3-1.26.15.tar.gz"
-    sha256 "8a388717b9476f934a21484e8c8e61875ab60644d29b9b39e11e4b9dc1c6b305"
+    url "https://files.pythonhosted.org/packages/e2/7d/539e6f0cf9f0b95b71dd701a56dae89f768cd39fd8ce0096af3546aeb5a3/urllib3-1.26.16.tar.gz"
+    sha256 "8f135f6502756bde6b2a9b28989df5fbe87c9970cecaa69041edcce7f0589b14"
   end
 
   resource "wcwidth" do
@@ -86,7 +82,7 @@ class Awscli < Formula
 
   def install
     # Ensure that the `openssl` crate picks up the intended library.
-    ENV["OPENSSL_DIR"] = Formula["openssl@1.1"].opt_prefix
+    ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
     ENV["OPENSSL_NO_VENDOR"] = "1"
 
     # Temporary workaround for Xcode 14's ld causing build failure (without logging a reason):
