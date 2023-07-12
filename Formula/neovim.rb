@@ -2,11 +2,22 @@ class Neovim < Formula
   desc "Ambitious Vim-fork focused on extensibility and agility"
   homepage "https://neovim.io/"
   license "Apache-2.0"
-  head "https://github.com/neovim/neovim.git", branch: "master"
 
   stable do
-    url "https://github.com/neovim/neovim/archive/v0.9.0.tar.gz"
-    sha256 "39d79107c54d2f3babcad2cd157c399241c04f6e75e98c18e8afaf2bb5e82937"
+    url "https://github.com/neovim/neovim/archive/v0.9.1.tar.gz"
+    sha256 "8db17c2a1f4776dcda00e59489ea0d98ba82f7d1a8ea03281d640e58d8a3a00e"
+
+    # Remove when `mpack` resource is removed.
+    depends_on "luarocks" => :build
+
+    # Remove in 0.10.
+    resource "mpack" do
+      url "https://github.com/libmpack/libmpack-lua/releases/download/1.0.10/libmpack-lua-1.0.10.tar.gz"
+      sha256 "18e202473c9a255f1d2261b019874522a4f1c6b6f989f80da93d7335933e8119"
+    end
+
+    # Keep resources updated according to:
+    # https://github.com/neovim/neovim/blob/v#{version}/cmake.deps/CMakeLists.txt
 
     # TODO: Consider shipping these as separate formulae instead. See discussion at
     #       https://github.com/orgs/Homebrew/discussions/3611
@@ -16,8 +27,8 @@ class Neovim < Formula
     end
 
     resource "tree-sitter-lua" do
-      url "https://github.com/MunifTanjim/tree-sitter-lua/archive/v0.0.14.tar.gz"
-      sha256 "930d0370dc15b66389869355c8e14305b9ba7aafd36edbfdb468c8023395016d"
+      url "https://github.com/MunifTanjim/tree-sitter-lua/archive/v0.0.17.tar.gz"
+      sha256 "8963fd0a185d786c164dfca3824941c7eaec497ce49a3a0bc24bf753f5e0e59c"
     end
 
     resource "tree-sitter-vim" do
@@ -41,8 +52,15 @@ class Neovim < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  # TODO: Replace with single-line `head` when `lpeg`
+  #       is no longer a head-only dependency in 0.10.0.
+  head do
+    url "https://github.com/neovim/neovim.git", branch: "master"
+    depends_on "lpeg"
+  end
+
   depends_on "cmake" => :build
-  depends_on "luarocks" => :build
+  depends_on "lpeg" => :build # needed at runtime in 0.10.0
   depends_on "pkg-config" => :build
   depends_on "gettext"
   depends_on "libtermkey"
@@ -60,48 +78,32 @@ class Neovim < Formula
     depends_on "libnsl"
   end
 
-  # Keep resources updated according to:
-  # https://github.com/neovim/neovim/blob/v#{version}/third-party/CMakeLists.txt
-
-  resource "mpack" do
-    url "https://github.com/libmpack/libmpack-lua/releases/download/1.0.10/libmpack-lua-1.0.10.tar.gz"
-    sha256 "18e202473c9a255f1d2261b019874522a4f1c6b6f989f80da93d7335933e8119"
-  end
-
-  resource "lpeg" do
-    url "https://luarocks.org/manifests/gvvaughan/lpeg-1.0.2-1.src.rock"
-    sha256 "e0d0d687897f06588558168eeb1902ac41a11edd1b58f1aa61b99d0ea0abbfbc"
-  end
-
   def install
     resources.each do |r|
       r.stage(buildpath/"deps-build/build/src"/r.name)
     end
 
-    # The path separator for `LUA_PATH` and `LUA_CPATH` is `;`.
-    ENV.prepend "LUA_PATH", buildpath/"deps-build/share/lua/5.1/?.lua", ";"
-    ENV.prepend "LUA_CPATH", buildpath/"deps-build/lib/lua/5.1/?.so", ";"
-    # Don't clobber the default search path
-    ENV.append "LUA_PATH", ";", ";"
-    ENV.append "LUA_CPATH", ";", ";"
-    lua_path = "--lua-dir=#{Formula["luajit"].opt_prefix}"
+    if build.stable?
+      cd "deps-build/build/src" do
+        # TODO: Remove `mpack` build block in 0.10.0.
+        cd "mpack" do
+          luajit = Formula["luajit"]
+          lua_path = "--lua-dir=#{luajit.opt_prefix}"
+          deps_build = buildpath/"deps-build"
 
-    cd "deps-build/build/src" do
-      %w[
-        mpack/mpack-1.0.10-0.rockspec
-        lpeg/lpeg-1.0.2-1.src.rock
-      ].each do |rock|
-        dir, rock = rock.split("/")
-        cd dir do
-          output = Utils.safe_popen_read("luarocks", "unpack", lua_path, rock, "--tree=#{buildpath}/deps-build")
+          # The path separator for `LUA_PATH` and `LUA_CPATH` is `;`.
+          ENV.prepend "LUA_PATH", deps_build/"share/lua/5.1/?.lua", ";"
+          ENV.prepend "LUA_CPATH", deps_build/"lib/lua/5.1/?.so", ";"
+
+          rock = "mpack-1.0.10-0.rockspec"
+          output = Utils.safe_popen_read("luarocks", "unpack", lua_path, rock, "--tree=#{deps_build}")
           unpack_dir = output.split("\n")[-2]
+
           cd unpack_dir do
-            system "luarocks", "make", lua_path, "--tree=#{buildpath}/deps-build"
+            system "luarocks", "make", lua_path, "--tree=#{deps_build}"
           end
         end
-      end
 
-      if build.stable?
         Dir["tree-sitter-*"].each do |ts_dir|
           cd ts_dir do
             cp buildpath/"cmake.deps/cmake/TreesitterParserCMakeLists.txt", "CMakeLists.txt"
@@ -109,8 +111,7 @@ class Neovim < Formula
             parser_name = ts_dir[/^tree-sitter-(\w+)$/, 1]
             system "cmake", "-S", ".", "-B", "build", "-DPARSERLANG=#{parser_name}", *std_cmake_args
             system "cmake", "--build", "build"
-
-            (lib/"nvim/parser").install "build/#{parser_name}.so"
+            system "cmake", "--install", "build"
           end
         end
       end
@@ -120,7 +121,7 @@ class Neovim < Formula
     inreplace "src/nvim/os/stdpaths.c" do |s|
       s.gsub! "/etc/xdg/", "#{etc}/xdg/:\\0"
 
-      unless HOMEBREW_PREFIX.to_s == HOMEBREW_DEFAULT_PREFIX
+      if HOMEBREW_PREFIX.to_s != HOMEBREW_DEFAULT_PREFIX
         s.gsub! "/usr/local/share/:/usr/share/", "#{HOMEBREW_PREFIX}/share/:\\0"
       end
     end
@@ -128,8 +129,14 @@ class Neovim < Formula
     # Replace `-dirty` suffix in `--version` output with `-Homebrew`.
     inreplace "cmake/GenerateVersion.cmake", "--dirty", "--dirty=-Homebrew"
 
+    # Needed to find `lpeg` in non-default prefixes.
+    ENV.prepend "LUA_CPATH", Formula["lpeg"].opt_lib/"lua/5.1/?.so", ";"
+    # Don't clobber the default search path
+    ENV.append "LUA_PATH", ";", ";"
+    ENV.append "LUA_CPATH", ";", ";"
+
     system "cmake", "-S", ".", "-B", "build",
-                    "-DLIBLUV_LIBRARY=#{Formula["luv"].opt_lib/shared_library("libluv")}",
+                    "-DLUV_LIBRARY=#{Formula["luv"].opt_lib/shared_library("libluv")}",
                     "-DLIBUV_LIBRARY=#{Formula["libuv"].opt_lib/shared_library("libuv")}",
                     *std_cmake_args
 
