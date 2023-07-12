@@ -1,9 +1,9 @@
 class Coreutils < Formula
   desc "GNU File, Shell, and Text utilities"
   homepage "https://www.gnu.org/software/coreutils"
-  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.2.tar.xz"
-  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.2.tar.xz"
-  sha256 "6885ff47b9cdb211de47d368c17853f406daaf98b148aaecdf10de29cc04b0b3"
+  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.3.tar.xz"
+  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.3.tar.xz"
+  sha256 "adbcfcfe899235b71e8768dcf07cd532520b7f54f9a8064843f8d199a904bbaa"
   license "GPL-3.0-or-later"
 
   head do
@@ -32,7 +32,7 @@ class Coreutils < Formula
   conflicts_with "aardvark_shell_utils", because: "both install `realpath` binaries"
   conflicts_with "b2sum", because: "both install `b2sum` binaries"
   conflicts_with "ganglia", because: "both install `gstat` binaries"
-  conflicts_with "gdu", because: "both install `gdu` binaries"
+  conflicts_with "gfold", because: "both install `gfold` binaries"
   conflicts_with "idutils", because: "both install `gid` and `gid.1`"
   conflicts_with "md5sha1sum", because: "both install `md5sum` and `sha1sum` binaries"
   conflicts_with "truncate", because: "both install `truncate` binaries"
