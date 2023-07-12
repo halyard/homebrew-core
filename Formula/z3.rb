@@ -1,15 +1,15 @@
 class Z3 < Formula
   desc "High-performance theorem prover"
   homepage "https://github.com/Z3Prover/z3"
-  url "https://github.com/Z3Prover/z3/archive/z3-4.12.1.tar.gz"
-  sha256 "a3735fabf00e1341adcc70394993c05fd3e2ae167a3e9bb46045e33084eb64a3"
+  url "https://github.com/Z3Prover/z3/archive/z3-4.12.2.tar.gz"
+  sha256 "9f58f3710bd2094085951a75791550f547903d75fe7e2fcb373c5f03fc761b8f"
   license "MIT"
   head "https://github.com/Z3Prover/z3.git", branch: "master"
 
   livecheck do
     url :stable
+    regex(/z3[._-]v?(\d+(?:\.\d+)+)/i)
     strategy :github_latest
-    regex(%r{href=.*?/tag/z3[._-]v?(\d+(?:\.\d+)+)["' >]}i)
   end
 
   depends_on "cmake" => :build
@@ -24,11 +24,8 @@ class Z3 < Formula
   end
 
   def install
-    # LTO on Intel Monterey produces segfaults.
-    # https://github.com/Z3Prover/z3/issues/6414
-    do_lto = MacOS.version < :monterey || Hardware::CPU.arm?
     args = %W[
-      -DZ3_LINK_TIME_OPTIMIZATION=#{do_lto ? "ON" : "OFF"}
+      -DZ3_LINK_TIME_OPTIMIZATION=ON
       -DZ3_INCLUDE_GIT_DESCRIBE=OFF
       -DZ3_INCLUDE_GIT_HASH=OFF
       -DZ3_INSTALL_PYTHON_BINDINGS=ON
