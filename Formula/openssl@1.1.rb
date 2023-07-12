@@ -1,13 +1,13 @@
 class OpensslAT11 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
   homepage "https://openssl.org/"
-  url "https://www.openssl.org/source/openssl-1.1.1t.tar.gz"
-  mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-1.1.1t.tar.gz"
-  mirror "http://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-1.1.1t.tar.gz"
-  mirror "https://www.openssl.org/source/old/1.1.1/openssl-1.1.1t.tar.gz"
-  mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/old/1.1.1/openssl-1.1.1t.tar.gz"
-  mirror "http://www.mirrorservice.org/sites/ftp.openssl.org/source/old/1.1.1/openssl-1.1.1t.tar.gz"
-  sha256 "8dee9b24bdb1dcbf0c3d1e9b02fb8f6bf22165e807f45adeb7c9677536859d3b"
+  url "https://www.openssl.org/source/openssl-1.1.1u.tar.gz"
+  mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-1.1.1u.tar.gz"
+  mirror "http://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-1.1.1u.tar.gz"
+  mirror "https://www.openssl.org/source/old/1.1.1/openssl-1.1.1u.tar.gz"
+  mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/old/1.1.1/openssl-1.1.1u.tar.gz"
+  mirror "http://www.mirrorservice.org/sites/ftp.openssl.org/source/old/1.1.1/openssl-1.1.1u.tar.gz"
+  sha256 "e2f8d84b523eecd06c7be7626830370300fbcc15386bf5142d72758f6963ebc6"
   license "OpenSSL"
   version_scheme 1
 
@@ -16,7 +16,7 @@ class OpensslAT11 < Formula
     regex(/href=.*?openssl[._-]v?(1\.1(?:\.\d+)+[a-z]?)\.t/i)
   end
 
-  keg_only :shadowed_by_macos, "macOS provides LibreSSL"
+  keg_only :versioned_formula
 
   # See: https://www.openssl.org/policies/releasestrat.html
   deprecate! date: "2023-09-11", because: :unsupported
