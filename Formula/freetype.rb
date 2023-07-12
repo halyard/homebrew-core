@@ -1,11 +1,10 @@
 class Freetype < Formula
   desc "Software library to render fonts"
   homepage "https://www.freetype.org/"
-  url "https://downloads.sourceforge.net/project/freetype/freetype2/2.13.0/freetype-2.13.0.tar.xz"
-  mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.xz"
-  sha256 "5ee23abd047636c24b2d43c6625dcafc66661d1aca64dec9e0d05df29592624c"
+  url "https://downloads.sourceforge.net/project/freetype/freetype2/2.13.1/freetype-2.13.1.tar.xz"
+  mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.1.tar.xz"
+  sha256 "ea67e3b019b1104d1667aa274f5dc307d8cbd606b399bc32df308a77f1a564bf"
   license "FTL"
-  revision 1
 
   livecheck do
     url :stable
@@ -17,19 +16,6 @@ class Freetype < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
-
-  # Earlier versions of Apple Clang don't recognise the `fallthrough` attribute.
-  # The following patches make it possible to build with them.
-  # Remove both on next release.
-  patch do
-    url "https://gitlab.freedesktop.org/freetype/freetype/-/commit/2257f9abf6e12daf7c3e1bfe28fa88de85e45785.diff"
-    sha256 "64f41363467c455ccfeb3350bc3bea0c028fa5d108821e2e81cd8475675b7926"
-  end
-
-  patch do
-    url "https://gitlab.freedesktop.org/freetype/freetype/-/commit/d874ffa96ccad7dd122cdc369a284d171e221809.diff"
-    sha256 "aff06e28afc48cd96d7ea4321069046db8ba0f512bf965ef475c1cdbcdc2635f"
-  end
 
   def install
     # This file will be installed to bindir, so we want to avoid embedding the
