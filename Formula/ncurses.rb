@@ -40,8 +40,10 @@ class Ncurses < Formula
     system "make", "install"
     make_libncurses_symlinks
 
-    prefix.install "test"
-    (prefix/"test").install "install-sh", "config.sub", "config.guess"
+    # Avoid hardcoding Cellar paths in client software.
+    inreplace bin/"ncursesw6-config", prefix, opt_prefix
+    pkgshare.install "test"
+    (pkgshare/"test").install "install-sh", "config.sub", "config.guess"
   end
 
   def make_libncurses_symlinks
@@ -80,12 +82,14 @@ class Ncurses < Formula
   end
 
   test do
+    refute_match prefix.to_s, shell_output("#{bin}/ncursesw6-config --prefix")
+    refute_match share.to_s, shell_output("#{bin}/ncursesw6-config --terminfo-dirs")
+
     ENV["TERM"] = "xterm"
 
-    system prefix/"test/configure", "--prefix=#{testpath}/test",
-                                    "--with-curses-dir=#{prefix}"
+    system pkgshare/"test/configure", "--prefix=#{testpath}",
+                                      "--with-curses-dir=#{prefix}"
     system "make", "install"
-
-    system testpath/"test/bin/ncurses-examples"
+    system testpath/"bin/ncurses-examples"
   end
 end
