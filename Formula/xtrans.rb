@@ -1,8 +1,8 @@
 class Xtrans < Formula
   desc "X.Org: X Network Transport layer shared code"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/xtrans-1.4.0.tar.bz2"
-  sha256 "377c4491593c417946efcd2c7600d1e62639f7a8bbca391887e2c4679807d773"
+  url "https://www.x.org/archive/individual/lib/xtrans-1.5.0.tar.xz"
+  sha256 "1ba4b703696bfddbf40bacf25bce4e3efb2a0088878f017a50e9884b0c8fb1bd"
   license "MIT"
 
   depends_on "pkg-config" => :build
@@ -18,9 +18,6 @@ class Xtrans < Formula
       --disable-silent-rules
       --enable-docs=no
     ]
-
-    # Fedora systems do not provide sys/stropts.h
-    inreplace "Xtranslcl.c", "# include <sys/stropts.h>", "# include <sys/ioctl.h>"
 
     system "./configure", *args
     system "make", "install"
