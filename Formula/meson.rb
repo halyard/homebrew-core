@@ -1,8 +1,8 @@
 class Meson < Formula
   desc "Fast and user friendly build system"
   homepage "https://mesonbuild.com/"
-  url "https://github.com/mesonbuild/meson/releases/download/1.0.1/meson-1.0.1.tar.gz"
-  sha256 "d926b730de6f518728cc7c57bc5e701667bae0c3522f9e369427b2cc7839d3c1"
+  url "https://github.com/mesonbuild/meson/releases/download/1.1.1/meson-1.1.1.tar.gz"
+  sha256 "d04b541f97ca439fb82fab7d0d480988be4bd4e62563a5ca35fadb5400727b1c"
   license "Apache-2.0"
   head "https://github.com/mesonbuild/meson.git", branch: "master"
 
@@ -26,8 +26,8 @@ class Meson < Formula
       dependencies/boost.py
       dependencies/cuda.py
       dependencies/qt.py
+      scripts/python_info.py
       utils/universal.py
-      modules/python.py
     ].map { |f| mesonbuild/f }
     inreplace_files << (bash_completion/"meson")
 
@@ -37,6 +37,7 @@ class Meson < Formula
 
   test do
     (testpath/"helloworld.c").write <<~EOS
+      #include <stdio.h>
       main() {
         puts("hi");
         return 0;
