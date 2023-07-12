@@ -1,15 +1,29 @@
 class Grep < Formula
   desc "GNU grep, egrep and fgrep"
   homepage "https://www.gnu.org/software/grep/"
-  url "https://ftp.gnu.org/gnu/grep/grep-3.10.tar.xz"
-  mirror "https://ftpmirror.gnu.org/grep/grep-3.10.tar.xz"
-  sha256 "24efa5b595fb5a7100879b51b8868a0bb87a71c183d02c4c602633b88af6855b"
+  url "https://ftp.gnu.org/gnu/grep/grep-3.11.tar.xz"
+  mirror "https://ftpmirror.gnu.org/grep/grep-3.11.tar.xz"
+  sha256 "1db2aedde89d0dea42b16d9528f894c8d15dae4e190b59aecc78f5a951276eab"
   license "GPL-3.0-or-later"
+
+  head do
+    url "https://git.savannah.gnu.org/git/grep.git", branch: "master"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "gettext" => :build
+    depends_on "texinfo" => :build
+    depends_on "wget" => :build
+
+    uses_from_macos "gperf" => :build
+  end
 
   depends_on "pkg-config" => :build
   depends_on "pcre2"
 
   def install
+    system "./bootstrap" if build.head?
+
     args = %W[
       --disable-dependency-tracking
       --disable-nls
