@@ -1,8 +1,8 @@
 class Tree < Formula
   desc "Display directories as trees (with optional color/HTML output)"
   homepage "http://mama.indstate.edu/users/ice/tree/"
-  url "http://mama.indstate.edu/users/ice/tree/src/tree-2.1.0.tgz"
-  sha256 "0160c535bff2b0dc6a830b9944e981e3427380f63e748da96ced7071faebabf6"
+  url "http://mama.indstate.edu/users/ice/tree/src/tree-2.1.1.tgz"
+  sha256 "d3c3d55f403af7c76556546325aa1eca90b918cbaaf6d3ab60a49d8367ab90d5"
   license "GPL-2.0-or-later"
 
   livecheck do
