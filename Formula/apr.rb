@@ -2,9 +2,9 @@ class Apr < Formula
   desc "Apache Portable Runtime library"
   homepage "https://apr.apache.org/"
   # TODO: Remove `libexec` symlinks in `install` when we no longer have a Big Sur bottle.
-  url "https://www.apache.org/dyn/closer.lua?path=apr/apr-1.7.3.tar.bz2"
-  mirror "https://archive.apache.org/dist/apr/apr-1.7.3.tar.bz2"
-  sha256 "455e218c060c474f2c834816873f6ed69c0cf0e4cfee54282cc93e8e989ee59e"
+  url "https://www.apache.org/dyn/closer.lua?path=apr/apr-1.7.4.tar.bz2"
+  mirror "https://archive.apache.org/dist/apr/apr-1.7.4.tar.bz2"
+  sha256 "fc648de983f3a2a6c9e78dea1f180639bd2fad6c06d556d4367a701fe5c35577"
   license "Apache-2.0"
 
   keg_only :provided_by_macos, "Apple's CLT provides apr"
@@ -13,12 +13,6 @@ class Apr < Formula
 
   on_linux do
     depends_on "util-linux"
-  end
-
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
