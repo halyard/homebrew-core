@@ -1,8 +1,8 @@
 class Telnet < Formula
   desc "User interface to the TELNET protocol"
   homepage "https://opensource.apple.com/"
-  url "https://github.com/apple-oss-distributions/remote_cmds/archive/refs/tags/remote_cmds-64.tar.gz"
-  sha256 "9beae91af0ac788227119c4ed17c707cd3bb3e4ed71422ab6ed230129cbb9362"
+  url "https://github.com/apple-oss-distributions/remote_cmds/archive/refs/tags/remote_cmds-69.tar.gz"
+  sha256 "ce917122a88f8bee98686476abf83f1d442e387637a021eabe02f0fe88e02986"
   license all_of: ["BSD-4-Clause-UC", "APSL-1.0"]
 
   depends_on xcode: :build
@@ -20,25 +20,31 @@ class Telnet < Formula
       ENV["SDKROOT"] = MacOS.sdk_path
       ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
 
-      xcodebuild "SYMROOT=build", "-arch", Hardware::CPU.arch
+      xcodebuild "OBJROOT=build/Intermediates",
+                 "SYMROOT=build/Products",
+                 "DSTROOT=build/Archive",
+                 "-IDEBuildLocationStyle=Custom",
+                 "-IDECustomDerivedDataLocation=#{buildpath}",
+                 "-arch", Hardware::CPU.arch
 
-      libtelnet_dst = buildpath/"telnet.tproj/build/Products"
-      libtelnet_dst.install "build/Release/libtelnet.a"
-      libtelnet_dst.install "build/Release/usr/local/include/libtelnet/"
+      libtelnet_dst = buildpath/"libtelnet"
+      libtelnet_dst.install "build/Products/Release/libtelnet.a"
+      libtelnet_dst.install "build/Products/Release/usr/local/include/libtelnet/"
     end
 
-    ENV.append_to_cflags "-isystembuild/Products/"
-    system "make", "-C", "telnet.tproj",
-                   "OBJROOT=build/Intermediates",
-                   "SYMROOT=build/Products",
-                   "DSTROOT=build/Archive",
-                   "CFLAGS=$(CC_Flags) #{ENV.cflags}",
-                   "LDFLAGS=$(LD_Flags) -Lbuild/Products/",
-                   "RC_ARCHS=#{Hardware::CPU.arch}",
-                   "install"
+    xcodebuild "OBJROOT=build/Intermediates",
+               "SYMROOT=build/Products",
+               "DSTROOT=build/Archive",
+               "OTHER_CFLAGS=${inherited} #{ENV.cflags} -I#{buildpath}/libtelnet",
+               "OTHER_LDFLAGS=${inherited} #{ENV.ldflags} -L#{buildpath}/libtelnet",
+               "-IDEBuildLocationStyle=Custom",
+               "-IDECustomDerivedDataLocation=#{buildpath}",
+               "-sdk", "macosx",
+               "-arch", Hardware::CPU.arch,
+               "-target", "telnet"
 
-    bin.install "telnet.tproj/build/Archive/usr/local/bin/telnet"
-    man1.install "telnet.tproj/telnet.1"
+    bin.install "build/Products/Release/telnet"
+    man1.install "telnet/telnet.1"
   end
 
   test do
