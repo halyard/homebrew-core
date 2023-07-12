@@ -4,11 +4,11 @@ class Xz < Formula
   desc "General-purpose data compression with high compression ratio"
   homepage "https://tukaani.org/xz/"
   # The archive.org mirror below needs to be manually created at `archive.org`.
-  url "https://downloads.sourceforge.net/project/lzmautils/xz-5.4.2.tar.gz"
-  mirror "https://tukaani.org/xz/xz-5.4.2.tar.gz"
-  mirror "https://archive.org/download/xz-5.4.2/xz-5.4.2.tar.gz"
-  mirror "http://archive.org/download/xz-5.4.2/xz-5.4.2.tar.gz"
-  sha256 "87947679abcf77cc509d8d1b474218fd16b72281e2797360e909deaee1ac9d05"
+  url "https://downloads.sourceforge.net/project/lzmautils/xz-5.4.3.tar.gz"
+  mirror "https://tukaani.org/xz/xz-5.4.3.tar.gz"
+  mirror "https://archive.org/download/xz-5.4.3/xz-5.4.3.tar.gz"
+  mirror "http://archive.org/download/xz-5.4.3/xz-5.4.3.tar.gz"
+  sha256 "1c382e0bc2e4e0af58398a903dd62fff7e510171d2de47a1ebe06d1528e9b7e9"
   license all_of: [
     :public_domain,
     "LGPL-2.1-or-later",
@@ -37,5 +37,15 @@ class Xz < Formula
     # decompress: data.txt.xz -> data.txt
     system bin/"xz", "-d", "#{path}.xz"
     assert_equal original_contents, path.read
+
+    # Check that http mirror works
+    xz_tar = testpath/"xz.tar.gz"
+    stable.mirrors.each do |mirror|
+      next if mirror.start_with?("https")
+
+      xz_tar.unlink if xz_tar.exist?
+      system "curl", "--location", mirror, "--output", xz_tar
+      assert_equal stable.checksum.hexdigest, xz_tar.sha256
+    end
   end
 end
