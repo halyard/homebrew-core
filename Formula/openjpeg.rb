@@ -4,6 +4,7 @@ class Openjpeg < Formula
   url "https://github.com/uclouvain/openjpeg/archive/v2.5.0.tar.gz"
   sha256 "0333806d6adecc6f7a91243b2b839ff4d2053823634d4f6ed7a59bc87409122a"
   license "BSD-2-Clause"
+  revision 1
   head "https://github.com/uclouvain/openjpeg.git", branch: "master"
 
   depends_on "cmake" => :build
