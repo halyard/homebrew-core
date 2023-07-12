@@ -1,11 +1,10 @@
 class Libtiff < Formula
   desc "TIFF library and utilities"
   homepage "https://libtiff.gitlab.io/libtiff/"
-  url "https://download.osgeo.org/libtiff/tiff-4.4.0.tar.gz"
-  mirror "https://fossies.org/linux/misc/tiff-4.4.0.tar.gz"
-  sha256 "917223b37538959aca3b790d2d73aa6e626b688e02dcda272aec24c2f498abed"
+  url "https://download.osgeo.org/libtiff/tiff-4.5.1.tar.gz"
+  mirror "https://fossies.org/linux/misc/tiff-4.5.1.tar.gz"
+  sha256 "d7f38b6788e4a8f5da7940c5ac9424f494d8a79eba53d555f4a507167dca5e2b"
   license "libtiff"
-  revision 1
 
   livecheck do
     url "https://download.osgeo.org/libtiff/"
@@ -13,17 +12,17 @@ class Libtiff < Formula
   end
 
   depends_on "jpeg-turbo"
+  depends_on "xz"
   depends_on "zstd"
-
   uses_from_macos "zlib"
 
   def install
     args = %W[
       --prefix=#{prefix}
-      --enable-zstd
       --disable-dependency-tracking
-      --disable-lzma
       --disable-webp
+      --enable-zstd
+      --enable-lzma
       --with-jpeg-include-dir=#{Formula["jpeg-turbo"].opt_include}
       --with-jpeg-lib-dir=#{Formula["jpeg-turbo"].opt_lib}
       --without-x
