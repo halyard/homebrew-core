@@ -1,18 +1,20 @@
 class Teleport < Formula
   desc "Modern SSH server for teams managing distributed infrastructure"
   homepage "https://gravitational.com/teleport"
-  url "https://github.com/gravitational/teleport/archive/v12.2.1.tar.gz"
-  sha256 "ba53679c08ce3d63bcf3ffe384a862ea6774996d36b6bf3fbe88257ce4555765"
+  url "https://github.com/gravitational/teleport/archive/v13.2.0.tar.gz"
+  sha256 "d791e54f4dc3e26fb7319ec4eb3bdc9a004338baf8f4d371d58e1853450e8bcb"
   license "Apache-2.0"
   head "https://github.com/gravitational/teleport.git", branch: "master"
 
-  # We check the Git tags instead of using the `GithubLatest` strategy, as the
-  # "latest" version can be incorrect. As of writing, two major versions of
-  # `teleport` are being maintained side by side and the "latest" tag can point
-  # to a release from the older major version.
+  # As of writing, two major versions of `teleport` are being maintained
+  # side by side and the "latest" release can point to an older major version,
+  # so we can't use the `GithubLatest` strategy. We use the `GithubReleases`
+  # strategy instead of `Git` because there is often a notable gap (days)
+  # between when a version is tagged and released.
   livecheck do
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_releases
   end
 
   depends_on "go" => :build
@@ -20,6 +22,7 @@ class Teleport < Formula
   depends_on "yarn" => :build
   depends_on "libfido2"
   depends_on "node"
+  depends_on "openssl@3"
 
   uses_from_macos "curl" => :test
   uses_from_macos "netcat" => :test
