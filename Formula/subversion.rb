@@ -2,7 +2,7 @@ class Subversion < Formula
   desc "Version control system designed to be a better CVS"
   homepage "https://subversion.apache.org/"
   license "Apache-2.0"
-  revision 1
+  revision 3
 
   stable do
     url "https://www.apache.org/dyn/closer.lua?path=subversion/subversion-1.14.2.tar.bz2"
@@ -25,7 +25,7 @@ class Subversion < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.10" => :build
+  depends_on "python@3.11" => [:build, :test]
   depends_on "scons" => :build # For Serf
   depends_on "swig" => :build
   depends_on "apr"
@@ -35,7 +35,7 @@ class Subversion < Formula
   # gettext, lz4 and utf8proc for consistency
   depends_on "gettext"
   depends_on "lz4"
-  depends_on "openssl@1.1" # For Serf
+  depends_on "openssl@3" # For Serf
   depends_on "utf8proc"
 
   uses_from_macos "expat"
@@ -46,14 +46,12 @@ class Subversion < Formula
   uses_from_macos "zlib"
 
   on_macos do
-    depends_on "openjdk" => :build unless MacOS.version.outdated_release?
     # Prevent "-arch ppc" from being pulled in from Perl's $Config{ccflags}
     patch :DATA
   end
 
   on_linux do
     depends_on "libtool" => :build
-    depends_on "openjdk" => :build
   end
 
   resource "py3c" do
@@ -62,9 +60,13 @@ class Subversion < Formula
   end
 
   resource "serf" do
-    url "https://www.apache.org/dyn/closer.lua?path=serf/serf-1.3.9.tar.bz2"
-    mirror "https://archive.apache.org/dist/serf/serf-1.3.9.tar.bz2"
-    sha256 "549c2d21c577a8a9c0450facb5cca809f26591f048e466552240947bdf7a87cc"
+    url "https://www.apache.org/dyn/closer.lua?path=serf/serf-1.3.10.tar.bz2"
+    mirror "https://archive.apache.org/dist/serf/serf-1.3.10.tar.bz2"
+    sha256 "be81ef08baa2516ecda76a77adf7def7bc3227eeb578b9a33b45f7b41dc064e6"
+  end
+
+  def python3
+    "python3.11"
   end
 
   def install
@@ -75,20 +77,12 @@ class Subversion < Formula
     resource("serf").stage do
       if OS.linux?
         inreplace "SConstruct" do |s|
-          s.gsub! "env.Append(LIBPATH=['$OPENSSL\/lib'])",
-          "\\1\nenv.Append(CPPPATH=['$ZLIB\/include'])\nenv.Append(LIBPATH=['$ZLIB/lib'])"
+          s.gsub! "env.Append(LIBPATH=['$OPENSSL/lib'])",
+          "\\1\nenv.Append(CPPPATH=['$ZLIB/include'])\nenv.Append(LIBPATH=['$ZLIB/lib'])"
         end
       end
 
       inreplace "SConstruct" do |s|
-        s.gsub! "print 'Warning: Used unknown variables:', ', '.join(unknown.keys())",
-        "print('Warning: Used unknown variables:', ', '.join(unknown.keys()))"
-        s.gsub! "match = re.search('SERF_MAJOR_VERSION ([0-9]+).*'",
-        "match = re.search(b'SERF_MAJOR_VERSION ([0-9]+).*'"
-        s.gsub! "'SERF_MINOR_VERSION ([0-9]+).*'",
-        "b'SERF_MINOR_VERSION ([0-9]+).*'"
-        s.gsub! "'SERF_PATCH_VERSION ([0-9]+)'",
-        "b'SERF_PATCH_VERSION ([0-9]+)'"
         s.gsub! "variables=opts,",
         "variables=opts, RPATHPREFIX = '-Wl,-rpath,',"
       end
@@ -103,7 +97,7 @@ class Subversion < Formula
       args = %W[
         PREFIX=#{serf_prefix} GSSAPI=#{krb5} CC=#{ENV.cc}
         CFLAGS=#{ENV.cflags} LINKFLAGS=#{ENV.ldflags}
-        OPENSSL=#{Formula["openssl@1.1"].opt_prefix}
+        OPENSSL=#{Formula["openssl@3"].opt_prefix}
         APR=#{Formula["apr"].opt_prefix}
         APU=#{Formula["apr-util"].opt_prefix}
       ]
@@ -135,10 +129,8 @@ class Subversion < Formula
       ENV.append "LDFLAGS", "-Wl,-rpath=#{serf_prefix}/lib"
     end
 
-    openjdk = deps.map(&:to_formula).find { |f| f.name.match? "^openjdk" }
     perl = DevelopmentTools.locate("perl")
     ruby = DevelopmentTools.locate("ruby")
-    python3 = "python3.10"
 
     args = %W[
       --prefix=#{prefix}
@@ -160,13 +152,9 @@ class Subversion < Formula
       --without-gpg-agent
       --without-jikes
       PERL=#{perl}
-      PYTHON=#{python3}
+      PYTHON=#{which(python3)}
       RUBY=#{ruby}
     ]
-    if openjdk
-      args.unshift "--with-jdk=#{Formula["openjdk"].opt_prefix}",
-                   "--enable-javahl"
-    end
 
     # preserve compatibility with macOS 12.0–12.2
     args.unshift "--enable-sqlite-compatibility-version=3.36.0" if MacOS.version == :monterey
@@ -188,14 +176,6 @@ class Subversion < Formula
     system "make", "swig-py"
     system "make", "install-swig-py"
     (prefix/Language::Python.site_packages(python3)).install_symlink Dir["#{lib}/svn-python/*"]
-
-    # Java and Perl support don't build correctly in parallel:
-    # https://github.com/Homebrew/homebrew/issues/20415
-    if openjdk
-      ENV.deparallelize
-      system "make", "javahl"
-      system "make", "install-javahl"
-    end
 
     perl_archlib = Utils.safe_popen_read(perl.to_s, "-MConfig", "-e", "print $Config{archlib}")
     perl_core = Pathname.new(perl_archlib)/"CORE"
@@ -221,7 +201,7 @@ class Subversion < Formula
     system "make", "install-swig-pl-lib"
     cd "subversion/bindings/swig/perl/native" do
       system perl, "Makefile.PL", "PREFIX=#{prefix}", "INSTALLSITEMAN3DIR=#{man3}"
-      system "make", "install"
+      ENV.deparallelize { system "make", "install" }
     end
 
     # This is only created when building against system Perl, but it isn't
@@ -238,10 +218,6 @@ class Subversion < Formula
 
       The perl bindings are located in various subdirectories of:
         #{opt_lib}/perl5
-
-      You may need to link the Java bindings into the Java Extensions folder:
-        sudo mkdir -p /Library/Java/Extensions
-        sudo ln -s #{HOMEBREW_PREFIX}/lib/libsvnjavahl-1.dylib /Library/Java/Extensions/libsvnjavahl-1.dylib
     EOS
   end
 
@@ -261,6 +237,8 @@ class Subversion < Formula
     perl_version = Utils.safe_popen_read(perl.to_s, "--version")[/v(\d+\.\d+(?:\.\d+)?)/, 1]
     ENV["PERL5LIB"] = "#{lib}/perl5/site_perl/#{perl_version}/#{platform}"
     system perl, "-e", "use SVN::Client; new SVN::Client()"
+
+    system python3, "-c", "import svn.client, svn.repos"
   end
 end
 
