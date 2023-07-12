@@ -2,13 +2,14 @@ class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
   # Don't forget to update the documentation resources along with the url!
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.40.0.tar.xz"
-  sha256 "b17a598fbf58729ef13b577465eb93b2d484df1201518b708b5044ff623bf46d"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.41.0.tar.xz"
+  sha256 "e748bafd424cfe80b212cbc6f1bbccc3a47d4862fb1eb7988877750478568040"
   license "GPL-2.0-only"
+  revision 2
   head "https://github.com/git/git.git", branch: "master"
 
   livecheck do
-    url "https://www.kernel.org/pub/software/scm/git/"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/"
     regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
@@ -21,17 +22,17 @@ class Git < Formula
 
   on_linux do
     depends_on "linux-headers@5.15" => :build
-    depends_on "openssl@1.1" # Uses CommonCrypto on macOS
+    depends_on "openssl@3" # Uses CommonCrypto on macOS
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.40.0.tar.xz"
-    sha256 "3da9fbe542e7d565b4168ea15872e8e1b13324e4bb5ab65604ca9a333dfe37bb"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.41.0.tar.xz"
+    sha256 "0cb2d4a09270eede7c1b686e2dfeac9bffef9e42c117a7e120f3cbb3e665d286"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.40.0.tar.xz"
-    sha256 "5766aecf137370015e3fd72e355b83c73dc2aa2ee14a42546049346442c3356e"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.41.0.tar.xz"
+    sha256 "bc7a4c944492c76fc3cd766ce22e826d0241e43792c611d4fdc068e0df545877"
   end
 
   resource "Net::SMTP::SSL" do
@@ -43,7 +44,7 @@ class Git < Formula
     # If these things are installed, tell Git build system not to use them
     ENV["NO_FINK"] = "1"
     ENV["NO_DARWIN_PORTS"] = "1"
-    ENV["PYTHON_PATH"] = which("python")
+    ENV["PYTHON_PATH"] = which("python3")
     ENV["PERL_PATH"] = which("perl")
     ENV["USE_LIBPCRE2"] = "1"
     ENV["INSTALL_SYMLINKS"] = "1"
@@ -78,7 +79,7 @@ class Git < Formula
     args += if OS.mac?
       %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
     else
-      openssl_prefix = Formula["openssl@1.1"].opt_prefix
+      openssl_prefix = Formula["openssl@3"].opt_prefix
 
       %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     end
