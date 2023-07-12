@@ -1,18 +1,31 @@
 class Tmux < Formula
   desc "Terminal multiplexer"
   homepage "https://tmux.github.io/"
-  url "https://github.com/tmux/tmux/releases/download/3.3a/tmux-3.3a.tar.gz"
-  sha256 "e4fd347843bd0772c4f48d6dde625b0b109b7a380ff15db21e97c11a4dcdf93f"
   license "ISC"
+  revision 2
+
+  stable do
+    # Remove `stable` block in next release.
+    url "https://github.com/tmux/tmux/releases/download/3.3a/tmux-3.3a.tar.gz"
+    sha256 "e4fd347843bd0772c4f48d6dde625b0b109b7a380ff15db21e97c11a4dcdf93f"
+
+    # Patch for CVE-2022-47016. Remove in next release.
+    # Upstream commit does not apply to 3.3a, so we use Nix's patch.
+    # https://github.com/NixOS/nixpkgs/pull/213041
+    patch do
+      url "https://raw.githubusercontent.com/NixOS/nixpkgs/2821a121dc2acf2fe07d9636ee35ff61807087ea/pkgs/tools/misc/tmux/CVE-2022-47016.patch"
+      sha256 "c1284aace9231e736ace52333ec91726d3dfda58d3a3404b67c6f40bf5ed28a4"
+    end
+  end
 
   livecheck do
     url :stable
+    regex(/v?(\d+(?:\.\d+)+[a-z]?)/i)
     strategy :github_latest
-    regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+[a-z]?)["' >]}i)
   end
 
   head do
-    url "https://github.com/tmux/tmux.git"
+    url "https://github.com/tmux/tmux.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -27,7 +40,7 @@ class Tmux < Formula
 
   # Old versions of macOS libc disagree with utf8proc character widths.
   # https://github.com/tmux/tmux/issues/2223
-  on_high_sierra :or_newer do
+  on_system :linux, macos: :sierra_or_newer do
     depends_on "utf8proc"
   end
 
@@ -50,7 +63,7 @@ class Tmux < Formula
     # tools that link with the very old ncurses provided by macOS.
     # https://github.com/Homebrew/homebrew-core/issues/102748
     args << "--with-TERM=screen-256color" if OS.mac?
-    args << "--enable-utf8proc" if MacOS.version >= :high_sierra
+    args << "--enable-utf8proc" if MacOS.version >= :high_sierra || OS.linux?
 
     ENV.append "LDFLAGS", "-lresolv"
     system "./configure", *args
