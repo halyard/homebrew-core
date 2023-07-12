@@ -3,15 +3,16 @@ class Netpbm < Formula
   homepage "https://netpbm.sourceforge.io/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4482"
-  version "10.86.37"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4534"
+  version "10.86.38"
   license "GPL-3.0-or-later"
+  revision 1
   version_scheme 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
 
   livecheck do
-    url "https://sourceforge.net/p/netpbm/code/HEAD/tree/stable/"
-    regex(/Release v?(\d+(?:\.\d+)+)/i)
+    url "https://sourceforge.net/p/netpbm/code/HEAD/log/?path=/stable"
+    regex(/Release\s+v?(\d+(?:\.\d+)+)/i)
     strategy :page_match
   end
 
@@ -50,6 +51,7 @@ class Netpbm < Formula
     end
 
     ENV.deparallelize
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" # Workaround for Xcode 14.3.
     system "make"
     system "make", "package", "pkgdir=#{buildpath}/stage"
 
@@ -64,6 +66,11 @@ class Netpbm < Formula
       lib.install buildpath.glob("staticlink/*.a"), buildpath.glob("sharedlink/#{shared_library("*")}")
       (lib/"pkgconfig").install "pkgconfig_template" => "netpbm.pc"
     end
+
+    # We don't run `make install`, so an unversioned library symlink is never generated.
+    # FIXME: Check whether we can call `make install` instead of creating this manually.
+    libnetpbm = lib.glob(shared_library("libnetpbm", "*")).reject(&:symlink?).first.basename
+    lib.install_symlink libnetpbm => shared_library("libnetpbm")
   end
 
   test do
