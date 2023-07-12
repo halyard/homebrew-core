@@ -1,9 +1,10 @@
 class Krb5 < Formula
   desc "Network authentication protocol"
   homepage "https://web.mit.edu/kerberos/"
-  url "https://kerberos.org/dist/krb5/1.20/krb5-1.20.1.tar.gz"
-  sha256 "704aed49b19eb5a7178b34b2873620ec299db08752d6a8574f95d41879ab8851"
+  url "https://kerberos.org/dist/krb5/1.21/krb5-1.21.tar.gz"
+  sha256 "69f8aaff85484832df67a4bbacd99b9259bd95aab8c651fbbe65cdc9620ea93b"
   license :cannot_represent
+  revision 1
 
   livecheck do
     url :homepage
@@ -12,18 +13,16 @@ class Krb5 < Formula
 
   keg_only :provided_by_macos
 
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
-  uses_from_macos "bison"
+  uses_from_macos "bison" => :build
   uses_from_macos "libedit"
 
   def install
     cd "src" do
-      system "./configure", "--disable-debug",
-                            "--disable-dependency-tracking",
+      system "./configure", *std_configure_args,
                             "--disable-nls",
                             "--disable-silent-rules",
-                            "--prefix=#{prefix}",
                             "--without-system-verto",
                             "--without-keyutils"
       system "make"
