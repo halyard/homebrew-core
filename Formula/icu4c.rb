@@ -1,9 +1,9 @@
 class Icu4c < Formula
   desc "C/C++ and Java libraries for Unicode and globalization"
   homepage "https://icu.unicode.org/home"
-  url "https://github.com/unicode-org/icu/releases/download/release-72-1/icu4c-72_1-src.tgz"
-  version "72.1"
-  sha256 "a2d2d38217092a7ed56635e34467f92f976b370e20182ad325edea6681a71d68"
+  url "https://github.com/unicode-org/icu/releases/download/release-73-2/icu4c-73_2-src.tgz"
+  version "73.2"
+  sha256 "818a80712ed3caacd9b652305e01afc7fa167e6f2e94996da44b90c2ab604ce1"
   license "ICU"
 
   livecheck do
@@ -17,8 +17,7 @@ class Icu4c < Formula
   keg_only :provided_by_macos, "macOS provides libicucore.dylib (but nothing else)"
 
   def install
-    args = %W[
-      --prefix=#{prefix}
+    args = %w[
       --disable-samples
       --disable-tests
       --enable-static
@@ -26,7 +25,7 @@ class Icu4c < Formula
     ]
 
     cd "source" do
-      system "./configure", *args
+      system "./configure", *std_configure_args, *args
       system "make"
       system "make", "install"
     end
