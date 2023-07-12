@@ -11,7 +11,7 @@ class Libusb < Formula
   end
 
   head do
-    url "https://github.com/libusb/libusb.git"
+    url "https://github.com/libusb/libusb.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
