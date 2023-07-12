@@ -4,14 +4,14 @@ class Rust < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   stable do
-    url "https://static.rust-lang.org/dist/rustc-1.69.0-src.tar.gz"
-    sha256 "fb05971867ad6ccabbd3720279f5a94b99f61024923187b56bb5c455fa3cf60f"
+    url "https://static.rust-lang.org/dist/rustc-1.70.0-src.tar.gz"
+    sha256 "b2bfae000b7a5040e4ec4bbc50a09f21548190cb7570b0ed77358368413bd27c"
 
     # From https://github.com/rust-lang/rust/tree/#{version}/src/tools
     resource "cargo" do
       url "https://github.com/rust-lang/cargo.git",
-          tag:      "0.70.0",
-          revision: "6e9a83356b70586d4b77613a6b33f9ea067b9cdf"
+          tag:      "0.71.0",
+          revision: "ec8a8a0cabb0e0cadef58902470f6c7ee7868bdc"
     end
   end
 
@@ -36,24 +36,24 @@ class Rust < Formula
     on_macos do
       # From https://github.com/rust-lang/rust/blob/#{version}/src/stage0.json
       on_arm do
-        url "https://static.rust-lang.org/dist/2023-03-28/cargo-1.68.2-aarch64-apple-darwin.tar.gz"
-        sha256 "7317f1a2823a78f531f433d55cf76baf8701d16268bded12e0501fc07e74c6f4"
+        url "https://static.rust-lang.org/dist/2023-04-20/cargo-1.69.0-aarch64-apple-darwin.tar.gz"
+        sha256 "b185ea41a0ad76ac23b08744732c51e4811528291f7193d612a42e3e54ecd535"
       end
       on_intel do
-        url "https://static.rust-lang.org/dist/2023-03-28/cargo-1.68.2-x86_64-apple-darwin.tar.gz"
-        sha256 "c580e7dbf6bde9bf4246380ac1591682981dc7cbdb7b82a95eac8322d866e4bd"
+        url "https://static.rust-lang.org/dist/2023-04-20/cargo-1.69.0-x86_64-apple-darwin.tar.gz"
+        sha256 "3ed0b5eaaf7e908f196b4882aad757cb2a623ca3c8e8e74471422df5e93ebfb0"
       end
     end
 
     on_linux do
       # From: https://github.com/rust-lang/rust/blob/#{version}/src/stage0.json
       on_arm do
-        url "https://static.rust-lang.org/dist/2023-03-28/cargo-1.68.2-aarch64-unknown-linux-gnu.tar.gz"
-        sha256 "09119c8df515f3358dbbb23514a80deb5d9891a5fcd4323667dbc84f32a160da"
+        url "https://static.rust-lang.org/dist/2023-04-20/cargo-1.69.0-aarch64-unknown-linux-gnu.tar.gz"
+        sha256 "6ba6e4a9295b03d01b7dac94b7941d71c029343dc3abfd6cc4733a99fc3c7976"
       end
       on_intel do
-        url "https://static.rust-lang.org/dist/2023-03-28/cargo-1.68.2-x86_64-unknown-linux-gnu.tar.gz"
-        sha256 "cf4e6c9d1a61c1898ffa21353fc9eb4c1512fc6beb6cad433851fbed777f1ea6"
+        url "https://static.rust-lang.org/dist/2023-04-20/cargo-1.69.0-x86_64-unknown-linux-gnu.tar.gz"
+        sha256 "7ee899206f592a86687478465970aa6b57772ccbe9a1f1b7695aa1237c2325a6"
       end
     end
   end
