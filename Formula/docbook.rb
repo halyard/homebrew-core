@@ -15,8 +15,8 @@ class Docbook < Formula
 
   resource "xml412" do
     url "https://docbook.org/xml/4.1.2/docbkx412.zip"
-    sha256 "30f0644064e0ea71751438251940b1431f46acada814a062870f486c772e7772"
     version "4.1.2"
+    sha256 "30f0644064e0ea71751438251940b1431f46acada814a062870f486c772e7772"
   end
 
   resource "xml42" do
@@ -73,16 +73,19 @@ class Docbook < Formula
     etc_catalog = etc/"xml/catalog"
     ENV["XML_CATALOG_FILES"] = etc_catalog
 
+    # We use `/usr/bin/xmlcatalog` on macOS, but libxml2's `xmlcatalog` on Linux.
+    xmlcatalog = DevelopmentTools.locate("xmlcatalog")
+
     # only create catalog file if it doesn't exist already to avoid content added
     # by other formulae to be removed
-    system "xmlcatalog", "--noout", "--create", etc_catalog unless File.file?(etc_catalog)
+    system xmlcatalog, "--noout", "--create", etc_catalog unless etc_catalog.file?
 
     %w[4.2 4.1.2 4.3 4.4 4.5 5.0 5.1].each do |version|
       catalog = opt_prefix/"docbook/xml/#{version}/catalog.xml"
 
-      system "xmlcatalog", "--noout", "--del",
+      system xmlcatalog, "--noout", "--del",
              "file://#{catalog}", etc_catalog
-      system "xmlcatalog", "--noout", "--add", "nextCatalog",
+      system xmlcatalog, "--noout", "--add", "nextCatalog",
              "", "file://#{catalog}", etc_catalog
     end
   end
