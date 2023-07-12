@@ -3,8 +3,8 @@ require "language/node"
 class Emscripten < Formula
   desc "LLVM bytecode to JavaScript compiler"
   homepage "https://emscripten.org/"
-  url "https://github.com/emscripten-core/emscripten/archive/3.1.35.tar.gz"
-  sha256 "61530cf2d51fe00bfad9b0c5d14fd310fc3cffe00de423764dc9839d62071bcb"
+  url "https://github.com/emscripten-core/emscripten/archive/3.1.43.tar.gz"
+  sha256 "f44f43a9a8696398fd2d5ad7df3cc2a265c2c097ed2938a7fac2a8ba551a0f66"
   license all_of: [
     "Apache-2.0", # binaryen
     "Apache-2.0" => { with: "LLVM-exception" }, # llvm
@@ -37,10 +37,11 @@ class Emscripten < Formula
   fails_with gcc: "5"
 
   # Use emscripten's recommended binaryen revision to avoid build failures.
+  # https://github.com/emscripten-core/emscripten/issues/12252
   # See llvm resource below for instructions on how to update this.
   resource "binaryen" do
     url "https://github.com/WebAssembly/binaryen.git",
-        revision: "47056c9a00e368969a503209b6b9f5c0bc287058"
+        revision: "0d3bb31a37e151a7d4dcf32575f5789f0a3818ce"
   end
 
   # emscripten does not support using the stable version of LLVM.
@@ -52,7 +53,7 @@ class Emscripten < Formula
   # Then use the listed llvm_project_revision for the resource below.
   resource "llvm" do
     url "https://github.com/llvm/llvm-project.git",
-        revision: "6865cff8ea8b07d9f2385fd92cecb422404f0f35"
+        revision: "71513a71cdf380efd6a44be6939e2cb979a62407"
   end
 
   def install
@@ -68,7 +69,7 @@ class Emscripten < Formula
     # repository.
     libexec.install buildpath.children
 
-    # Remove unneded files. See `tools/install.py`.
+    # Remove unneeded files. See `tools/install.py`.
     (libexec/"test/third_party").rmtree
 
     # emscripten needs an llvm build with the following executables:
@@ -192,7 +193,7 @@ class Emscripten < Formula
   end
 
   test do
-    # We're targetting WASM, so we don't want to use the macOS SDK here.
+    # We're targeting WASM, so we don't want to use the macOS SDK here.
     ENV.remove_macosxsdk if OS.mac?
     # Avoid errors on Linux when other formulae like `sdl12-compat` are installed
     ENV.delete "CPATH"
