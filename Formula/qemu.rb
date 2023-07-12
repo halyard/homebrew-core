@@ -1,8 +1,8 @@
 class Qemu < Formula
   desc "Emulator for x86 and PowerPC"
   homepage "https://www.qemu.org/"
-  url "https://download.qemu.org/qemu-7.2.1.tar.xz"
-  sha256 "8c85699acf9d7a43a5fe29a64cdd56370b0c2d1ad074baf7098a824d17aad73b"
+  url "https://download.qemu.org/qemu-8.0.3.tar.xz"
+  sha256 "ecf4d32cbef9d397bfc8cc50e4d1e92a1b30253bf32e8ee73c7a8dcf9a232b09"
   license "GPL-2.0-only"
   head "https://git.qemu.org/git/qemu.git", branch: "master"
 
@@ -10,6 +10,7 @@ class Qemu < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "spice-protocol" => :build
 
   depends_on "capstone"
   depends_on "glib"
@@ -26,6 +27,9 @@ class Qemu < Formula
   depends_on "snappy"
   depends_on "vde"
   depends_on "zstd"
+
+  uses_from_macos "bison" => :build
+  uses_from_macos "flex" => :build
 
   on_linux do
     depends_on "attr"
