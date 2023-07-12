@@ -1,8 +1,8 @@
 class Luv < Formula
   desc "Bare libuv bindings for lua"
   homepage "https://github.com/luvit/luv"
-  url "https://github.com/luvit/luv/archive/1.44.2-1.tar.gz"
-  sha256 "f8c69908e17ec8ab370253d1508e23deaecfc0c4752d2efb77e427e579501104"
+  url "https://github.com/luvit/luv/archive/1.45.0-0.tar.gz"
+  sha256 "97e89940f9eeaa8dfb34f1c19f80dd373299c42719d15228ec790f415d4e4965"
   license "Apache-2.0"
   head "https://github.com/luvit/luv.git", branch: "master"
 
