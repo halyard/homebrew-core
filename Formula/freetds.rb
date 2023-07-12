@@ -2,6 +2,7 @@ class Freetds < Formula
   desc "Libraries to talk to Microsoft SQL Server and Sybase databases"
   homepage "https://www.freetds.org/"
   license "GPL-2.0-or-later"
+  revision 1
 
   stable do
     url "https://www.freetds.org/files/stable/freetds-1.3.18.tar.bz2", using: :homebrew_curl
@@ -29,7 +30,7 @@ class Freetds < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "unixodbc"
 
   uses_from_macos "krb5"
@@ -45,7 +46,7 @@ class Freetds < Formula
       --mandir=#{man}
       --sysconfdir=#{etc}
       --with-unixodbc=#{Formula["unixodbc"].opt_prefix}
-      --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
+      --with-openssl=#{Formula["openssl@3"].opt_prefix}
       --enable-sybase-compat
       --enable-krb5
       --enable-odbc-wide
