@@ -1,9 +1,9 @@
 class Nettle < Formula
   desc "Low-level cryptographic library"
   homepage "https://www.lysator.liu.se/~nisse/nettle/"
-  url "https://ftp.gnu.org/gnu/nettle/nettle-3.8.1.tar.gz"
-  mirror "https://ftpmirror.gnu.org/nettle/nettle-3.8.1.tar.gz"
-  sha256 "364f3e2b77cd7dcde83fd7c45219c834e54b0c75e428b6f894a23d12dd41cbfe"
+  url "https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz"
+  mirror "https://ftpmirror.gnu.org/nettle/nettle-3.9.1.tar.gz"
+  sha256 "ccfeff981b0ca71bbd6fbcb054f407c60ffb644389a5be80d6716d5b550c6ce3"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
 
   depends_on "gmp"
@@ -11,22 +11,7 @@ class Nettle < Formula
   uses_from_macos "m4" => :build
 
   def install
-    # The LLVM shipped with Xcode/CLT 10+ compiles binaries/libraries with
-    # ___chkstk_darwin, which upsets nettle's expected symbol check.
-    # https://github.com/Homebrew/homebrew-core/issues/28817#issuecomment-396762855
-    # https://lists.lysator.liu.se/pipermail/nettle-bugs/2018/007300.html
-    if DevelopmentTools.clang_build_version >= 1000
-      inreplace "testsuite/symbols-test", "get_pc_thunk",
-                                          "get_pc_thunk|(_*chkstk_darwin)"
-    end
-
-    args = []
-    args << "--build=aarch64-apple-darwin#{OS.kernel_version}" if Hardware::CPU.arm?
-
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--enable-shared",
-                          *args
+    system "./configure", *std_configure_args, "--enable-shared"
     system "make"
     system "make", "install"
     system "make", "check"
