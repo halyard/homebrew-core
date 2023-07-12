@@ -6,6 +6,7 @@ class Libidn2 < Formula
   mirror "http://ftp.gnu.org/gnu/libidn/libidn2-2.3.4.tar.gz"
   sha256 "93caba72b4e051d1f8d4f5a076ab63c99b77faee019b72b9783b267986dbb45f"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
+  revision 1
 
   livecheck do
     url :stable
@@ -13,27 +14,36 @@ class Libidn2 < Formula
   end
 
   head do
-    url "https://gitlab.com/libidn/libidn2.git"
+    url "https://gitlab.com/libidn/libidn2.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "gengetopt" => :build
+    depends_on "gettext" => :build
+    depends_on "help2man" => :build
     depends_on "libtool" => :build
     depends_on "ronn" => :build
+
+    uses_from_macos "gperf" => :build
+
+    on_system :linux, macos: :ventura_or_newer do
+      depends_on "texinfo" => :build
+    end
   end
 
   depends_on "pkg-config" => :build
-  depends_on "gettext"
   depends_on "libunistring"
 
-  def install
-    system "./bootstrap" if build.head?
+  on_macos do
+    depends_on "gettext"
+  end
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--with-libintl-prefix=#{Formula["gettext"].opt_prefix}",
-                          "--with-packager=Homebrew"
+  def install
+    args = ["--disable-silent-rules", "--with-packager=Homebrew"]
+    args << "--with-libintl-prefix=#{Formula["gettext"].opt_prefix}" if OS.mac?
+
+    system "./bootstrap", "--skip-po" if build.head?
+    system "./configure", *std_configure_args, *args
     system "make", "install"
   end
 
