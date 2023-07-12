@@ -1,17 +1,17 @@
 class Srt < Formula
   desc "Secure Reliable Transport"
   homepage "https://www.srtalliance.org/"
-  url "https://github.com/Haivision/srt/archive/v1.5.1.tar.gz"
-  sha256 "af891e7a7ffab61aa76b296982038b3159da690f69ade7c119f445d924b3cf53"
+  url "https://github.com/Haivision/srt/archive/v1.5.2.tar.gz"
+  sha256 "463970a3f575446b3f55abb6f323d5476c963c77b3c975cd902e9c87cdd9a92c"
   license "MPL-2.0"
   head "https://github.com/Haivision/srt.git", branch: "master"
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   def install
-    openssl = Formula["openssl@1.1"]
+    openssl = Formula["openssl@3"]
     system "cmake", ".", "-DWITH_OPENSSL_INCLUDEDIR=#{openssl.opt_include}",
                          "-DWITH_OPENSSL_LIBDIR=#{openssl.opt_lib}",
                          "-DCMAKE_INSTALL_BINDIR=bin",
