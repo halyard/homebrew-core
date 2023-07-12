@@ -1,8 +1,8 @@
 class Libxml2 < Formula
   desc "GNOME XML library"
   homepage "http://xmlsoft.org/"
-  url "https://download.gnome.org/sources/libxml2/2.10/libxml2-2.10.3.tar.xz"
-  sha256 "5d2cc3d78bec3dbe212a9d7fa629ada25a7da928af432c93060ff5c17ee28a9c"
+  url "https://download.gnome.org/sources/libxml2/2.11/libxml2-2.11.4.tar.xz"
+  sha256 "737e1d7f8ab3f139729ca13a2494fd17bf30ddb4b7a427cf336252cab57f57f7"
   license "MIT"
   revision 1
 
@@ -26,20 +26,12 @@ class Libxml2 < Formula
 
   depends_on "python@3.10" => [:build, :test]
   depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.9" => [:build, :test]
   depends_on "pkg-config" => :test
   depends_on "icu4c"
   depends_on "readline"
 
   uses_from_macos "zlib"
-
-  # Fix crash when using Python 3 using Fedora's patch.
-  # Reported upstream:
-  # https://bugzilla.gnome.org/show_bug.cgi?id=789714
-  # https://gitlab.gnome.org/GNOME/libxml2/issues/12
-  patch do
-    url "https://bugzilla.opensuse.org/attachment.cgi?id=746044"
-    sha256 "37eb81a8ec6929eed1514e891bff2dd05b450bcf0c712153880c485b7366c17c"
-  end
 
   def pythons
     deps.map(&:to_formula)
