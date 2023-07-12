@@ -1,10 +1,9 @@
 class Lua < Formula
   desc "Powerful, lightweight programming language"
   homepage "https://www.lua.org/"
-  url "https://www.lua.org/ftp/lua-5.4.4.tar.gz"
-  sha256 "164c7849653b80ae67bec4b7473b884bf5cc8d2dca05653475ec2ed27b9ebf61"
+  url "https://www.lua.org/ftp/lua-5.4.6.tar.gz"
+  sha256 "7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad88"
   license "MIT"
-  revision 1
 
   livecheck do
     url "https://www.lua.org/ftp/"
@@ -32,10 +31,6 @@ class Lua < Formula
       sha256 "522dc63a0c1d87bf127c992dfdf73a9267890fd01a5a17e2bcf06f7eb2782942"
     end
   end
-
-  # Fix crash issue in luac when invoked with multiple files.
-  # http://lua-users.org/lists/lua-l/2022-02/msg00113.html
-  patch :DATA
 
   def install
     if OS.linux?
@@ -115,17 +110,3 @@ class Lua < Formula
     assert_match "Homebrew is awesome!", shell_output("#{bin}/lua -e \"print ('Homebrew is awesome!')\"")
   end
 end
-
-__END__
-diff --git a/src/luac.c b/src/luac.c
-index f6db9cf..ba0a81e 100644
---- a/src/luac.c
-+++ b/src/luac.c
-@@ -156,6 +156,7 @@ static const Proto* combine(lua_State* L, int n)
-    if (f->p[i]->sizeupvalues>0) f->p[i]->upvalues[0].instack=0;
-   }
-   luaM_freearray(L,f->lineinfo,f->sizelineinfo);
-+  f->lineinfo = NULL;
-   f->sizelineinfo=0;
-   return f;
-  }
