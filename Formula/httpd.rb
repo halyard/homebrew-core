@@ -5,12 +5,13 @@ class Httpd < Formula
   mirror "https://downloads.apache.org/httpd/httpd-2.4.57.tar.bz2"
   sha256 "dbccb84aee95e095edfbb81e5eb926ccd24e6ada55dcd83caecb262e5cf94d2a"
   license "Apache-2.0"
+  revision 1
 
   depends_on "apr"
   depends_on "apr-util"
   depends_on "brotli"
   depends_on "libnghttp2"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "pcre2"
 
   uses_from_macos "libxml2"
@@ -67,7 +68,7 @@ class Httpd < Formula
                           "--with-libxml2=#{libxml2}",
                           "--with-mpm=prefork",
                           "--with-nghttp2=#{Formula["libnghttp2"].opt_prefix}",
-                          "--with-ssl=#{Formula["openssl@1.1"].opt_prefix}",
+                          "--with-ssl=#{Formula["openssl@3"].opt_prefix}",
                           "--with-pcre=#{Formula["pcre2"].opt_prefix}/bin/pcre2-config",
                           "--with-z=#{zlib}",
                           "--disable-lua",
