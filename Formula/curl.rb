@@ -1,12 +1,14 @@
 class Curl < Formula
   desc "Get a file from an HTTP, HTTPS or FTP server"
   homepage "https://curl.se"
-  url "https://curl.se/download/curl-8.0.1.tar.bz2"
-  mirror "https://github.com/curl/curl/releases/download/curl-8_0_0/curl-8.0.1.tar.bz2"
-  mirror "http://fresh-center.net/linux/www/curl-8.0.1.tar.bz2"
-  mirror "http://fresh-center.net/linux/www/legacy/curl-8.0.1.tar.bz2"
-  sha256 "9b6b1e96b748d04b968786b6bdf407aa5c75ab53a3d37c1c8c81cdb736555ccf"
+  # Don't forget to update both instances of the version in the GitHub mirror URL.
+  url "https://curl.se/download/curl-8.1.2.tar.bz2"
+  mirror "https://github.com/curl/curl/releases/download/curl-8_1_2/curl-8.1.2.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/curl-8.1.2.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/legacy/curl-8.1.2.tar.bz2"
+  sha256 "b54974d32fd610acace92e3df1f643144015ac65847f0a041fdc17db6f43f243"
   license "curl"
+  revision 1
 
   livecheck do
     url "https://curl.se/download/"
@@ -29,7 +31,7 @@ class Curl < Formula
   depends_on "libnghttp2"
   depends_on "libssh2"
   depends_on "openldap"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "rtmpdump"
   depends_on "zstd"
 
@@ -44,7 +46,7 @@ class Curl < Formula
       --disable-dependency-tracking
       --disable-silent-rules
       --prefix=#{prefix}
-      --with-ssl=#{Formula["openssl@1.1"].opt_prefix}
+      --with-ssl=#{Formula["openssl@3"].opt_prefix}
       --without-ca-bundle
       --without-ca-path
       --with-ca-fallback
@@ -69,6 +71,11 @@ class Curl < Formula
   end
 
   test do
+    tag_name = "curl-#{version.to_s.tr(".", "_")}"
+    assert_match tag_name, stable.mirrors.grep(/github\.com/).first,
+                 "Tag name #{tag_name} is not found in the GitHub mirror " \
+                 "URL! Please make sure the URL is correct"
+
     # Fetch the curl tarball and see that the checksum matches.
     # This requires a network connection, but so does Homebrew in general.
     filename = (testpath/"test.tar.gz")
