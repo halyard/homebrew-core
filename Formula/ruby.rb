@@ -2,6 +2,7 @@ class Ruby < Formula
   desc "Powerful, clean, object-oriented scripting language"
   homepage "https://www.ruby-lang.org/"
   license "Ruby"
+  revision 1
 
   stable do
     url "https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.gz"
@@ -25,7 +26,6 @@ class Ruby < Formula
     url "https://github.com/ruby/ruby.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "bison" => :build
-    depends_on "rust" => :build
   end
 
   keg_only :provided_by_macos
@@ -35,7 +35,7 @@ class Ruby < Formula
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
   depends_on "libyaml"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "readline"
 
   uses_from_macos "gperf"
@@ -62,7 +62,7 @@ class Ruby < Formula
 
     system "./autogen.sh" if build.head?
 
-    paths = %w[libyaml openssl@1.1 readline].map { |f| Formula[f].opt_prefix }
+    paths = %w[libyaml openssl@3 readline].map { |f| Formula[f].opt_prefix }
     args = %W[
       --prefix=#{prefix}
       --enable-shared
