@@ -1,8 +1,8 @@
 class Libx11 < Formula
   desc "X.Org: Core X11 protocol client library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libX11-1.8.4.tar.gz"
-  sha256 "efd3a3a43c1f177edc2c205bedb0719b6648203595e54c0b83a32576aeaca7cd"
+  url "https://www.x.org/archive/individual/lib/libX11-1.8.6.tar.gz"
+  sha256 "5ff0d26c94d82ebb94a944b9f1f55cd01b9713fd461fe93f62f3527ce14ad94e"
   license "MIT"
 
   depends_on "pkg-config" => :build
@@ -15,21 +15,18 @@ class Libx11 < Formula
     ENV.delete "LC_ALL"
     ENV["LC_CTYPE"] = "C"
     args = %W[
-      --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
-      --disable-dependency-tracking
       --disable-silent-rules
       --enable-unix-transport
       --enable-tcp-transport
       --enable-ipv6
-      --enable-local-transport
       --enable-loadable-i18n
       --enable-xthreads
       --enable-specs=no
     ]
 
-    system "./configure", *args
+    system "./configure", *std_configure_args, *args
     system "make"
     system "make", "install"
   end
@@ -68,6 +65,5 @@ class Libx11 < Formula
     EOS
     system ENV.cc, "test.c", "-L#{lib}", "-lX11", "-o", "test", "-I#{include}"
     system "./test"
-    assert_equal 0, $CHILD_STATUS.exitstatus
   end
 end
