@@ -1,18 +1,16 @@
-class Libgit2AT15 < Formula
+class Libgit2 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
   homepage "https://libgit2.github.com/"
-  url "https://github.com/libgit2/libgit2/archive/v1.5.2.tar.gz"
-  sha256 "57638ac0e319078f56a7e17570be754515e5b1276d3750904b4214c92e8fa196"
+  url "https://github.com/libgit2/libgit2/archive/v1.6.4.tar.gz"
+  sha256 "d25866a4ee275a64f65be2d9a663680a5cf1ed87b7ee4c534997562c828e500d"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
   revision 1
-  head "https://github.com/libgit2/libgit2.git", branch: "maint/v1.5"
+  head "https://github.com/libgit2/libgit2.git", branch: "main"
 
   livecheck do
     url :stable
-    regex(/v?(1\.5(?:\.\d+)+)/i)
+    strategy :github_latest
   end
-
-  keg_only :versioned_formula
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
@@ -20,10 +18,15 @@ class Libgit2AT15 < Formula
   depends_on "openssl@3"
 
   def install
-    args = %w[-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DUSE_SSH=ON -DBUILD_SHARED_LIBS=ON]
-    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    args = %w[-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DUSE_SSH=ON]
+
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
+
+    system "cmake", "-S", ".", "-B", "build-static", "-DBUILD_SHARED_LIBS=OFF", *args, *std_cmake_args
+    system "cmake", "--build", "build-static"
+    lib.install "build-static/libgit2.a"
   end
 
   test do
