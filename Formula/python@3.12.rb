@@ -1,13 +1,14 @@
-class PythonAT310 < Formula
+class PythonAT312 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz"
-  sha256 "cefea32d3be89c02436711c95a45c7f8e880105514b78680c14fe76f5709a0f6"
+  url "https://www.python.org/ftp/python/3.12.2/Python-3.12.2.tgz"
+  sha256 "a7c4f6a9dc423d8c328003254ab0c9338b83037bd787d680826a5bf84308116e"
   license "Python-2.0"
+  revision 1
 
   livecheck do
     url "https://www.python.org/ftp/python/"
-    regex(%r{href=.*?v?(3\.10(?:\.\d+)*)/?["' >]}i)
+    regex(%r{href=.*?v?(3\.12(?:\.\d+)*)/?["' >]}i)
   end
 
   # setuptools remembers the build flags python is built with and uses them to
@@ -15,15 +16,14 @@ class PythonAT310 < Formula
   pour_bottle? only_if: :clt_installed
 
   depends_on "pkg-config" => :build
-  depends_on "gdbm"
   depends_on "mpdecimal"
   depends_on "openssl@3"
-  depends_on "readline"
   depends_on "sqlite"
   depends_on "xz"
 
   uses_from_macos "bzip2"
   uses_from_macos "expat"
+  uses_from_macos "libedit"
   uses_from_macos "libffi", since: :catalina
   uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
@@ -31,12 +31,31 @@ class PythonAT310 < Formula
   uses_from_macos "zlib"
 
   on_linux do
+    depends_on "berkeley-db@5"
     depends_on "libnsl"
   end
 
-  skip_clean "bin/pip3", "bin/pip-3.4", "bin/pip-3.5", "bin/pip-3.6", "bin/pip-3.7", "bin/pip-3.8", "bin/pip-3.9"
+  skip_clean "bin/pip3", "bin/pip-3.4", "bin/pip-3.5", "bin/pip-3.6", "bin/pip-3.7", "bin/pip-3.8", "bin/pip-3.9",
+              "bin/pip-3.10", "bin/pip-3.11"
   skip_clean "bin/easy_install3", "bin/easy_install-3.4", "bin/easy_install-3.5", "bin/easy_install-3.6",
-              "bin/easy_install-3.7", "bin/easy_install-3.8", "bin/easy_install-3.9"
+              "bin/easy_install-3.7", "bin/easy_install-3.8", "bin/easy_install-3.9", "bin/easy_install-3.10",
+              "bin/easy_install-3.11"
+
+  link_overwrite "bin/2to3"
+  link_overwrite "bin/idle3"
+  link_overwrite "bin/pip3"
+  link_overwrite "bin/pydoc3"
+  link_overwrite "bin/python3"
+  link_overwrite "bin/python3-config"
+  link_overwrite "bin/wheel3"
+  link_overwrite "share/man/man1/python3.1"
+  link_overwrite "lib/libpython3.so"
+  link_overwrite "lib/pkgconfig/python3.pc"
+  link_overwrite "lib/pkgconfig/python3-embed.pc"
+  link_overwrite "Frameworks/Python.framework/Headers"
+  link_overwrite "Frameworks/Python.framework/Python"
+  link_overwrite "Frameworks/Python.framework/Resources"
+  link_overwrite "Frameworks/Python.framework/Versions/Current"
 
   # Always update to latest release
   resource "flit-core" do
@@ -50,28 +69,21 @@ class PythonAT310 < Formula
   end
 
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/4d/5b/dc575711b6b8f2f866131a40d053e30e962e633b332acf7cd2c24843d83d/setuptools-69.2.0.tar.gz"
-    sha256 "0ff4183f8f42cd8fa3acea16c45205521a4ef28f73c6391d8a25e92893134f2e"
+    url "https://files.pythonhosted.org/packages/fc/c9/b146ca195403e0182a374e0ea4dbc69136bad3cd55bc293df496d625d0f7/setuptools-69.0.3.tar.gz"
+    sha256 "be1af57fc409f93647f2e8e4573a142ed38724b8cdd389706a867bb4efcf1e78"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/b8/d6/ac9cd92ea2ad502ff7c1ab683806a9deb34711a1e2bd8a59814e8fc27e69/wheel-0.43.0.tar.gz"
-    sha256 "465ef92c69fa5c5da2d1cf8ac40559a8c940886afcef87dcf14b9470862f1d85"
+    url "https://files.pythonhosted.org/packages/b0/b4/bc2baae3970c282fae6c2cb8e0f179923dceb7eaffb0e76170628f9af97b/wheel-0.42.0.tar.gz"
+    sha256 "c45be39f7882c9d34243236f2d63cbd58039e360f85d0913425fbd7ceea617a8"
   end
 
   # Modify default sysconfig to match the brew install layout.
   # Remove when a non-patching mechanism is added (https://bugs.python.org/issue43976).
   # We (ab)use osx_framework_library to exploit pip behaviour to allow --prefix to still work.
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/a1618a5005d0b01d63b720321806820a03432f1a/python/3.10-sysconfig.diff"
-    sha256 "51bc741a7f201bf7382067f5561a10968476c98d952e54a4f1931f17f1397ef8"
-  end
-
-  # Make bundled distutils look at preferred sysconfig scheme.
-  # Remove with Python 3.12.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/a1618a5005d0b01d63b720321806820a03432f1a/python/3.10-distutils-scheme.diff"
-    sha256 "d1a29b3c9ecf8aecd65e1e54efc42fb1422b2f5d05cba0c747178f4ef8a69683"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/6d2fba8de3159182025237d373a6f4f78b8bd203/python/3.11-sysconfig.diff"
+    sha256 "8bfe417c815da4ca2c0a2457ce7ef81bc9dae310e20e4fb36235901ea4be1658"
   end
 
   def lib_cellar
@@ -102,9 +114,11 @@ class PythonAT310 < Formula
     ENV["PYTHONHOME"] = nil
     ENV["PYTHONPATH"] = nil
 
-    # Override the auto-detection in setup.py, which assumes a universal build.
+    # Override the auto-detection of libmpdec, which assumes a universal build.
+    # This is currently an inreplace due to https://github.com/python/cpython/issues/98557.
     if OS.mac?
-      ENV["PYTHON_DECIMAL_WITH_MACHINE"] = Hardware::CPU.arm? ? "uint128" : "x64"
+      inreplace "configure", "libmpdec_machine=universal",
+                "libmpdec_machine=#{ENV["PYTHON_DECIMAL_WITH_MACHINE"] = Hardware::CPU.arm? ? "uint128" : "x64"}"
     end
 
     # The --enable-optimization and --with-lto flags diverge from what upstream
@@ -120,10 +134,10 @@ class PythonAT310 < Formula
       --without-ensurepip
       --enable-loadable-sqlite-extensions
       --with-openssl=#{Formula["openssl@3"].opt_prefix}
-      --with-dbmliborder=gdbm:ndbm
       --enable-optimizations
       --with-system-expat
       --with-system-libmpdec
+      --with-readline=editline
     ]
 
     # Python re-uses flags when building native modules.
@@ -138,42 +152,30 @@ class PythonAT310 < Formula
     cppflags       = ["-I#{HOMEBREW_PREFIX}/include"]
 
     if OS.mac?
-      # Enabling LTO on Linux makes libpython3.*.a unusable for anyone whose GCC
-      # install does not match the one in CI _exactly_ (major and minor version).
-      # https://github.com/orgs/Homebrew/discussions/3734
-      args << "--with-lto"
-      args << "--enable-framework=#{frameworks}"
-      args << "--with-dtrace"
-
       if MacOS.sdk_path_if_needed
         # Help Python's build system (setuptools/pip) to build things on SDK-based systems
         # The setup.py looks at "-isysroot" to get the sysroot (and not at --sysroot)
         cflags  << "-isysroot #{MacOS.sdk_path}"
         ldflags << "-isysroot #{MacOS.sdk_path}"
       end
+
+      # Enabling LTO on Linux makes libpython3.*.a unusable for anyone whose GCC
+      # install does not match the one in CI _exactly_ (major and minßor version).
+      # https://github.com/orgs/Homebrew/discussions/3734
+      args << "--with-lto"
+      args << "--enable-framework=#{frameworks}"
+      args << "--with-dtrace"
+      args << "--with-dbmliborder=ndbm"
+
       # Avoid linking to libgcc https://mail.python.org/pipermail/python-dev/2012-February/116205.html
       args << "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
     else
       args << "--enable-shared"
+      args << "--with-dbmliborder=bdb"
     end
 
     # Resolve HOMEBREW_PREFIX in our sysconfig modification.
     inreplace "Lib/sysconfig.py", "@@HOMEBREW_PREFIX@@", HOMEBREW_PREFIX
-
-    # Disable _tkinter - this is built in a separate formula python-tk
-    inreplace "setup.py", "DISABLED_MODULE_LIST = []", "DISABLED_MODULE_LIST = ['_tkinter']"
-
-    # We want our readline! This is just to outsmart the detection code,
-    # superenv makes cc always find includes/libs!
-    inreplace "setup.py",
-      /do_readline = self.compiler.find_library_file\(self.lib_dirs,\s*readline_lib\)/,
-      "do_readline = '#{Formula["readline"].opt_lib/shared_library("libhistory")}'"
-
-    inreplace "setup.py" do |s|
-      s.gsub! "sqlite_setup_debug = False", "sqlite_setup_debug = True"
-      s.gsub! "for d_ in self.inc_dirs + sqlite_inc_paths:",
-              "for d_ in ['#{Formula["sqlite"].opt_include}']:"
-    end
 
     if OS.linux?
       # Python's configure adds the system ncurses include entry to CPPFLAGS
@@ -200,16 +202,17 @@ class PythonAT310 < Formula
     args << "LDFLAGS_NODIST=#{ldflags_nodist.join(" ")}" unless ldflags_nodist.empty?
     args << "CPPFLAGS=#{cppflags.join(" ")}" unless cppflags.empty?
 
+    # Disabled modules - provided in separate formulae
+    args += %w[
+      py_cv_module__tkinter=disabled
+    ]
+
     system "./configure", *args
     system "make"
 
     ENV.deparallelize do
-      # The `altinstall` target prevents the installation of files with only Python's major
-      # version in its name. This allows us to link multiple versioned Python formulae.
-      #   https://github.com/python/cpython#installing-multiple-versions
-      #
       # Tell Python not to install into /Applications (default for framework builds)
-      system "make", "altinstall", "PYTHONAPPSDIR=#{prefix}"
+      system "make", "install", "PYTHONAPPSDIR=#{prefix}"
       system "make", "frameworkinstallextras", "PYTHONAPPSDIR=#{pkgshare}" if OS.mac?
     end
 
@@ -242,9 +245,6 @@ class PythonAT310 < Formula
       inreplace lib_cellar/"_sysconfigdata__darwin_darwin.py",
                 %r{('LINKFORSHARED': .*?)'(Python.framework/Versions/3.\d+/Python)'}m,
                 "\\1'#{opt_prefix}/Frameworks/\\2'"
-
-      # Remove symlinks that conflict with the main Python formula.
-      rm %w[Headers Python Resources Versions/Current].map { |subdir| frameworks/"Python.framework"/subdir }
     else
       # Prevent third-party packages from building against fragile Cellar paths
       inreplace Dir[lib_cellar/"**/_sysconfigdata_*linux_x86_64-*.py",
@@ -256,9 +256,6 @@ class PythonAT310 < Formula
       inreplace bin/"python#{version.major_minor}-config",
                 'prefix_real=$(installed_prefix "$0")',
                 "prefix_real=#{opt_prefix}"
-
-      # Remove symlinks that conflict with the main Python formula.
-      rm lib/"libpython3.so"
     end
 
     # Remove the site-packages that Python created in its Cellar.
@@ -274,19 +271,20 @@ class PythonAT310 < Formula
     ]
     whl_build = buildpath/"whl_build"
     system python3, "-m", "venv", whl_build
-    resource("flit-core").stage do
-      system whl_build/"bin/pip3", "install", *common_pip_args, "."
+    %w[flit-core wheel setuptools].each do |r|
+      resource(r).stage do
+        system whl_build/"bin/pip3", "install", *common_pip_args, "."
+      end
     end
     resource("wheel").stage do
-      system whl_build/"bin/pip3", "install", *common_pip_args, "."
       system whl_build/"bin/pip3", "wheel", *common_pip_args,
                                             "--wheel-dir=#{libexec}",
                                             "."
     end
 
-    # Replace bundled setuptools/pip with our own.
-    rm lib_cellar.glob("ensurepip/_bundled/{setuptools,pip}-*.whl")
-    %w[setuptools pip].each do |r|
+    # Replace bundled pip with our own.
+    rm lib_cellar.glob("ensurepip/_bundled/pip-*.whl")
+    %w[pip].each do |r|
       resource(r).stage do
         system whl_build/"bin/pip3", "wheel", *common_pip_args,
                                               "--wheel-dir=#{lib_cellar}/ensurepip/_bundled",
@@ -294,25 +292,20 @@ class PythonAT310 < Formula
       end
     end
 
-    # Patch ensurepip to bootstrap our updated versions of setuptools/pip
+    # Patch ensurepip to bootstrap our updated version of pip
     inreplace lib_cellar/"ensurepip/__init__.py" do |s|
-      s.gsub!(/_SETUPTOOLS_VERSION = .*/, "_SETUPTOOLS_VERSION = \"#{resource("setuptools").version}\"")
       s.gsub!(/_PIP_VERSION = .*/, "_PIP_VERSION = \"#{resource("pip").version}\"")
     end
 
     # Write out sitecustomize.py
     (lib_cellar/"sitecustomize.py").atomic_write(sitecustomize)
 
-    # Install unversioned and major-versioned symlinks in libexec/bin.
+    # Install unversioned symlinks in libexec/bin.
     {
-      "idle"           => "idle#{version.major_minor}",
-      "idle3"          => "idle#{version.major_minor}",
-      "pydoc"          => "pydoc#{version.major_minor}",
-      "pydoc3"         => "pydoc#{version.major_minor}",
-      "python"         => "python#{version.major_minor}",
-      "python3"        => "python#{version.major_minor}",
-      "python-config"  => "python#{version.major_minor}-config",
-      "python3-config" => "python#{version.major_minor}-config",
+      "idle"          => "idle#{version.major_minor}",
+      "pydoc"         => "pydoc#{version.major_minor}",
+      "python"        => "python#{version.major_minor}",
+      "python-config" => "python#{version.major_minor}-config",
     }.each do |short_name, long_name|
       (libexec/"bin").install_symlink (bin/long_name).realpath => short_name
     end
@@ -338,14 +331,14 @@ class PythonAT310 < Formula
     # listed in the easy_install.pth. This can break setuptools build with
     # zipimport.ZipImportError: bad local file header
     # setuptools-0.9.8-py3.3.egg
-    rm_rf Dir["#{site_packages}/setuptools[-_.][0-9]*", "#{site_packages}/setuptools"]
     rm_rf Dir["#{site_packages}/distribute[-_.][0-9]*", "#{site_packages}/distribute"]
     rm_rf Dir["#{site_packages}/pip[-_.][0-9]*", "#{site_packages}/pip"]
     rm_rf Dir["#{site_packages}/wheel[-_.][0-9]*", "#{site_packages}/wheel"]
 
+    (lib_cellar/"EXTERNALLY-MANAGED").unlink if (lib_cellar/"EXTERNALLY-MANAGED").exist?
     system python3, "-Im", "ensurepip"
 
-    # Install desired versions of setuptools, pip, wheel using the version of
+    # Install desired versions of pip, wheel using the version of
     # pip bootstrapped by ensurepip.
     # Note that while we replaced the ensurepip wheels, there's no guarantee
     # ensurepip actually used them, since other existing installations could
@@ -357,7 +350,6 @@ class PythonAT310 < Formula
            "--upgrade",
            "--isolated",
            "--target=#{site_packages}",
-           bundled/"setuptools-#{resource("setuptools").version}-py3-none-any.whl",
            bundled/"pip-#{resource("pip").version}-py3-none-any.whl",
            libexec/"wheel-#{resource("wheel").version}-py3-none-any.whl"
 
@@ -366,23 +358,56 @@ class PythonAT310 < Formula
     mv (site_packages/"bin").children, bin
     rmdir site_packages/"bin"
 
-    rm_rf bin.glob("pip{,3}")
+    rm_rf bin/"pip"
     mv bin/"wheel", bin/"wheel#{version.major_minor}"
+    bin.install_symlink "wheel#{version.major_minor}" => "wheel3"
 
-    # Install unversioned and major-versioned symlinks in libexec/bin.
+    # Install unversioned symlinks in libexec/bin.
     {
-      "pip"    => "pip#{version.major_minor}",
-      "pip3"   => "pip#{version.major_minor}",
-      "wheel"  => "wheel#{version.major_minor}",
-      "wheel3" => "wheel#{version.major_minor}",
+      "pip"   => "pip#{version.major_minor}",
+      "wheel" => "wheel#{version.major_minor}",
     }.each do |short_name, long_name|
       (libexec/"bin").install_symlink (bin/long_name).realpath => short_name
     end
 
     # post_install happens after link
-    %W[wheel#{version.major_minor} pip#{version.major_minor}].each do |e|
+    %W[wheel3 pip3 wheel#{version.major_minor} pip#{version.major_minor}].each do |e|
       (HOMEBREW_PREFIX/"bin").install_symlink bin/e
     end
+
+    # Mark Homebrew python as externally managed: https://peps.python.org/pep-0668/#marking-an-interpreter-as-using-an-external-package-manager
+    # Placed after ensurepip since it invokes pip in isolated mode, meaning
+    # we can't pass --break-system-packages.
+    (lib_cellar/"EXTERNALLY-MANAGED").write <<~EOS
+      [externally-managed]
+      Error=To install Python packages system-wide, try brew install
+       xyz, where xyz is the package you are trying to
+       install.
+
+       If you wish to install a Python library that isn't in Homebrew,
+       use a virtual environment:
+
+         python3 -m venv path/to/venv
+         source path/to/venv/bin/activate
+         python3 -m pip install xyz
+
+       If you wish to install a Python application that isn't in Homebrew,
+       it may be easiest to use 'pipx install xyz', which will manage a
+       virtual environment for you. You can install pipx with
+
+         brew install pipx
+
+       You may restore the old behavior of pip by passing
+       the '--break-system-packages' flag to pip, or by adding
+       'break-system-packages = true' to your pip.conf file. The latter
+       will permanently disable this error.
+
+       If you disable this error, we STRONGLY recommend that you additionally
+       pass the '--user' flag to pip, or set 'user = true' in your pip.conf
+       file. Failure to do this can result in a broken Homebrew installation.
+
+       Read more about this behavior here: <https://peps.python.org/pep-0668/>
+    EOS
   end
 
   def sitecustomize
@@ -434,32 +459,22 @@ class PythonAT310 < Formula
                   site.PREFIXES[:] = [new_exec_prefix if x == sys.exec_prefix else x for x in site.PREFIXES]
                   sys.exec_prefix = new_exec_prefix
               sys.base_exec_prefix = new_exec_prefix
-      # Check for and add the python-tk prefix.
-      tkinter_prefix = "#{HOMEBREW_PREFIX}/opt/python-tk@#{version.major_minor}/libexec"
-      if os.path.isdir(tkinter_prefix):
-          sys.path.append(tkinter_prefix)
+      # Check for and add the prefix of split Python formulae.
+      for split_module in ["tk", "gdbm"]:
+          split_prefix = f"#{HOMEBREW_PREFIX}/opt/python-{split_module}@#{version.major_minor}/libexec"
+          if os.path.isdir(split_prefix):
+              sys.path.append(split_prefix)
     EOS
   end
 
   def caveats
     <<~EOS
       Python has been installed as
-        #{HOMEBREW_PREFIX}/bin/python#{version.major_minor}
+        #{HOMEBREW_PREFIX}/bin/python3
 
-      Unversioned and major-versioned symlinks `python`, `python3`, `python-config`, `python3-config`, `pip`, `pip3`, etc. pointing to
-      `python#{version.major_minor}`, `python#{version.major_minor}-config`, `pip#{version.major_minor}` etc., respectively, have been installed into
+      Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
+      `python3`, `python3-config`, `pip3` etc., respectively, have been installed into
         #{opt_libexec}/bin
-
-      You can install Python packages with
-        pip#{version.major_minor} install <package>
-      They will install into the site-package directory
-        #{HOMEBREW_PREFIX}/lib/python#{version.major_minor}/site-packages
-
-      tkinter is no longer included with this formula, but it is available separately:
-        brew install python-tk@#{version.major_minor}
-
-      If you do not need a specific version of Python, and always want Homebrew's `python3` in your PATH:
-        brew install python3
 
       See: https://docs.brew.sh/Homebrew-and-Python
     EOS
@@ -476,13 +491,19 @@ class PythonAT310 < Formula
     # Check if some other modules import. Then the linked libs are working.
     system python3, "-c", "import _ctypes"
     system python3, "-c", "import _decimal"
-    system python3, "-c", "import _gdbm"
     system python3, "-c", "import pyexpat"
+    system python3, "-c", "import readline"
     system python3, "-c", "import zlib"
 
     # tkinter is provided in a separate formula
     assert_match "ModuleNotFoundError: No module named '_tkinter'",
                  shell_output("#{python3} -Sc 'import tkinter' 2>&1", 1)
+
+    # gdbm is provided in a separate formula
+    assert_match "ModuleNotFoundError: No module named '_gdbm'",
+                 shell_output("#{python3} -Sc 'import _gdbm' 2>&1", 1)
+    assert_match "ModuleNotFoundError: No module named '_gdbm'",
+                 shell_output("#{python3} -Sc 'import dbm.gnu' 2>&1", 1)
 
     # Verify that the selected DBM interface works
     (testpath/"dbm_test.py").write <<~EOS
@@ -498,5 +519,9 @@ class PythonAT310 < Formula
     system python3, "dbm_test.py"
 
     system bin/"pip#{version.major_minor}", "list", "--format=columns"
+
+    # Check our externally managed marker
+    assert_match "If you wish to install a Python library",
+                 shell_output("#{python3} -m pip install pip 2>&1", 1)
   end
 end
