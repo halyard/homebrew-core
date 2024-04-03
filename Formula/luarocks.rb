@@ -1,8 +1,8 @@
 class Luarocks < Formula
   desc "Package manager for the Lua programming language"
   homepage "https://luarocks.org/"
-  url "https://luarocks.org/releases/luarocks-3.9.2.tar.gz"
-  sha256 "bca6e4ecc02c203e070acdb5f586045d45c078896f6236eb46aa33ccd9b94edb"
+  url "https://luarocks.org/releases/luarocks-3.11.0.tar.gz"
+  sha256 "25f56b3c7272fb35b869049371d649a1bbe668a56d24df0a66e3712e35dd44a6"
   license "MIT"
   head "https://github.com/luarocks/luarocks.git", branch: "master"
 
@@ -11,13 +11,15 @@ class Luarocks < Formula
     regex(%r{/luarocks[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
-  depends_on "lua@5.3" => :test
   depends_on "luajit" => :test
   depends_on "lua"
 
   uses_from_macos "unzip"
 
   def install
+    # Fix the lua config file missing issue for luarocks-admin build
+    ENV.deparallelize
+
     system "./configure", "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}",
                           "--rocks-tree=#{HOMEBREW_PREFIX}"
@@ -36,22 +38,12 @@ class Luarocks < Formula
       loader
     ].map { |file| share/"lua"/luaversion/"luarocks/#{file}.lua" }
     inreplace inreplace_files, "/usr/local", HOMEBREW_PREFIX
-  end
-
-  def caveats
-    <<~EOS
-      LuaRocks supports multiple versions of Lua. By default it is configured
-      to use Lua#{Formula["lua"].version.major_minor}, but you can require it to use another version at runtime
-      with the `--lua-dir` flag, like this:
-
-        luarocks --lua-dir=#{Formula["lua@5.3"].opt_prefix} install say
-    EOS
+    generate_completions_from_executable(bin/"luarocks", "completion")
   end
 
   test do
     luas = [
       Formula["lua"],
-      Formula["lua@5.3"],
       Formula["luajit"],
     ]
 

@@ -1,11 +1,11 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  url "https://c-ares.org/download/c-ares-1.19.1.tar.gz"
-  mirror "https://github.com/c-ares/c-ares/releases/download/cares-1_17_2/c-ares-1.19.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/dns/c-ares-1.19.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/dns/legacy/c-ares-1.19.1.tar.gz"
-  sha256 "321700399b72ed0e037d0074c629e7741f6b2ec2dda92956abe3e9671d3e268e"
+  url "https://c-ares.org/download/c-ares-1.28.1.tar.gz"
+  mirror "https://github.com/c-ares/c-ares/releases/download/cares-1_17_2/c-ares-1.28.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/dns/c-ares-1.28.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/dns/legacy/c-ares-1.28.1.tar.gz"
+  sha256 "675a69fc54ddbf42e6830bc671eeb6cd89eeca43828eb413243fd2c0a760809d"
   license "MIT"
   head "https://github.com/c-ares/c-ares.git", branch: "main"
 
@@ -17,7 +17,13 @@ class CAres < Formula
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    args = %W[
+      -DCARES_STATIC=ON
+      -DCARES_SHARED=ON
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

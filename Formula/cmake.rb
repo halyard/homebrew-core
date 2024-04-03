@@ -1,18 +1,19 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  url "https://github.com/Kitware/CMake/releases/download/v3.26.4/cmake-3.26.4.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/cmake-3.26.4.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/cmake-3.26.4.tar.gz"
-  sha256 "313b6880c291bd4fe31c0aa51d6e62659282a521e695f30d5cc0d25abbd5c208"
+  url "https://github.com/Kitware/CMake/releases/download/v3.29.0/cmake-3.29.0.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/cmake-3.29.0.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/cmake-3.29.0.tar.gz"
+  sha256 "a0669630aae7baa4a8228048bf30b622f9e9fd8ee8cedb941754e9e38686c778"
   license "BSD-3-Clause"
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
-  # The "latest" release on GitHub has been an unstable version before, so we
-  # check the Git tags instead.
+  # The "latest" release on GitHub has been an unstable version before, and
+  # there have been delays between the creation of a tag and the corresponding
+  # release, so we check the website's downloads page instead.
   livecheck do
-    url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://cmake.org/download/"
+    regex(/href=.*?cmake[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   uses_from_macos "ncurses"

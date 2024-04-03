@@ -1,14 +1,14 @@
 class LibpthreadStubs < Formula
   desc "X.Org: pthread-stubs.pc"
   homepage "https://www.x.org/"
-  url "https://xcb.freedesktop.org/dist/libpthread-stubs-0.4.tar.bz2"
-  sha256 "e4d05911a3165d3b18321cc067fdd2f023f06436e391c6a28dff618a78d2e733"
+  url "https://xcb.freedesktop.org/dist/libpthread-stubs-0.5.tar.xz"
+  sha256 "59da566decceba7c2a7970a4a03b48d9905f1262ff94410a649224e33d2442bc"
   license "MIT"
 
   depends_on "pkg-config"
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args.reject { |s| s["--disable-debug"] }
     system "make", "install"
   end
 

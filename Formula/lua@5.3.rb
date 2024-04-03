@@ -12,6 +12,10 @@ class LuaAT53 < Formula
 
   keg_only :versioned_formula
 
+  # See: https://www.lua.org/versions.html#5.3
+  # Last release on 2020-09-25
+  deprecate! date: "2023-12-14", because: :deprecated_upstream
+
   uses_from_macos "unzip" => :build
 
   on_macos do
@@ -47,7 +51,7 @@ class LuaAT53 < Formula
       s.gsub! "@LUA_PREFIX@", prefix if OS.mac?
       s.remove_make_var! "CC"
       s.change_make_var! "CFLAGS", "#{ENV.cflags} -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)"
-      s.change_make_var! "MYLDFLAGS", ENV.ldflags
+      s.change_make_var! "MYLDFLAGS", ENV.ldflags || ""
     end
 
     # Fix path in the config header
@@ -93,7 +97,7 @@ class LuaAT53 < Formula
     bin.install_symlink "luac" => "luac#{version.major_minor}"
     bin.install_symlink "luac" => "luac-#{version.major_minor}"
     (include/"lua#{version.major_minor}").install_symlink Dir[include/"lua/*"]
-    lib.install_symlink shared_library("liblua", version.major_minor) => shared_library("liblua#{version.major_minor}")
+    lib.install_symlink shared_library("liblua", version.major_minor.to_s) => shared_library("liblua#{version.major_minor}")
     (lib/"pkgconfig").install_symlink "lua.pc" => "lua#{version.major_minor}.pc"
     (lib/"pkgconfig").install_symlink "lua.pc" => "lua-#{version.major_minor}.pc"
 

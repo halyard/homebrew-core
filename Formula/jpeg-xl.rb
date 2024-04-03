@@ -1,8 +1,8 @@
 class JpegXl < Formula
   desc "New file format for still image compression"
   homepage "https://jpeg.org/jpegxl/index.html"
-  url "https://github.com/libjxl/libjxl/archive/v0.8.2.tar.gz"
-  sha256 "c70916fb3ed43784eb840f82f05d390053a558e2da106e40863919238fa7b420"
+  url "https://github.com/libjxl/libjxl/archive/refs/tags/v0.10.2.tar.gz"
+  sha256 "95e807f63143856dc4d161c071cca01115d2c6405b3d3209854ac6989dc6bb91"
   license "BSD-3-Clause"
 
   livecheck do
@@ -29,23 +29,16 @@ class JpegXl < Formula
 
   uses_from_macos "libxml2" => :build
   uses_from_macos "libxslt" => :build # for xsltproc
+  uses_from_macos "python"
 
   fails_with gcc: "5"
   fails_with gcc: "6"
-  fails_with :clang do
-    build 1000
-    cause <<-EOS
-      lib/jxl/enc_fast_lossless.cc:369:7: error: invalid cpu feature string for builtin
-        if (__builtin_cpu_supports("avx512vbmi2")) {
-            ^                      ~~~~~~~~~~~~~
-    EOS
-  end
 
   # These resources are versioned according to the script supplied with jpeg-xl to download the dependencies:
   # https://github.com/libjxl/libjxl/tree/v#{version}/third_party
   resource "sjpeg" do
     url "https://github.com/webmproject/sjpeg.git",
-        revision: "868ab558fad70fcbe8863ba4e85179eeb81cc840"
+        revision: "e5ab13008bb214deb66d5f3e17ca2f8dbff150bf"
   end
 
   def install
@@ -56,10 +49,12 @@ class JpegXl < Formula
                     "-DJPEGXL_FORCE_SYSTEM_LCMS2=ON",
                     "-DJPEGXL_FORCE_SYSTEM_HWY=ON",
                     "-DJPEGXL_ENABLE_JNI=OFF",
+                    "-DJPEGXL_ENABLE_JPEGLI=OFF",
                     "-DJPEGXL_ENABLE_SKCMS=OFF",
                     "-DJPEGXL_VERSION=#{version}",
                     "-DJPEGXL_ENABLE_MANPAGES=ON",
                     "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    "-DPython_EXECUTABLE=#{Formula["asciidoc"].libexec/"bin/python"}",
                     "-DPython3_EXECUTABLE=#{Formula["asciidoc"].libexec/"bin/python3"}",
                     *std_cmake_args
     system "cmake", "--build", "build"

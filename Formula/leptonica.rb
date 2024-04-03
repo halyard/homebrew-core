@@ -1,15 +1,9 @@
 class Leptonica < Formula
   desc "Image processing and image analysis library"
   homepage "http://www.leptonica.org/"
-  url "http://www.leptonica.org/source/leptonica-1.82.0.tar.gz"
-  sha256 "155302ee914668c27b6fe3ca9ff2da63b245f6d62f3061c8f27563774b8ae2d6"
+  url "https://github.com/DanBloomberg/leptonica/releases/download/1.84.1/leptonica-1.84.1.tar.gz"
+  sha256 "2b3e1254b1cca381e77c819b59ca99774ff43530209b9aeb511e1d46588a64f6"
   license "BSD-2-Clause"
-  revision 2
-
-  livecheck do
-    url "http://www.leptonica.org/download.html"
-    regex(/href=.*?leptonica[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
 
   depends_on "pkg-config" => :build
   depends_on "giflib"

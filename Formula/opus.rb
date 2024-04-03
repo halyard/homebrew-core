@@ -1,8 +1,8 @@
 class Opus < Formula
   desc "Audio codec"
   homepage "https://www.opus-codec.org/"
-  url "https://downloads.xiph.org/releases/opus/opus-1.4.tar.gz", using: :homebrew_curl
-  sha256 "c9b32b4253be5ae63d1ff16eea06b94b5f0f2951b7a02aceef58e3a3ce49c51f"
+  url "https://downloads.xiph.org/releases/opus/opus-1.5.1.tar.gz", using: :homebrew_curl
+  sha256 "b84610959b8d417b611aa12a22565e0a3732097c6389d19098d844543e340f85"
   license "BSD-3-Clause"
 
   livecheck do

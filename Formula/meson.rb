@@ -1,16 +1,17 @@
 class Meson < Formula
   desc "Fast and user friendly build system"
   homepage "https://mesonbuild.com/"
-  url "https://github.com/mesonbuild/meson/releases/download/1.1.1/meson-1.1.1.tar.gz"
-  sha256 "d04b541f97ca439fb82fab7d0d480988be4bd4e62563a5ca35fadb5400727b1c"
+  url "https://github.com/mesonbuild/meson/releases/download/1.4.0/meson-1.4.0.tar.gz"
+  sha256 "8fd6630c25c27f1489a8a0392b311a60481a3c161aa699b330e25935b750138d"
   license "Apache-2.0"
   head "https://github.com/mesonbuild/meson.git", branch: "master"
 
+  depends_on "python-setuptools" => :build
   depends_on "ninja"
-  depends_on "python@3.11"
+  depends_on "python@3.12"
 
   def install
-    python = "python3.11"
+    python = "python3.12"
     system python, *Language::Python.setup_install_args(prefix, python), "--install-data=#{prefix}"
 
     bash_completion.install "data/shell-completions/bash/meson"
@@ -38,7 +39,7 @@ class Meson < Formula
   test do
     (testpath/"helloworld.c").write <<~EOS
       #include <stdio.h>
-      main() {
+      int main(void) {
         puts("hi");
         return 0;
       }

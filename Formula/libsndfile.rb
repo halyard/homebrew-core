@@ -1,10 +1,9 @@
 class Libsndfile < Formula
   desc "C library for files containing sampled sound"
   homepage "https://libsndfile.github.io/libsndfile/"
-  url "https://github.com/libsndfile/libsndfile/releases/download/1.2.0/libsndfile-1.2.0.tar.xz"
-  sha256 "0e30e7072f83dc84863e2e55f299175c7e04a5902ae79cfb99d4249ee8f6d60a"
+  url "https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2.tar.xz"
+  sha256 "3799ca9924d3125038880367bf1468e53a1b7e3686a934f098b7e1d286cdb80e"
   license "LGPL-2.1-or-later"
-  revision 1
 
   livecheck do
     url :stable
@@ -22,17 +21,21 @@ class Libsndfile < Formula
   uses_from_macos "python" => :build, since: :catalina
 
   def install
-    system "cmake", "-S", ".", "-B", "build",
-                    "-DBUILD_SHARED_LIBS=ON",
-                    "-DBUILD_PROGRAMS=ON",
-                    "-DENABLE_PACKAGE_CONFIG=ON",
-                    "-DINSTALL_PKGCONFIG_MODULE=ON",
-                    "-DBUILD_EXAMPLES=OFF",
-                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
-                    "-DPYTHON_EXECUTABLE=#{which("python3")}",
-                    *std_cmake_args
+    args = %W[
+      -DBUILD_PROGRAMS=ON
+      -DENABLE_PACKAGE_CONFIG=ON
+      -DINSTALL_PKGCONFIG_MODULE=ON
+      -DBUILD_EXAMPLES=OFF
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+      -DPYTHON_EXECUTABLE=#{which("python3")}
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DBUILD_SHARED_LIBS=ON", *args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
+    system "cmake", "-S", ".", "-B", "static", *std_cmake_args, "-DBUILD_SHARED_LIBS=OFF", *args
+    system "cmake", "--build", "static"
+    lib.install "static/libsndfile.a"
   end
 
   test do

@@ -1,8 +1,8 @@
 class Harfbuzz < Formula
   desc "OpenType text shaping engine"
   homepage "https://github.com/harfbuzz/harfbuzz"
-  url "https://github.com/harfbuzz/harfbuzz/archive/8.0.0.tar.gz"
-  sha256 "a8e8ec6f0befce0bd5345dd741d2f88534685a798002e343a38b7f9b2e00c884"
+  url "https://github.com/harfbuzz/harfbuzz/archive/refs/tags/8.4.0.tar.gz"
+  sha256 "9f1ca089813b05944ad1ce8c7e018213026d35dc9bab480a21eb876838396556"
   license "MIT"
   head "https://github.com/harfbuzz/harfbuzz.git", branch: "main"
 
@@ -10,7 +10,7 @@ class Harfbuzz < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.12" => [:build, :test]
   depends_on "pygobject3" => :test
   depends_on "cairo"
   depends_on "freetype"
@@ -47,6 +47,6 @@ class Harfbuzz < Formula
       shape = pipe_output("#{bin}/hb-shape 270b89df543a7e48e206a2d830c0e10e5265c630.ttf", "സ്റ്റ്").chomp
       assert_equal "[glyph201=0+1183|U0D4D=0+0]", shape
     end
-    system "python3.11", "-c", "from gi.repository import HarfBuzz"
+    system "python3.12", "-c", "from gi.repository import HarfBuzz"
   end
 end

@@ -1,9 +1,10 @@
 class Zeromq < Formula
   desc "High-performance, asynchronous messaging library"
   homepage "https://zeromq.org/"
-  url "https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz"
-  sha256 "c593001a89f5a85dd2ddf564805deb860e02471171b3f204944857336295c3e5"
-  license "LGPL-3.0-or-later" => { with: "LGPL-3.0-linking-exception" }
+  url "https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz"
+  sha256 "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43"
+  license "MPL-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -26,7 +27,7 @@ class Zeromq < Formula
 
   def install
     # Work around "error: no member named 'signbit' in the global namespace"
-    if MacOS.version == :high_sierra
+    if OS.mac? && MacOS.version == :high_sierra
       ENV.delete("HOMEBREW_SDKROOT")
       ENV.delete("SDKROOT")
     end

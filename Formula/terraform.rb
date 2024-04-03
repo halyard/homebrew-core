@@ -1,14 +1,17 @@
 class Terraform < Formula
   desc "Tool to build, change, and version infrastructure"
   homepage "https://www.terraform.io/"
-  url "https://github.com/hashicorp/terraform/archive/v1.5.2.tar.gz"
-  sha256 "1fb4e2e583a65583a24a8af3699fd0a9cd762da71b2436d0b62e448fe89180e9"
+  # NOTE: Do not bump to v1.6.0+ as license changed to BUSL-1.1
+  # https://github.com/hashicorp/terraform/pull/33661
+  # https://github.com/hashicorp/terraform/pull/33697
+  url "https://github.com/hashicorp/terraform/archive/refs/tags/v1.5.7.tar.gz"
+  sha256 "6742fc87cba5e064455393cda12f0e0241c85a7cb2a3558d13289380bb5f26f5"
   license "MPL-2.0"
   head "https://github.com/hashicorp/terraform.git", branch: "main"
 
+  # TODO: Remove this if/when the formula is deprecated.
   livecheck do
-    url "https://releases.hashicorp.com/terraform/"
-    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
+    skip "Formula will not be updated due to BUSL license change"
   end
 
   depends_on "go" => :build

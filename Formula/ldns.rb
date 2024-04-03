@@ -13,14 +13,15 @@ class Ldns < Formula
     regex(/^(?:release-)?v?(\d+(?:\.\d+)+)$/i)
   end
 
+  depends_on "python-setuptools" => :build
   depends_on "swig" => :build
   depends_on "openssl@3"
-  depends_on "python@3.11"
+  depends_on "python@3.12"
 
   conflicts_with "drill", because: "both install a `drill` binary"
 
   def install
-    python3 = "python3.11"
+    python3 = "python3.12"
     args = *std_configure_args + %W[
       --with-drill
       --with-examples

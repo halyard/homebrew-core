@@ -1,10 +1,9 @@
 class Libzip < Formula
   desc "C library for reading, creating, and modifying zip archives"
   homepage "https://libzip.org/"
-  url "https://libzip.org/download/libzip-1.10.0.tar.xz", using: :homebrew_curl
-  sha256 "cd2a7ac9f1fb5bfa6218272d9929955dc7237515bba6e14b5ad0e1d1e2212b43"
+  url "https://libzip.org/download/libzip-1.10.1.tar.xz", using: :homebrew_curl
+  sha256 "dc3c8d5b4c8bbd09626864f6bcf93de701540f761d76b85d7c7d710f4bd90318"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url "https://libzip.org/download/"
@@ -23,8 +22,7 @@ class Libzip < Formula
     depends_on "openssl@3"
   end
 
-  conflicts_with "libtcod", "minizip-ng",
-    because: "libtcod, libzip and minizip-ng install a `zip.h` header"
+  conflicts_with "libtcod", because: "libtcod and libzip install a `zip.h` header"
 
   def install
     crypto_args = %w[

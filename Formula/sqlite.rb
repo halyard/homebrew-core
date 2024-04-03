@@ -1,16 +1,16 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  url "https://www.sqlite.org/2023/sqlite-autoconf-3420000.tar.gz"
-  version "3.42.0"
-  sha256 "7abcfd161c6e2742ca5c6c0895d1f853c940f203304a0b49da4e1eca5d088ca6"
+  url "https://www.sqlite.org/2024/sqlite-autoconf-3450200.tar.gz"
+  version "3.45.2"
+  sha256 "bc9067442eedf3dd39989b5c5cfbfff37ae66cc9c99274e0c3052dc4d4a8f6ae"
   license "blessing"
 
   livecheck do
     url :homepage
     regex(%r{href=.*?releaselog/v?(\d+(?:[._]\d+)+)\.html}i)
     strategy :page_match do |page, regex|
-      page.scan(regex).map { |match| match&.first&.gsub("_", ".") }
+      page.scan(regex).map { |match| match&.first&.tr("_", ".") }
     end
   end
 
@@ -21,13 +21,23 @@ class Sqlite < Formula
   uses_from_macos "zlib"
 
   def install
-    ENV.append "CPPFLAGS", "-DSQLITE_ENABLE_COLUMN_METADATA=1"
     # Default value of MAX_VARIABLE_NUMBER is 999 which is too low for many
     # applications. Set to 250000 (Same value used in Debian and Ubuntu).
-    ENV.append "CPPFLAGS", "-DSQLITE_MAX_VARIABLE_NUMBER=250000"
-    ENV.append "CPPFLAGS", "-DSQLITE_ENABLE_RTREE=1"
-    ENV.append "CPPFLAGS", "-DSQLITE_ENABLE_FTS3=1 -DSQLITE_ENABLE_FTS3_PARENTHESIS=1"
-    ENV.append "CPPFLAGS", "-DSQLITE_ENABLE_JSON1=1"
+    ENV.append "CPPFLAGS", %w[
+      -DSQLITE_ENABLE_API_ARMOR=1
+      -DSQLITE_ENABLE_COLUMN_METADATA=1
+      -DSQLITE_ENABLE_DBSTAT_VTAB=1
+      -DSQLITE_ENABLE_FTS3=1
+      -DSQLITE_ENABLE_FTS3_PARENTHESIS=1
+      -DSQLITE_ENABLE_FTS5=1
+      -DSQLITE_ENABLE_JSON1=1
+      -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1
+      -DSQLITE_ENABLE_RTREE=1
+      -DSQLITE_ENABLE_STAT4=1
+      -DSQLITE_ENABLE_UNLOCK_NOTIFY=1
+      -DSQLITE_MAX_VARIABLE_NUMBER=250000
+      -DSQLITE_USE_URI=1
+    ].join(" ")
 
     args = %W[
       --prefix=#{prefix}

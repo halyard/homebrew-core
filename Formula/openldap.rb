@@ -1,10 +1,10 @@
 class Openldap < Formula
   desc "Open source suite of directory software"
   homepage "https://www.openldap.org/software/"
-  url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.5.tgz"
-  mirror "http://fresh-center.net/linux/misc/openldap-2.6.5.tgz"
-  mirror "http://fresh-center.net/linux/misc/legacy/openldap-2.6.5.tgz"
-  sha256 "2e27a8d4f4c2af8fe840b573271c20aa163e24987f9765214644290f5beb38d9"
+  url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.7.tgz"
+  mirror "http://fresh-center.net/linux/misc/openldap-2.6.7.tgz"
+  mirror "http://fresh-center.net/linux/misc/legacy/openldap-2.6.7.tgz"
+  sha256 "cd775f625c944ed78a3da18a03b03b08eea73c8aabc97b41bb336e9a10954930"
   license "OLDAP-2.8"
 
   livecheck do
@@ -15,6 +15,8 @@ class Openldap < Formula
   keg_only :provided_by_macos
 
   depends_on "openssl@3"
+
+  uses_from_macos "mandoc" => :build
 
   on_linux do
     depends_on "util-linux"
@@ -53,17 +55,18 @@ class Openldap < Formula
       --without-systemd
     ]
 
-    if OS.linux? || MacOS.version >= :ventura
-      # Disable manpage generation, because it requires groff which has a huge
-      # dependency tree on Linux and isn't included on macOS since Ventura.
-      inreplace "Makefile.in" do |s|
-        subdirs = s.get_make_var("SUBDIRS").split - ["doc"]
-        s.change_make_var! "SUBDIRS", subdirs.join(" ")
+    soelim = if OS.mac?
+      if MacOS.version >= :ventura
+        "mandoc_soelim"
+      else
+        "soelim"
       end
+    else
+      "bsdsoelim"
     end
 
     system "./configure", *args
-    system "make", "install"
+    system "make", "install", "SOELIM=#{soelim}"
     (var/"run").mkpath
 
     # https://github.com/Homebrew/homebrew-dupes/pull/452

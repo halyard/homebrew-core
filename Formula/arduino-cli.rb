@@ -2,8 +2,8 @@ class ArduinoCli < Formula
   desc "Arduino command-line interface"
   homepage "https://github.com/arduino/arduino-cli"
   url "https://github.com/arduino/arduino-cli.git",
-      tag:      "0.33.1",
-      revision: "347bfeb0429dd7bce4216c44daff4680ba50f577"
+      tag:      "v0.35.3",
+      revision: "95cfd654fe0dd6b07e903d3132c0faceabfbe9e3"
   license "GPL-3.0-only"
   head "https://github.com/arduino/arduino-cli.git", branch: "master"
 
@@ -21,7 +21,7 @@ class ArduinoCli < Formula
       -X github.com/arduino/arduino-cli/version.commit=#{Utils.git_head(length: 8)}
       -X github.com/arduino/arduino-cli/version.date=#{time.iso8601}
     ]
-    system "go", "build", *std_go_args(ldflags: ldflags)
+    system "go", "build", *std_go_args(ldflags:)
 
     generate_completions_from_executable(bin/"arduino-cli", "completion")
   end

@@ -1,18 +1,19 @@
 class Pyyaml < Formula
   desc "YAML framework for Python"
   homepage "https://pyyaml.org"
-  url "https://files.pythonhosted.org/packages/36/2b/61d51a2c4f25ef062ae3f74576b01638bebad5e045f747ff12643df63844/PyYAML-6.0.tar.gz"
-  sha256 "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
+  url "https://files.pythonhosted.org/packages/cd/e5/af35f7ea75cf72f2cd079c95ee16797de7cd71f29ea7c68ae5ce7be1eda0/PyYAML-6.0.1.tar.gz"
+  sha256 "bfdf460b1736c775f2ba9f6a92bca30bc2095067b8a9d77876d1fad6cc3b4a43"
   license "MIT"
   revision 1
 
   depends_on "cython" => :build
-  depends_on "python@3.10" => [:build, :test]
+  depends_on "python-setuptools" => :build
   depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.12" => [:build, :test]
   depends_on "libyaml"
 
   def pythons
-    deps.select { |dep| dep.name.start_with?("python") }
+    deps.select { |dep| dep.name.start_with?("python@") }
         .map(&:to_formula)
         .sort_by(&:version)
   end
@@ -22,7 +23,7 @@ class Pyyaml < Formula
     system cythonize, "yaml/_yaml.pyx"
     pythons.each do |python|
       python_exe = python.opt_libexec/"bin/python"
-      system python_exe, *Language::Python.setup_install_args(prefix, python_exe)
+      system python_exe, "-m", "pip", "install", *std_pip_args, "."
     end
   end
 

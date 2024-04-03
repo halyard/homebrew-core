@@ -14,7 +14,7 @@ class Asciidoc < Formula
   end
 
   depends_on "docbook"
-  depends_on "python@3.11"
+  depends_on "python@3.12"
   depends_on "source-highlight"
 
   def install

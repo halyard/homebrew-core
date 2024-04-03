@@ -1,11 +1,10 @@
 class Httpd < Formula
   desc "Apache HTTP server"
   homepage "https://httpd.apache.org/"
-  url "https://dlcdn.apache.org/httpd/httpd-2.4.57.tar.bz2"
-  mirror "https://downloads.apache.org/httpd/httpd-2.4.57.tar.bz2"
-  sha256 "dbccb84aee95e095edfbb81e5eb926ccd24e6ada55dcd83caecb262e5cf94d2a"
+  url "https://dlcdn.apache.org/httpd/httpd-2.4.58.tar.bz2"
+  mirror "https://downloads.apache.org/httpd/httpd-2.4.58.tar.bz2"
+  sha256 "fa16d72a078210a54c47dd5bef2f8b9b8a01d94909a51453956b3ec6442ea4c5"
   license "Apache-2.0"
-  revision 1
 
   depends_on "apr"
   depends_on "apr-util"
@@ -38,13 +37,14 @@ class Httpd < Formula
       s.gsub! "${datadir}/icons",   "#{pkgshare}/icons"
     end
 
-    libxml2 = "#{MacOS.sdk_path_if_needed}/usr"
-    libxml2 = Formula["libxml2"].opt_prefix if OS.linux?
-    zlib = if OS.mac?
-      "#{MacOS.sdk_path_if_needed}/usr"
+    if OS.mac?
+      libxml2 = "#{MacOS.sdk_path_if_needed}/usr"
+      zlib = "#{MacOS.sdk_path_if_needed}/usr"
     else
-      Formula["zlib"].opt_prefix
+      libxml2 = Formula["libxml2"].opt_prefix
+      zlib = Formula["zlib"].opt_prefix
     end
+
     system "./configure", "--enable-layout=Slackware-FHS",
                           "--prefix=#{prefix}",
                           "--sbindir=#{bin}",

@@ -1,23 +1,18 @@
 class Libxcb < Formula
   desc "X.Org: Interface to the X Window System protocol"
   homepage "https://www.x.org/"
-  url "https://xcb.freedesktop.org/dist/libxcb-1.15.tar.gz"
-  sha256 "1cb65df8543a69ec0555ac696123ee386321dfac1964a3da39976c9a05ad724d"
+  url "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.16.1.tar.xz"
+  sha256 "f24d187154c8e027b358fc7cb6588e35e33e6a92f11c668fe77396a7ae66e311"
   license "MIT"
-  revision 1
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build # match version in `xcb-proto`
+  depends_on "python@3.12" => :build # match version in `xcb-proto`
   depends_on "xcb-proto" => :build
   depends_on "libxau"
   depends_on "libxdmcp"
 
-  # Drop libpthread-stubs on macOS
-  # remove in next release
-  patch :DATA
-
   def install
-    python3 = "python3.11"
+    python3 = "python3.12"
 
     args = %W[
       --sysconfdir=#{etc}
@@ -90,18 +85,3 @@ class Libxcb < Formula
     assert_equal 0, $CHILD_STATUS.exitstatus
   end
 end
-
-__END__
-diff --git a/configure b/configure
-index 2503d4b..0c36685 100755
---- a/configure
-+++ b/configure
-@@ -20662,7 +20662,7 @@ printf "%s\n" "yes" >&6; }
- fi
- NEEDED="xau >= 0.99.2"
- case $host_os in
--linux*) ;;
-+linux*|darwin*) ;;
-      *) NEEDED="$NEEDED pthread-stubs" ;;
- esac
- 

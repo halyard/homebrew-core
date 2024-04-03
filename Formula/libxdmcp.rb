@@ -1,8 +1,8 @@
 class Libxdmcp < Formula
   desc "X.Org: X Display Manager Control Protocol library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libXdmcp-1.1.4.tar.xz"
-  sha256 "2dce5cc317f8f0b484ec347d87d81d552cdbebb178bd13c5d8193b6b7cd6ad00"
+  url "https://www.x.org/archive/individual/lib/libXdmcp-1.1.5.tar.xz"
+  sha256 "d8a5222828c3adab70adf69a5583f1d32eb5ece04304f7f8392b6a353aa2228c"
   license "MIT"
 
   depends_on "pkg-config" => :build

@@ -1,10 +1,9 @@
 class Libsodium < Formula
   desc "NaCl networking and cryptography library"
   homepage "https://libsodium.org/"
-  url "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
-  sha256 "6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1"
+  url "https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz"
+  sha256 "018d79fe0a045cca07331d37bd0cb57b2e838c51bc48fd837a1472e50068bbea"
   license "ISC"
-  revision 1
 
   livecheck do
     url "https://download.libsodium.org/libsodium/releases/"
@@ -20,7 +19,7 @@ class Libsodium < Formula
   end
 
   def install
-    system "./autogen.sh" if build.head?
+    system "./autogen.sh", "-sb" if build.head?
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "check"

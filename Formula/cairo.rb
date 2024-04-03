@@ -1,23 +1,18 @@
 class Cairo < Formula
   desc "Vector graphics library with cross-device output support"
   homepage "https://cairographics.org/"
-  url "https://cairographics.org/releases/cairo-1.16.0.tar.xz"
-  sha256 "5e7b29b3f113ef870d1e3ecf8adf21f923396401604bda16d44be45e66052331"
+  url "https://cairographics.org/releases/cairo-1.18.0.tar.xz"
+  sha256 "243a0736b978a33dee29f9cca7521733b78a65b5418206fef7bd1c3d4cf10b64"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
-  revision 5
+  head "https://gitlab.freedesktop.org/cairo/cairo.git", branch: "master"
 
   livecheck do
     url "https://cairographics.org/releases/?C=M&O=D"
     regex(%r{href=(?:["']?|.*?/)cairo[._-]v?(\d+\.\d*[02468](?:\.\d+)*)\.t}i)
   end
 
-  head do
-    url "https://gitlab.freedesktop.org/cairo/cairo.git"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "fontconfig"
   depends_on "freetype"
@@ -32,34 +27,22 @@ class Cairo < Formula
 
   uses_from_macos "zlib"
 
-  # Avoid segfaults on Big Sur. Remove at version bump.
-  # https://gitlab.freedesktop.org/cairo/cairo/-/issues/420
-  patch do
-    url "https://gitlab.freedesktop.org/cairo/cairo/-/commit/e22d7212acb454daccc088619ee147af03883974.diff"
-    sha256 "3b98004d7321c06d294fa901ac91964b6a4277ce4e53ef0cf98bf89e00d93332"
-  end
-
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --enable-gobject
-      --enable-svg
-      --enable-tee
-      --disable-valgrind
-      --enable-xcb
-      --enable-xlib
-      --enable-xlib-xrender
+    args = %w[
+      -Dfontconfig=enabled
+      -Dfreetype=enabled
+      -Dpng=enabled
+      -Dglib=enabled
+      -Dxcb=enabled
+      -Dxlib=enabled
+      -Dzlib=enabled
+      -Dglib=enabled
     ]
-    args << "--enable-quartz-image" if OS.mac?
+    args << "-Dquartz=enabled" if OS.mac?
 
-    if build.head?
-      ENV["NOCONFIGURE"] = "1"
-      system "./autogen.sh"
-    end
-
-    system "./configure", *args
-    system "make", "install"
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do

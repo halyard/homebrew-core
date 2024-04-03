@@ -1,8 +1,8 @@
 class Node < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v20.4.0/node-v20.4.0.tar.xz"
-  sha256 "09bd0b73c526b63c029d5ddfd885d10962e7ad87c975b94583c1f8ce90ee5348"
+  url "https://nodejs.org/dist/v21.7.1/node-v21.7.1.tar.xz"
+  sha256 "1272b6e129d564dbde17527b844210b971c20a70ae729268186b7cb9d990a64b"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
 
@@ -12,7 +12,7 @@ class Node < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.11" => :build
+  depends_on "python@3.12" => :build
   depends_on "brotli"
   depends_on "c-ares"
   depends_on "icu4c"
@@ -39,15 +39,18 @@ class Node < Formula
   # We track major/minor from upstream Node releases.
   # We will accept *important* npm patch releases when necessary.
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-9.7.2.tgz"
-    sha256 "d34dcbd0e4f2de422cb3402bdfdd89ff69b6d906dcd848b5de002eaff88ac7ca"
+    url "https://registry.npmjs.org/npm/-/npm-10.5.0.tgz"
+    sha256 "17ca6e08e7633b624e8f870db81a78f46afe119de62bcaf0a7407574139198fc"
   end
 
   def install
     ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
 
+    # The new linker crashed during LTO due to high memory usage.
+    ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.clang_build_version >= 1500
+
     # make sure subprocesses spawned by make are using our Python 3
-    ENV["PYTHON"] = which("python3.11")
+    ENV["PYTHON"] = which("python3.12")
 
     # Never install the bundled "npm", always prefer our
     # installation from tarball for better packaging control.
@@ -80,7 +83,7 @@ class Node < Formula
     # terminate called after throwing an instance of 'std::out_of_range'
     # Pre-Catalina macOS also can't build with LTO
     # LTO is unpleasant if you have to build from source.
-    args << "--enable-lto" if MacOS.version >= :catalina && build.bottle?
+    args << "--enable-lto" if OS.mac? && MacOS.version >= :catalina && build.bottle?
 
     system "./configure", *args
     system "make", "install"
@@ -117,8 +120,10 @@ class Node < Formula
     # bottle-npm-and-retain-a-private-copy-in-libexec setup
     # All other installs **do** symlink to homebrew_prefix/bin correctly.
     # We ln rather than cp this because doing so mimics npm's normal install.
-    ln_sf node_modules/"npm/bin/npm-cli.js", HOMEBREW_PREFIX/"bin/npm"
-    ln_sf node_modules/"npm/bin/npx-cli.js", HOMEBREW_PREFIX/"bin/npx"
+    ln_sf node_modules/"npm/bin/npm-cli.js", bin/"npm"
+    ln_sf node_modules/"npm/bin/npx-cli.js", bin/"npx"
+    ln_sf bin/"npm", HOMEBREW_PREFIX/"bin/npm"
+    ln_sf bin/"npx", HOMEBREW_PREFIX/"bin/npx"
 
     # Create manpage symlinks (or overwrite the old ones)
     %w[man1 man5 man7].each do |man|

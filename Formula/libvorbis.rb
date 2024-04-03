@@ -12,7 +12,7 @@ class Libvorbis < Formula
   end
 
   head do
-    url "https://gitlab.xiph.org/xiph/vorbis.git"
+    url "https://gitlab.xiph.org/xiph/vorbis.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -29,6 +29,7 @@ class Libvorbis < Formula
 
   def install
     system "./autogen.sh" if build.head?
+    inreplace "configure", " -force_cpusubtype_ALL", ""
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "install"

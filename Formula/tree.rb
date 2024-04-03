@@ -1,14 +1,10 @@
 class Tree < Formula
   desc "Display directories as trees (with optional color/HTML output)"
-  homepage "http://mama.indstate.edu/users/ice/tree/"
-  url "http://mama.indstate.edu/users/ice/tree/src/tree-2.1.1.tgz"
-  sha256 "d3c3d55f403af7c76556546325aa1eca90b918cbaaf6d3ab60a49d8367ab90d5"
+  homepage "https://oldmanprogrammer.net/source.php?dir=projects/tree"
+  url "https://github.com/Old-Man-Programmer/tree/archive/refs/tags/2.1.1.tar.gz"
+  sha256 "1b70253994dca48a59d6ed99390132f4d55c486bf0658468f8520e7e63666a06"
   license "GPL-2.0-or-later"
-
-  livecheck do
-    url "http://mama.indstate.edu/users/ice/tree/src/"
-    regex(/href=.*?tree[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
+  revision 1
 
   def install
     ENV.append "CFLAGS", "-fomit-frame-pointer"

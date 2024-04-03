@@ -1,16 +1,18 @@
 class Zstd < Formula
   desc "Zstandard is a real-time compression algorithm"
   homepage "https://facebook.github.io/zstd/"
-  url "https://github.com/facebook/zstd/archive/v1.5.5.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/zstd-1.5.5.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/zstd-1.5.5.tar.gz"
-  sha256 "98e9c3d949d1b924e28e01eccb7deed865eefebf25c2f21c702e5cd5b63b85e1"
+  url "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/zstd-1.5.6.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/zstd-1.5.6.tar.gz"
+  sha256 "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
   license "BSD-3-Clause"
   head "https://github.com/facebook/zstd.git", branch: "dev"
 
+  # The upstream repository contains old, one-off tags (5.5.5, 6.6.6) that are
+  # higher than current versions, so we check the "latest" release instead.
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   depends_on "cmake" => :build
@@ -34,6 +36,10 @@ class Zstd < Formula
                     *std_cmake_args
     system "cmake", "--build", "builddir"
     system "cmake", "--install", "builddir"
+
+    # Prevent dependents from relying on fragile Cellar paths.
+    # https://github.com/ocaml/ocaml/issues/12431
+    inreplace lib/"pkgconfig/libzstd.pc", prefix, opt_prefix
   end
 
   test do

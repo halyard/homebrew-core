@@ -1,10 +1,9 @@
 class CargoC < Formula
   desc "Helper program to build and install c-like libraries"
   homepage "https://github.com/lu-zero/cargo-c"
-  url "https://github.com/lu-zero/cargo-c/archive/refs/tags/v0.9.20.tar.gz"
-  sha256 "6a89125c4b59279e73f977ef8a7aa5d83240bdf5d1d7ef1a53b8d1f2201a5f41"
+  url "https://github.com/lu-zero/cargo-c/archive/refs/tags/v0.9.31.tar.gz"
+  sha256 "4a04db8fb17a55db403bc59572f05475a477fece7ab08cfb2de970e188b80b83"
   license "MIT"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,6 +11,10 @@ class CargoC < Formula
   end
 
   depends_on "rust" => :build
+  # The `cargo` crate requires http2, which `curl-config` from macOS reports to
+  # be missing despite its presence.
+  # Try switching to `uses_from_macos` when that's resolved.
+  depends_on "curl"
   depends_on "libgit2"
   depends_on "libssh2"
   depends_on "openssl@3"
@@ -23,7 +26,7 @@ class CargoC < Formula
   end
 
   def install
-    ENV["LIBGIT2_SYS_USE_PKG_CONFIG"] = "1"
+    ENV["LIBGIT2_NO_VENDOR"] = "1"
     ENV["LIBSSH2_SYS_USE_PKG_CONFIG"] = "1"
     # Ensure the correct `openssl` will be picked up.
     ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
@@ -46,6 +49,7 @@ class CargoC < Formula
     assert_match cargo_error, shell_output("#{bin}/cargo-cbuild cbuild 2>&1", 1)
 
     [
+      Formula["curl"].opt_lib/shared_library("libcurl"),
       Formula["libgit2"].opt_lib/shared_library("libgit2"),
       Formula["libssh2"].opt_lib/shared_library("libssh2"),
       Formula["openssl@3"].opt_lib/shared_library("libssl"),

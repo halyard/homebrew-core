@@ -2,13 +2,12 @@ class Curl < Formula
   desc "Get a file from an HTTP, HTTPS or FTP server"
   homepage "https://curl.se"
   # Don't forget to update both instances of the version in the GitHub mirror URL.
-  url "https://curl.se/download/curl-8.1.2.tar.bz2"
-  mirror "https://github.com/curl/curl/releases/download/curl-8_1_2/curl-8.1.2.tar.bz2"
-  mirror "http://fresh-center.net/linux/www/curl-8.1.2.tar.bz2"
-  mirror "http://fresh-center.net/linux/www/legacy/curl-8.1.2.tar.bz2"
-  sha256 "b54974d32fd610acace92e3df1f643144015ac65847f0a041fdc17db6f43f243"
+  url "https://curl.se/download/curl-8.7.1.tar.bz2"
+  mirror "https://github.com/curl/curl/releases/download/curl-8_7_1/curl-8.7.1.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/curl-8.7.1.tar.bz2"
+  mirror "http://fresh-center.net/linux/www/legacy/curl-8.7.1.tar.bz2"
+  sha256 "05bbd2b698e9cfbab477c33aa5e99b4975501835a41b7ca6ca71de03d8849e76"
   license "curl"
-  revision 1
 
   livecheck do
     url "https://curl.se/download/"
@@ -38,7 +37,20 @@ class Curl < Formula
   uses_from_macos "krb5"
   uses_from_macos "zlib"
 
+  # Fixes `curl: (23) Failed writing received data to disk/application`
+  # Remove in next release
+  patch do
+    url "https://github.com/curl/curl/commit/b30d694a027eb771c02a3db0dee0ca03ccab7377.patch?full_index=1"
+    sha256 "da4ae2efdf05169938c2631ba6e7bca45376f1d67abc305cf8b6a982c618df4d"
+  end
+
   def install
+    tag_name = "curl-#{version.to_s.tr(".", "_")}"
+    if build.stable? && stable.mirrors.grep(/github\.com/).first.exclude?(tag_name)
+      odie "Tag name #{tag_name} is not found in the GitHub mirror URL! " \
+           "Please make sure the URL is correct."
+    end
+
     system "./buildconf" if build.head?
 
     args = %W[
@@ -71,11 +83,6 @@ class Curl < Formula
   end
 
   test do
-    tag_name = "curl-#{version.to_s.tr(".", "_")}"
-    assert_match tag_name, stable.mirrors.grep(/github\.com/).first,
-                 "Tag name #{tag_name} is not found in the GitHub mirror " \
-                 "URL! Please make sure the URL is correct"
-
     # Fetch the curl tarball and see that the checksum matches.
     # This requires a network connection, but so does Homebrew in general.
     filename = (testpath/"test.tar.gz")

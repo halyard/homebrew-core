@@ -3,8 +3,8 @@ class Gd < Formula
   homepage "https://libgd.github.io/"
   url "https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.xz"
   sha256 "3fe822ece20796060af63b7c60acb151e5844204d289da0ce08f8fdf131e5a61"
-  license :cannot_represent
-  revision 5
+  license "GD"
+  revision 6
 
   head do
     url "https://github.com/libgd/libgd.git", branch: "master"

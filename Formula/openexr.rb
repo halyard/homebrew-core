@@ -1,8 +1,8 @@
 class Openexr < Formula
   desc "High dynamic-range image file format"
   homepage "https://www.openexr.com/"
-  url "https://github.com/AcademySoftwareFoundation/openexr/archive/v3.1.9.tar.gz"
-  sha256 "103e902d3902800ab07b5f3a298be7afd2755312737b2cdbfa01326ff99dac07"
+  url "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.2.4.tar.gz"
+  sha256 "81e6518f2c4656fdeaf18a018f135e96a96e7f66dbe1c1f05860dd94772176cc"
   license "BSD-3-Clause"
 
   depends_on "cmake" => :build

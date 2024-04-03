@@ -1,12 +1,11 @@
 class Netpbm < Formula
   desc "Image manipulation"
-  homepage "https://netpbm.sourceforge.io/"
+  homepage "https://netpbm.sourceforge.net/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4534"
-  version "10.86.38"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4822"
+  version "11.02.07"
   license "GPL-3.0-or-later"
-  revision 1
   version_scheme 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
 
@@ -51,7 +50,10 @@ class Netpbm < Formula
     end
 
     ENV.deparallelize
-    ENV.append_to_cflags "-Wno-implicit-function-declaration" # Workaround for Xcode 14.3.
+
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
     system "make"
     system "make", "package", "pkgdir=#{buildpath}/stage"
 

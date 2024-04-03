@@ -1,9 +1,9 @@
 class Npth < Formula
   desc "New GNU portable threads library"
   homepage "https://gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/npth/npth-1.6.tar.bz2"
-  sha256 "1393abd9adcf0762d34798dc34fdcf4d0d22a8410721e76f1e3afcd1daa4e2d1"
+  url "https://gnupg.org/ftp/gcrypt/npth/npth-1.7.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/npth/npth-1.7.tar.bz2"
+  sha256 "8589f56937b75ce33b28d312fccbf302b3b71ec3f3945fde6aaa74027914ad05"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,20 +11,38 @@ class Npth < Formula
     regex(/href=.*?npth[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  # Fix -flat_namespace being used on Big Sur and later.
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
-    sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
-  end
-
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/npth-config", "--version"
+    (testpath/"test.c").write <<~EOS
+      #include <stdio.h>
+      #include <npth.h>
+
+      void* thread_function(void *arg) {
+          printf("Hello from nPth thread!\\n");
+          return NULL;
+      }
+
+      int main() {
+          npth_t thread_id;
+          int status;
+
+          status = npth_init();
+          if (status != 0) {
+              fprintf(stderr, "Failed to initialize nPth.\\n");
+              return 1;
+          }
+
+          status = npth_create(&thread_id, NULL, thread_function, NULL);
+          npth_join(thread_id, NULL);
+          return 0;
+      }
+
+    EOS
+    system ENV.cc, "test.c", "-L#{lib}", "-lnpth", "-o", "test"
+    assert_match "Hello from nPth thread!", shell_output("./test")
   end
 end

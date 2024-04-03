@@ -2,12 +2,11 @@ class Subversion < Formula
   desc "Version control system designed to be a better CVS"
   homepage "https://subversion.apache.org/"
   license "Apache-2.0"
-  revision 3
 
   stable do
-    url "https://www.apache.org/dyn/closer.lua?path=subversion/subversion-1.14.2.tar.bz2"
-    mirror "https://archive.apache.org/dist/subversion/subversion-1.14.2.tar.bz2"
-    sha256 "c9130e8d0b75728a66f0e7038fc77052e671830d785b5616aad53b4810d3cc28"
+    url "https://www.apache.org/dyn/closer.lua?path=subversion/subversion-1.14.3.tar.bz2"
+    mirror "https://archive.apache.org/dist/subversion/subversion-1.14.3.tar.bz2"
+    sha256 "949efd451a09435f7e8573574c71c7b71b194d844890fa49cd61d2262ea1a440"
 
     # Fix -flat_namespace being used on Big Sur and later.
     patch do
@@ -25,7 +24,8 @@ class Subversion < Formula
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.11" => [:build, :test]
+  depends_on "python-setuptools" => :build
+  depends_on "python@3.12" => [:build, :test]
   depends_on "scons" => :build # For Serf
   depends_on "swig" => :build
   depends_on "apr"
@@ -55,8 +55,8 @@ class Subversion < Formula
   end
 
   resource "py3c" do
-    url "https://github.com/encukou/py3c/archive/v1.1.tar.gz"
-    sha256 "c7ffc22bc92dded0ca859db53ef3a0b466f89a9f8aad29359c9fe4ff18ebdd20"
+    url "https://github.com/encukou/py3c/archive/refs/tags/v1.4.tar.gz"
+    sha256 "abc745079ef906148817f4472c3fb4bc41d62a9ea51a746b53e09819494ac006"
   end
 
   resource "serf" do
@@ -66,7 +66,7 @@ class Subversion < Formula
   end
 
   def python3
-    "python3.11"
+    "python3.12"
   end
 
   def install
@@ -127,6 +127,10 @@ class Subversion < Formula
     if OS.linux?
       # svn can't find libserf-1.so.1 at runtime without this
       ENV.append "LDFLAGS", "-Wl,-rpath=#{serf_prefix}/lib"
+      # Fix linkage when build-from-source as brew disables superenv when
+      # `scons` is a dependency. Can remove if serf is moved to a separate
+      # formula or when serf's cmake support is stable.
+      ENV.append "LDFLAGS", "-Wl,-rpath=#{HOMEBREW_PREFIX}/lib" unless build.bottle?
     end
 
     perl = DevelopmentTools.locate("perl")
@@ -157,7 +161,7 @@ class Subversion < Formula
     ]
 
     # preserve compatibility with macOS 12.0–12.2
-    args.unshift "--enable-sqlite-compatibility-version=3.36.0" if MacOS.version == :monterey
+    args.unshift "--enable-sqlite-compatibility-version=3.36.0" if OS.mac? && MacOS.version == :monterey
 
     inreplace "Makefile.in",
               "toolsdir = @bindir@/svn-tools",
@@ -181,7 +185,7 @@ class Subversion < Formula
     perl_core = Pathname.new(perl_archlib)/"CORE"
     perl_extern_h = perl_core/"EXTERN.h"
 
-    unless perl_extern_h.exist?
+    if OS.mac? && !perl_extern_h.exist?
       # No EXTERN.h, maybe it's system perl
       perl_version = Utils.safe_popen_read(perl.to_s, "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
       perl_core = MacOS.sdk_path/"System/Library/Perl"/perl_version/"darwin-thread-multi-2level/CORE"

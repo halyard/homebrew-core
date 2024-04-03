@@ -33,6 +33,8 @@ class Lpeg < Formula
 
     doc.install "lpeg.html", "re.html"
     pkgshare.install "test.lua", "re.lua"
+    # Needed by neovim.
+    lib.install_symlink lib/"lua/5.1/lpeg.so" => shared_library("liblpeg")
   end
 
   test do

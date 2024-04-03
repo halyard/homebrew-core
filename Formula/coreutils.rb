@@ -1,9 +1,9 @@
 class Coreutils < Formula
   desc "GNU File, Shell, and Text utilities"
   homepage "https://www.gnu.org/software/coreutils"
-  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.3.tar.xz"
-  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.3.tar.xz"
-  sha256 "adbcfcfe899235b71e8768dcf07cd532520b7f54f9a8064843f8d199a904bbaa"
+  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.5.tar.xz"
+  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.5.tar.xz"
+  sha256 "cd328edeac92f6a665de9f323c93b712af1858bc2e0d88f3f7100469470a1b8a"
   license "GPL-3.0-or-later"
 
   head do
@@ -35,7 +35,6 @@ class Coreutils < Formula
   conflicts_with "gfold", because: "both install `gfold` binaries"
   conflicts_with "idutils", because: "both install `gid` and `gid.1`"
   conflicts_with "md5sha1sum", because: "both install `md5sum` and `sha1sum` binaries"
-  conflicts_with "truncate", because: "both install `truncate` binaries"
 
   # https://github.com/Homebrew/homebrew-core/pull/36494
   def breaks_macos_users
@@ -48,7 +47,7 @@ class Coreutils < Formula
     args = %W[
       --prefix=#{prefix}
       --program-prefix=g
-      --with-gmp
+      --with-libgmp
       --without-selinux
     ]
 

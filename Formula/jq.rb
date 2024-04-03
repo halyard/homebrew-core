@@ -1,18 +1,9 @@
 class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
-  homepage "https://stedolan.github.io/jq/"
+  homepage "https://jqlang.github.io/jq/"
+  url "https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz"
+  sha256 "478c9ca129fd2e3443fe27314b455e211e0d8c60bc8ff7df703873deeee580c2"
   license "MIT"
-
-  stable do
-    url "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
-    sha256 "5de8c8e29aaa3fb9cc6b47bb27299f271354ebb72514e3accadc7d38b5bbaa72"
-
-    # Fix -flat_namespace being used on Big Sur and later.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
-    end
-  end
 
   livecheck do
     url :stable
@@ -20,7 +11,7 @@ class Jq < Formula
   end
 
   head do
-    url "https://github.com/stedolan/jq.git", branch: "master"
+    url "https://github.com/jqlang/jq.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -30,11 +21,10 @@ class Jq < Formula
   depends_on "oniguruma"
 
   def install
-    system "autoreconf", "-iv" if build.head?
-    system "./configure", "--disable-dependency-tracking",
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *std_configure_args,
                           "--disable-silent-rules",
-                          "--disable-maintainer-mode",
-                          "--prefix=#{prefix}"
+                          "--disable-maintainer-mode"
     system "make", "install"
   end
 

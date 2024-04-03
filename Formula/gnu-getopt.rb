@@ -1,8 +1,8 @@
 class GnuGetopt < Formula
   desc "Command-line option parsing utility"
   homepage "https://github.com/util-linux/util-linux"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.1.tar.xz"
-  sha256 "890ae8ff810247bd19e274df76e8371d202cda01ad277681b0ea88eeaa00286b"
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.tar.xz"
+  sha256 "d57a626081f9ead02fa44c63a6af162ec19c58f53e993f206ab7c3a6641c2cd7"
   license "GPL-2.0-or-later"
 
   keg_only :provided_by_macos
@@ -17,18 +17,22 @@ class GnuGetopt < Formula
   end
 
   def install
-    system "./configure", "--disable-dependency-tracking",
+    system "./configure", *std_configure_args,
                           "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+                          "--disable-liblastlog2"
 
     system "make", "getopt", "misc-utils/getopt.1"
 
     bin.install "getopt"
     man1.install "misc-utils/getopt.1"
     bash_completion.install "bash-completion/getopt"
+    doc.install "misc-utils/getopt-example.bash", "misc-utils/getopt-example.tcsh"
   end
 
   test do
     system "#{bin}/getopt", "-o", "--test"
+    # Check that getopt is enhanced
+    quiet_system "#{bin}/getopt", "-T"
+    assert_equal 4, $CHILD_STATUS.exitstatus
   end
 end

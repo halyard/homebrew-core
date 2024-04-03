@@ -1,8 +1,8 @@
 class P11Kit < Formula
   desc "Library to load and enumerate PKCS#11 modules"
   homepage "https://p11-glue.freedesktop.org"
-  url "https://github.com/p11-glue/p11-kit/releases/download/0.25.0/p11-kit-0.25.0.tar.xz"
-  sha256 "d55583bcdde83d86579cabe3a8f7f2638675fef01d23cace733ff748fc354706"
+  url "https://github.com/p11-glue/p11-kit/releases/download/0.25.3/p11-kit-0.25.3.tar.xz"
+  sha256 "d8ddce1bb7e898986f9d250ccae7c09ce14d82f1009046d202a0eb1b428b2adc"
   license "BSD-3-Clause"
 
   head do
@@ -14,6 +14,8 @@ class P11Kit < Formula
     depends_on "libtool" => :build
   end
 
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "ca-certificates"
   depends_on "libtasn1"
@@ -29,17 +31,18 @@ class P11Kit < Formula
       system "./autogen.sh"
     end
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--with-module-config=#{etc}/pkcs11/modules",
-                          "--with-trust-paths=#{etc}/ca-certificates/cert.pem",
-                          "--without-systemd"
-    system "make"
+    args = %W[
+      -Dsystem_config=#{etc}
+      -Dmodule_config=#{etc}/pkcs11/modules
+      -Dtrust_paths=#{etc}/ca-certificates/cert.pem"
+      -Dsystemd=disabled
+    ]
+
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
     # This formula is used with crypto libraries, so let's run the test suite.
-    system "make", "check"
-    system "make", "install"
+    system "meson", "test", "-C", "build"
+    system "meson", "install", "-C", "build"
   end
 
   test do

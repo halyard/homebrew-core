@@ -1,37 +1,42 @@
+# NOTE: version 2 is out, but it requires Bash 4, and macOS ships
+# with 3.2.57. If you've upgraded bash, use bash-completion@2 instead.
 class BashCompletion < Formula
-  desc "Programmable completion for Bash 4.2+"
-  homepage "https://github.com/scop/bash-completion"
-  url "https://github.com/scop/bash-completion/releases/download/2.11/bash-completion-2.11.tar.xz"
-  sha256 "73a8894bad94dee83ab468fa09f628daffd567e8bef1a24277f1e9a0daf911ac"
-  license "GPL-2.0"
+  desc "Programmable completion for Bash 3.2"
+  homepage "https://salsa.debian.org/debian/bash-completion"
+  url "https://src.fedoraproject.org/repo/pkgs/bash-completion/bash-completion-1.3.tar.bz2/a1262659b4bbf44dc9e59d034de505ec/bash-completion-1.3.tar.bz2"
+  sha256 "8ebe30579f0f3e1a521013bcdd183193605dab353d7a244ff2582fb3a36f7bec"
+  license "GPL-2.0-or-later"
+  revision 3
 
   livecheck do
-    url :stable
-    strategy :github_latest
+    skip "1.x versions are no longer developed"
   end
 
-  head do
-    url "https://github.com/scop/bash-completion.git", branch: "master"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
+  on_linux do
+    conflicts_with "util-linux", because: "both install `mount`, `rfkill`, and `rtcwake` completions"
   end
 
-  depends_on "bash"
-
-  conflicts_with "bash-completion",
+  conflicts_with "bash-completion@2",
     because: "each are different versions of the same formula"
+  conflicts_with "medusa", because: "both install `medusa` bash completion"
+
+  # Backports the following upstream patch from 2.x:
+  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=740971
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/c1d87451da3b5b147bed95b2dc783a1b02520ac5/bash-completion/bug-740971.patch"
+    sha256 "bd242a35b8664c340add068bcfac74eada41ed26d52dc0f1b39eebe591c2ea97"
+  end
+
+  # Backports (a variant of) an upstream patch to fix man completion.
+  patch :DATA
 
   def install
     inreplace "bash_completion" do |s|
+      s.gsub! "/etc/bash_completion", etc/"bash_completion"
       s.gsub! "readlink -f", "readlink"
-      # Automatically read Homebrew's existing v1 completions
-      s.gsub! ":-/etc/bash_completion.d", ":-#{etc}/bash_completion.d"
     end
 
-    system "autoreconf", "-i" if build.head?
     system "./configure", "--prefix=#{prefix}"
-    ENV.deparallelize
     system "make", "install"
   end
 
@@ -43,6 +48,19 @@ class BashCompletion < Formula
   end
 
   test do
-    system "test", "-f", "#{share}/bash-completion/bash_completion"
+    system "bash", "-c", ". #{etc}/profile.d/bash_completion.sh"
   end
 end
+
+__END__
+--- a/completions/man
++++ b/completions/man
+@@ -27,7 +27,7 @@
+     fi
+
+     uname=$( uname -s )
+-    if [[ $uname == @(Linux|GNU|GNU/*|FreeBSD|Cygwin|CYGWIN_*) ]]; then
++    if [[ $uname == @(Darwin|Linux|GNU|GNU/*|FreeBSD|Cygwin|CYGWIN_*) ]]; then
+         manpath=$( manpath 2>/dev/null || command man --path )
+     else
+         manpath=$MANPATH

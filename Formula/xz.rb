@@ -1,26 +1,21 @@
-# Upstream project has requested we use a mirror as the main URL
-# https://github.com/Homebrew/legacy-homebrew/pull/21419
 class Xz < Formula
   desc "General-purpose data compression with high compression ratio"
-  homepage "https://tukaani.org/xz/"
+  homepage "https://xz.tukaani.org/xz-utils/"
   # The archive.org mirror below needs to be manually created at `archive.org`.
-  url "https://downloads.sourceforge.net/project/lzmautils/xz-5.4.3.tar.gz"
-  mirror "https://tukaani.org/xz/xz-5.4.3.tar.gz"
-  mirror "https://archive.org/download/xz-5.4.3/xz-5.4.3.tar.gz"
-  mirror "http://archive.org/download/xz-5.4.3/xz-5.4.3.tar.gz"
-  sha256 "1c382e0bc2e4e0af58398a903dd62fff7e510171d2de47a1ebe06d1528e9b7e9"
+  # GitHub repository has been disabled, so we need to use the mirror.
+  # url "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
+  url "https://downloads.sourceforge.net/project/lzmautils/xz-5.4.6.tar.gz"
+  mirror "https://archive.org/download/xz-5.4.6/xz-5.4.6.tar.gz"
+  mirror "http://archive.org/download/xz-5.4.6/xz-5.4.6.tar.gz"
+  sha256 "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
   license all_of: [
     :public_domain,
-    "LGPL-2.1-or-later",
     "GPL-2.0-or-later",
-    "GPL-3.0-or-later",
   ]
+  version_scheme 1
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args, "--disable-silent-rules", "--disable-nls"
     system "make", "check"
     system "make", "install"
   end

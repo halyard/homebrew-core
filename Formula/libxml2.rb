@@ -1,10 +1,9 @@
 class Libxml2 < Formula
   desc "GNOME XML library"
   homepage "http://xmlsoft.org/"
-  url "https://download.gnome.org/sources/libxml2/2.11/libxml2-2.11.4.tar.xz"
-  sha256 "737e1d7f8ab3f139729ca13a2494fd17bf30ddb4b7a427cf336252cab57f57f7"
+  url "https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.6.tar.xz"
+  sha256 "889c593a881a3db5fdd96cc9318c87df34eb648edfc458272ad46fd607353fbb"
   license "MIT"
-  revision 1
 
   # We use a common regex because libxml2 doesn't use GNOME's "even-numbered
   # minor is stable" version scheme.
@@ -24,8 +23,9 @@ class Libxml2 < Formula
 
   keg_only :provided_by_macos
 
-  depends_on "python@3.10" => [:build, :test]
+  depends_on "python-setuptools" => :build
   depends_on "python@3.11" => [:build, :test]
+  depends_on "python@3.12" => [:build, :test]
   depends_on "pkg-config" => :test
   depends_on "icu4c"
   depends_on "readline"
@@ -41,6 +41,7 @@ class Libxml2 < Formula
   def install
     system "autoreconf", "--force", "--install", "--verbose" if build.head?
     system "./configure", *std_configure_args,
+                          "--sysconfdir=#{etc}",
                           "--disable-silent-rules",
                           "--with-history",
                           "--with-icu",
@@ -64,8 +65,12 @@ class Libxml2 < Formula
       inreplace "setup.py", "includes_dir = [",
                             "includes_dir = [#{includes}"
 
-      pythons.each do |python|
-        system python, *Language::Python.setup_install_args(prefix, python)
+      # Needed for Python 3.12+.
+      # https://github.com/Homebrew/homebrew-core/pull/154551#issuecomment-1820102786
+      with_env(PYTHONPATH: buildpath/"python") do
+        pythons.each do |python|
+          system python, "-m", "pip", "install", *std_pip_args, "."
+        end
       end
     end
   end

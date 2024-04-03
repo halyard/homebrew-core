@@ -5,13 +5,13 @@ class Rav1e < Formula
   head "https://github.com/xiph/rav1e.git", branch: "master"
 
   stable do
-    url "https://github.com/xiph/rav1e/archive/v0.6.6.tar.gz"
-    sha256 "723696e93acbe03666213fbc559044f3cae5b8b888b2ddae667402403cff51e5"
+    url "https://github.com/xiph/rav1e/archive/refs/tags/v0.7.1.tar.gz"
+    sha256 "da7ae0df2b608e539de5d443c096e109442cdfa6c5e9b4014361211cf61d030c"
 
     # keep the version in sync
     resource "Cargo.lock" do
-      url "https://github.com/xiph/rav1e/releases/download/v0.6.6/Cargo.lock"
-      sha256 "2014f7d76e7d0d7eaa63158ef5a1a1cea15a095fd5fb79b20b1052015a7fcd0c"
+      url "https://github.com/xiph/rav1e/releases/download/v0.7.1/Cargo.lock"
+      sha256 "4482976bfb7647d707f9a01fa1a3848366988f439924b5c8ac7ab085fba24240"
     end
   end
 
@@ -27,23 +27,21 @@ class Rav1e < Formula
     depends_on "nasm" => :build
   end
 
-  resource "homebrew-bus_qcif_7.5fps.y4m" do
-    url "https://media.xiph.org/video/derf/y4m/bus_qcif_7.5fps.y4m"
-    sha256 "1f5bfcce0c881567ea31c1eb9ecb1da9f9583fdb7d6bb1c80a8c9acfc6b66f6b"
-  end
-
   def install
+    odie "Cargo.lock resource needs to be updated" if build.stable? && version != resource("Cargo.lock").version
+
     buildpath.install resource("Cargo.lock") if build.stable?
     system "cargo", "install", *std_cargo_args
     system "cargo", "cinstall", "--prefix", prefix
   end
 
   test do
-    assert_equal version, resource("Cargo.lock").version, "`Cargo.lock` resource needs updating!" unless head?
-    resource("homebrew-bus_qcif_7.5fps.y4m").stage do
-      system bin/"rav1e", "--tile-rows=2",
-                          "bus_qcif_7.5fps.y4m",
-                          "--output=bus_qcif_15fps.ivf"
+    resource "homebrew-bus_qcif_7.5fps.y4m" do
+      url "https://media.xiph.org/video/derf/y4m/bus_qcif_7.5fps.y4m"
+      sha256 "1f5bfcce0c881567ea31c1eb9ecb1da9f9583fdb7d6bb1c80a8c9acfc6b66f6b"
     end
+
+    testpath.install resource("homebrew-bus_qcif_7.5fps.y4m")
+    system bin/"rav1e", "--tile-rows=2", "bus_qcif_7.5fps.y4m", "--output=bus_qcif_15fps.ivf"
   end
 end

@@ -1,8 +1,8 @@
 class Mpdecimal < Formula
   desc "Library for decimal floating point arithmetic"
   homepage "https://www.bytereef.org/mpdecimal/"
-  url "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz"
-  sha256 "9f9cd4c041f99b5c49ffb7b59d9f12d95b683d88585608aa56a6307667b2b21f"
+  url "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-4.0.0.tar.gz"
+  sha256 "942445c3245b22730fd41a67a7c5c231d11cb1b9936b9c0f76334fb7d0b4468c"
   license "BSD-2-Clause"
 
   livecheck do
@@ -11,7 +11,9 @@ class Mpdecimal < Formula
   end
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath}"
+    ENV.append "LDXXFLAGS", "-Wl,-rpath,#{rpath}"
+    system "./configure", *std_configure_args
     system "make"
     system "make", "install"
   end

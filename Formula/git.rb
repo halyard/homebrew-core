@@ -2,10 +2,9 @@ class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
   # Don't forget to update the documentation resources along with the url!
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.41.0.tar.xz"
-  sha256 "e748bafd424cfe80b212cbc6f1bbccc3a47d4862fb1eb7988877750478568040"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.44.0.tar.xz"
+  sha256 "e358738dcb5b5ea340ce900a0015c03ae86e804e7ff64e47aa4631ddee681de3"
   license "GPL-2.0-only"
-  revision 2
   head "https://github.com/git/git.git", branch: "master"
 
   livecheck do
@@ -26,13 +25,13 @@ class Git < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.41.0.tar.xz"
-    sha256 "0cb2d4a09270eede7c1b686e2dfeac9bffef9e42c117a7e120f3cbb3e665d286"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.44.0.tar.xz"
+    sha256 "808f1221940de2a32d7b4a3f675f968a7d0a75058a12a791afcda58b01a6e820"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.41.0.tar.xz"
-    sha256 "bc7a4c944492c76fc3cd766ce22e826d0241e43792c611d4fdc068e0df545877"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.44.0.tar.xz"
+    sha256 "777be83bd54e301988fc49708cae3b5ce4b0971c2ca3b7a720be58e2f4633fcb"
   end
 
   resource "Net::SMTP::SSL" do
@@ -41,6 +40,9 @@ class Git < Formula
   end
 
   def install
+    odie "html resource needs to be updated" if build.stable? && version != resource("html").version
+    odie "man resource needs to be updated" if build.stable? && version != resource("man").version
+
     # If these things are installed, tell Git build system not to use them
     ENV["NO_FINK"] = "1"
     ENV["NO_DARWIN_PORTS"] = "1"
@@ -83,6 +85,10 @@ class Git < Formula
 
       %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     end
+
+    # Make sure `git` looks in `opt_prefix` instead of the Cellar.
+    # Otherwise, Cellar references propagate to generated plists from `git maintenance`.
+    inreplace "Makefile", /(-DFALLBACK_RUNTIME_PREFIX=")[^"]+/, "\\1#{opt_prefix}"
 
     system "make", "install", *args
 
@@ -166,9 +172,6 @@ class Git < Formula
   end
 
   test do
-    assert_equal version, resource("html").version, "`html` resource needs updating!"
-    assert_equal version, resource("man").version, "`man` resource needs updating!"
-
     system bin/"git", "init"
     %w[haunted house].each { |f| touch testpath/f }
     system bin/"git", "add", "haunted", "house"
@@ -177,16 +180,21 @@ class Git < Formula
     system bin/"git", "commit", "-a", "-m", "Initial Commit"
     assert_equal "haunted\nhouse", shell_output("#{bin}/git ls-files").strip
 
+    # Check that our `inreplace` for the `Makefile` does not break.
+    # If this assertion fails, please fix the `inreplace` instead of removing this test.
+    # The failure of this test means that `git` will generate broken launchctl plist files.
+    refute_match HOMEBREW_CELLAR.to_s, shell_output("#{bin}/git --exec-path")
+
+    return unless OS.mac?
+
     # Check Net::SMTP or Net::SMTP::SSL works for git-send-email
-    if OS.mac?
-      %w[foo bar].each { |f| touch testpath/f }
-      system bin/"git", "add", "foo", "bar"
-      system bin/"git", "commit", "-a", "-m", "Second Commit"
-      assert_match "Authentication Required", pipe_output(
-        "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
-        "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
-        "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
-      )
-    end
+    %w[foo bar].each { |f| touch testpath/f }
+    system bin/"git", "add", "foo", "bar"
+    system bin/"git", "commit", "-a", "-m", "Second Commit"
+    assert_match "Authentication Required", pipe_output(
+      "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
+      "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
+      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
+    )
   end
 end

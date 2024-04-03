@@ -1,18 +1,12 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  url "https://github.com/rclone/rclone/archive/v1.63.0.tar.gz"
-  sha256 "755af528052f946e8d41a3e96e5dbf8f03ecfe398f9d0fdeb7ca1a59208a75db"
+  url "https://github.com/rclone/rclone/archive/refs/tags/v1.66.0.tar.gz"
+  sha256 "9249391867044a0fa4c5a948b46a03b320706b4d5c4d59db9d4aeff8d47cade2"
   license "MIT"
   head "https://github.com/rclone/rclone.git", branch: "master"
 
   depends_on "go" => :build
-
-  # Fix builds on macOS < 12.
-  patch do
-    url "https://github.com/rclone/rclone/commit/c5a6821a8f09b1ac88e246a775d99271fa12cecd.patch?full_index=1"
-    sha256 "ca7fdb4200fc4e2919c99a3d392779ccf65ffe8f10bfde4c965fef8e4984d585"
-  end
 
   def install
     args = *std_go_args(ldflags: "-s -w -X github.com/rclone/rclone/fs.Version=v#{version}")
@@ -29,7 +23,7 @@ class Rclone < Formula
 
   def caveats
     <<~EOS
-      Homebrew's installation does not include the `mount` subcommand on MacOS.
+      Homebrew's installation does not include the `mount` subcommand on macOS which depends on FUSE, use `nfsmount` instead.
     EOS
   end
 

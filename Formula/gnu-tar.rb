@@ -1,11 +1,10 @@
 class GnuTar < Formula
   desc "GNU version of the tar archiving utility"
   homepage "https://www.gnu.org/software/tar/"
-  url "https://ftp.gnu.org/gnu/tar/tar-1.34.tar.gz"
-  mirror "https://ftpmirror.gnu.org/tar/tar-1.34.tar.gz"
-  sha256 "03d908cf5768cfe6b7ad588c921c6ed21acabfb2b79b788d1330453507647aed"
+  url "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.gz"
+  mirror "https://ftpmirror.gnu.org/tar/tar-1.35.tar.gz"
+  sha256 "14d55e32063ea9526e057fbf35fcabd53378e769787eff7919c3755b02d2b57e"
   license "GPL-3.0-or-later"
-  revision 1
 
   head do
     url "https://git.savannah.gnu.org/git/tar.git", branch: "master"
@@ -23,6 +22,7 @@ class GnuTar < Formula
     args = %W[
       --prefix=#{prefix}
       --mandir=#{man}
+      --disable-nls
     ]
 
     args << if OS.mac?
@@ -30,6 +30,13 @@ class GnuTar < Formula
     else
       "--without-selinux"
     end
+
+    # iconv is detected during configure process but -liconv is missing
+    # from LDFLAGS as of gnu-tar 1.35. Remove once iconv linking works
+    # without this. See https://savannah.gnu.org/bugs/?64441.
+    # fix commit, http://git.savannah.gnu.org/cgit/tar.git/commit/?id=8632df39, remove in next release
+    ENV.append "LDFLAGS", "-liconv" if OS.mac?
+
     system "./bootstrap" if build.head?
     system "./configure", *args
     system "make", "install"

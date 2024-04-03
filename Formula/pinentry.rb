@@ -1,9 +1,9 @@
 class Pinentry < Formula
   desc "Passphrase entry dialog utilizing the Assuan protocol"
   homepage "https://www.gnupg.org/related_software/pinentry/"
-  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.1.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.2.1.tar.bz2"
-  sha256 "457a185e5a85238fb945a955dc6352ab962dc8b48720b62fc9fa48c7540a4067"
+  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.3.0.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.3.0.tar.bz2"
+  sha256 "9b3cd5226e7597f2fded399a3bc659923351536559e9db0826981bca316494de"
   license "GPL-2.0-only"
 
   livecheck do
@@ -20,10 +20,11 @@ class Pinentry < Formula
   end
 
   def install
-    args = %W[
-      --disable-dependency-tracking
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
+    args = %w[
       --disable-silent-rules
-      --prefix=#{prefix}
       --disable-pinentry-fltk
       --disable-pinentry-gnome3
       --disable-pinentry-gtk2
@@ -33,7 +34,7 @@ class Pinentry < Formula
       --enable-pinentry-tty
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
