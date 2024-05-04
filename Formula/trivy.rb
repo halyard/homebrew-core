@@ -1,8 +1,8 @@
 class Trivy < Formula
   desc "Vulnerability scanner for container images, file systems, and Git repos"
   homepage "https://aquasecurity.github.io/trivy/"
-  url "https://github.com/aquasecurity/trivy/archive/refs/tags/v0.50.1.tar.gz"
-  sha256 "1b5acce5580a401998946d9eeb2aaa0312f243c001809a83eb9557efda628d2d"
+  url "https://github.com/aquasecurity/trivy/archive/refs/tags/v0.49.1.tar.gz"
+  sha256 "30145d74a857e6d0a91bf585c295de7e8cd97d0a3233607a299a5c40069c48ef"
   license "Apache-2.0"
   head "https://github.com/aquasecurity/trivy.git", branch: "main"
 
@@ -13,7 +13,7 @@ class Trivy < Formula
       -s -w
       -X github.com/aquasecurity/trivy/pkg/version.ver=#{version}
     ]
-    system "go", "build", *std_go_args(ldflags:), "./cmd/trivy"
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/trivy"
   end
 
   test do
