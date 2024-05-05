@@ -1,8 +1,8 @@
 class Openvino < Formula
   desc "Open Visual Inference And Optimization toolkit for AI inference"
   homepage "https://docs.openvino.ai"
-  url "https://github.com/openvinotoolkit/openvino/archive/refs/tags/2024.0.0.tar.gz"
-  sha256 "b3c257f8af9545ae68a6ea217173b2b2de9dd42d35e8703a7a51d76f4c2bfe2f"
+  url "https://github.com/openvinotoolkit/openvino/archive/refs/tags/2024.1.0.tar.gz"
+  sha256 "b298a91b5aae252ef9883e0f2017e88677be88a9839b1aa2f6e9f70067d98ce6"
   license "Apache-2.0"
   head "https://github.com/openvinotoolkit/openvino.git", branch: "master"
 
@@ -12,7 +12,6 @@ class Openvino < Formula
   end
 
   depends_on "cmake" => [:build, :test]
-  depends_on "cython" => :build
   depends_on "flatbuffers" => :build
   depends_on "pkg-config" => [:build, :test]
   depends_on "protobuf@21" => :build
@@ -32,8 +31,8 @@ class Openvino < Formula
     depends_on "opencl-icd-loader"
 
     resource "onednn_gpu" do
-      url "https://github.com/oneapi-src/oneDNN/archive/494af5f9921bdae98f1a0e2955fa7d76ff386c4f.tar.gz"
-      sha256 "e2f36563cecf39197ad8d4f8b351ccc5a431085dad26e47c0ae6f0bb79149df7"
+      url "https://github.com/oneapi-src/oneDNN/archive/4e6ff043c439652fcf6c400ac4e0c81bbac7c71c.tar.gz"
+      sha256 "c3543d560fbbb7297df91c191cc9bf682322c5554302e256f1bf4a757424a331"
     end
   end
 
@@ -41,8 +40,8 @@ class Openvino < Formula
     depends_on "scons" => :build
 
     resource "arm_compute" do
-      url "https://github.com/ARM-software/ComputeLibrary/archive/refs/tags/v23.08.tar.gz"
-      sha256 "62f514a555409d4401e5250b290cdf8cf1676e4eb775e5bd61ea6a740a8ce24f"
+      url "https://github.com/ARM-software/ComputeLibrary/archive/refs/tags/v24.02.1.tar.gz"
+      sha256 "590d5cb710355bce2ddfe7117529c2f492cd253b548f709bbfe84702203d99c8"
     end
   end
 
@@ -56,8 +55,8 @@ class Openvino < Formula
   end
 
   resource "onednn_cpu" do
-    url "https://github.com/openvinotoolkit/oneDNN/archive/f82148befdbdc9576ec721c9d500155ee4de8060.tar.gz"
-    sha256 "7fce5c6b499ffe1a30c26b2d4e4a5193a38aa217b6f54e44eea52b21cf38a684"
+    url "https://github.com/openvinotoolkit/oneDNN/archive/26633ae49edd4353a29b7170d9fcef6b2d79f4b3.tar.gz"
+    sha256 "3cd4a2aea30cd6ca689e63545cf986f8e83c88333b73d42bb750fcaf08940b17"
   end
 
   resource "onnx" do
@@ -98,8 +97,9 @@ class Openvino < Formula
       -DENABLE_CPPLINT=OFF
       -DENABLE_CLANG_FORMAT=OFF
       -DENABLE_NCC_STYLE=OFF
+      -DENABLE_JS=OFF
       -DENABLE_TEMPLATE=OFF
-      -DENABLE_INTEL_GNA=OFF
+      -DENABLE_INTEL_NPU=OFF
       -DENABLE_PYTHON=OFF
       -DENABLE_SAMPLES=OFF
       -DCPACK_GENERATOR=BREW
