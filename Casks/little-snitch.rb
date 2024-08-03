@@ -1,6 +1,6 @@
 cask "little-snitch" do
-  version "5.6"
-  sha256 "c424847fd9ec3eedca81a846f1944acbee492a7e8775cb1f5ad540658f81eda7"
+  version "6.0.4"
+  sha256 "6c195378ced1b90c2352469aca0d9893fd03b7b88f2d2875af4103df1eed5710"
 
   url "https://www.obdev.at/downloads/littlesnitch/LittleSnitch-#{version}.dmg"
   name "Little Snitch"
@@ -8,20 +8,34 @@ cask "little-snitch" do
   homepage "https://www.obdev.at/products/littlesnitch/index.html"
 
   livecheck do
-    url "https://www.obdev.at/products/littlesnitch/download.html"
-    regex(%r{href=.*?/LittleSnitch-(\d+(?:\.\d+)+)\.dmg}i)
+    url "https://sw-update.obdev.at/update-feeds/littlesnitch#{version.major}.plist"
+    regex(/LittleSnitch[._-]v?(\d+(?:\.\d+)+)\.dmg/)
+    strategy :xml do |xml, regex|
+      xml.get_elements("//key[text()='DownloadURL']").map do |item|
+        match = item.next_element&.text&.match(regex)
+        next if match.blank?
+
+        match[1]
+      end
+    end
   end
 
   auto_updates true
-  depends_on macos: ">= :big_sur"
+  conflicts_with cask: [
+    "little-snitch@4",
+    "little-snitch@5",
+  ]
+  depends_on macos: ">= :sonoma"
 
   app "Little Snitch.app"
 
   zap trash: [
         "/Library/Application Support/Objective Development/Little Snitch",
         "/Library/Caches/at.obdev.LittleSnitchConfiguration",
+        "/Library/Extensions/LittleSnitch.kext",
         "/Library/Little Snitch",
         "/Library/Logs/LittleSnitchDaemon.log",
+        "/Library/StagedExtensions/Library/Extensions/LittleSnitch.kext",
         "~/Library/Application Support/Little Snitch",
         "~/Library/Caches/at.obdev.LittleSnitchAgent",
         "~/Library/Caches/at.obdev.LittleSnitchConfiguration",
@@ -40,9 +54,6 @@ cask "little-snitch" do
         "~/Library/Preferences/at.obdev.LittleSnitchSoftwareUpdate.plist",
         "~/Library/Saved Application State/at.obdev.LittleSnitchInstaller.savedState",
         "~/Library/WebKit/at.obdev.LittleSnitchConfiguration",
-        # These kext's should not be uninstalled by Cask
-        "/Library/Extensions/LittleSnitch.kext",
-        "/Library/StagedExtensions/Library/Extensions/LittleSnitch.kext",
       ],
       rmdir: "/Library/Application Support/Objective Development"
 end
