@@ -1,8 +1,8 @@
 cask "obsidian" do
-  version "1.3.5"
-  sha256 "6d3209c10aae7f3c6ad7f67147cad560447cdad974a4f3292b00cfafd1b3d50e"
+  version "1.6.7"
+  sha256 "ac55e6865c57955cf99c2ad73267d819ac5ee3fc27051745c6c7e2c222031e0c"
 
-  url "https://github.com/obsidianmd/obsidian-releases/releases/download/v#{version}/Obsidian-#{version}-universal.dmg",
+  url "https://github.com/obsidianmd/obsidian-releases/releases/download/v#{version}/Obsidian-#{version}.dmg",
       verified: "github.com/obsidianmd/"
   name "Obsidian"
   desc "Knowledge base that works on top of a local folder of plain text Markdown files"
@@ -14,12 +14,13 @@ cask "obsidian" do
   end
 
   auto_updates true
+  depends_on macos: ">= :catalina"
 
   app "Obsidian.app"
 
   zap trash: [
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/md.obsidian.sfl*",
     "~/Library/Application Support/obsidian",
-    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/md.obsidian.sfl2",
     "~/Library/Preferences/md.obsidian.plist",
     "~/Library/Saved Application State/md.obsidian.savedState",
   ]
