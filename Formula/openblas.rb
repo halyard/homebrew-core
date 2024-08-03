@@ -1,8 +1,8 @@
 class Openblas < Formula
   desc "Optimized BLAS library"
   homepage "https://www.openblas.net/"
-  url "https://github.com/xianyi/OpenBLAS/archive/refs/tags/v0.3.26.tar.gz"
-  sha256 "4e6e4f5cb14c209262e33e6816d70221a2fe49eb69eaf0a06f065598ac602c68"
+  url "https://github.com/xianyi/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz"
+  sha256 "aa2d68b1564fe2b13bc292672608e9cdeeeb6dc34995512e65c3b10f4599e897"
   license "BSD-3-Clause"
   head "https://github.com/xianyi/OpenBLAS.git", branch: "develop"
 
@@ -10,6 +10,7 @@ class Openblas < Formula
     url :stable
     strategy :github_latest
   end
+
 
   keg_only :shadowed_by_macos, "macOS provides BLAS in Accelerate.framework"
 

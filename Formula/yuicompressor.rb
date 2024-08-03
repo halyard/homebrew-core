@@ -11,6 +11,7 @@ class Yuicompressor < Formula
     strategy :github_latest
   end
 
+
   depends_on "openjdk"
 
   def install

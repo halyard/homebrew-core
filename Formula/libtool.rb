@@ -6,6 +6,7 @@ class Libtool < Formula
   sha256 "4f7f217f057ce655ff22559ad221a0fd8ef84ad1fc5fcb6990cecc333aa1635d"
   license "GPL-2.0-or-later"
 
+
   depends_on "m4"
 
   def install
@@ -25,7 +26,7 @@ class Libtool < Formula
         (libexec/"gnubin").install_symlink bin/"g#{prog}" => prog
         (libexec/"gnuman/man1").install_symlink man1/"g#{prog}.1" => "#{prog}.1"
       end
-      libexec.install_symlink "gnuman" => "man"
+      (libexec/"gnubin").install_symlink "../gnuman" => "man"
     end
 
     if OS.linux?
@@ -49,11 +50,13 @@ class Libtool < Formula
   end
 
   test do
-    system "#{bin}/glibtool", "execute", File.executable?("/usr/bin/true") ? "/usr/bin/true" : "/bin/true"
+    system bin/"glibtool", "execute", File.executable?("/usr/bin/true") ? "/usr/bin/true" : "/bin/true"
+
     (testpath/"hello.c").write <<~EOS
       #include <stdio.h>
       int main() { puts("Hello, world!"); return 0; }
     EOS
+
     system bin/"glibtool", "--mode=compile", "--tag=CC",
       ENV.cc, "-c", "hello.c", "-o", "hello.o"
     system bin/"glibtool", "--mode=link", "--tag=CC",

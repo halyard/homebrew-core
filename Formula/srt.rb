@@ -6,6 +6,7 @@ class Srt < Formula
   license "MPL-2.0"
   head "https://github.com/Haivision/srt.git", branch: "master"
 
+
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "openssl@3"

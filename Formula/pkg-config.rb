@@ -13,6 +13,7 @@ class PkgConfig < Formula
     regex(/href=.*?pkg-config[._-]v?(\d+(?:\.\d+)+)\./i)
   end
 
+
   conflicts_with "pkgconf", because: "both install `pkg.m4` file"
 
   # FIXME: The bottle is mistakenly considered relocatable on Linux.

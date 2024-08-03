@@ -10,6 +10,7 @@ class Socat < Formula
     regex(/href=.*?socat[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "openssl@3"
   depends_on "readline"
 

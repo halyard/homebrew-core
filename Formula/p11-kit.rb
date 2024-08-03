@@ -1,9 +1,10 @@
 class P11Kit < Formula
   desc "Library to load and enumerate PKCS#11 modules"
   homepage "https://p11-glue.freedesktop.org"
-  url "https://github.com/p11-glue/p11-kit/releases/download/0.25.3/p11-kit-0.25.3.tar.xz"
-  sha256 "d8ddce1bb7e898986f9d250ccae7c09ce14d82f1009046d202a0eb1b428b2adc"
+  url "https://github.com/p11-glue/p11-kit/releases/download/0.25.5/p11-kit-0.25.5.tar.xz"
+  sha256 "04d0a86450cdb1be018f26af6699857171a188ac6d5b8c90786a60854e1198e5"
   license "BSD-3-Clause"
+
 
   head do
     url "https://github.com/p11-glue/p11-kit.git", branch: "master"
@@ -46,6 +47,6 @@ class P11Kit < Formula
   end
 
   test do
-    system "#{bin}/p11-kit", "list-modules"
+    system bin/"p11-kit", "list-modules"
   end
 end

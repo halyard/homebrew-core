@@ -1,16 +1,17 @@
 class Openldap < Formula
   desc "Open source suite of directory software"
   homepage "https://www.openldap.org/software/"
-  url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.7.tgz"
-  mirror "http://fresh-center.net/linux/misc/openldap-2.6.7.tgz"
-  mirror "http://fresh-center.net/linux/misc/legacy/openldap-2.6.7.tgz"
-  sha256 "cd775f625c944ed78a3da18a03b03b08eea73c8aabc97b41bb336e9a10954930"
+  url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.8.tgz"
+  mirror "http://fresh-center.net/linux/misc/openldap-2.6.8.tgz"
+  mirror "http://fresh-center.net/linux/misc/legacy/openldap-2.6.8.tgz"
+  sha256 "48969323e94e3be3b03c6a132942dcba7ef8d545f2ad35401709019f696c3c4e"
   license "OLDAP-2.8"
 
   livecheck do
     url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/"
     regex(/href=.*?openldap[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
+
 
   keg_only :provided_by_macos
 

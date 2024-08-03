@@ -38,6 +38,7 @@ class X264 < Formula
     end
   end
 
+
   on_macos do
     depends_on "gcc" if DevelopmentTools.clang_build_version <= 902
   end

@@ -11,6 +11,7 @@ class Libassuan < Formula
     regex(/href=.*?libassuan[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "libgpg-error"
 
   def install

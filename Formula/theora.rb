@@ -20,6 +20,7 @@ class Theora < Formula
     regex(/href=.*?libtheora[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   head do
     url "https://gitlab.xiph.org/xiph/theora.git", branch: "master"
 

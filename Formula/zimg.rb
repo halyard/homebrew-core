@@ -6,6 +6,7 @@ class Zimg < Formula
   license "WTFPL"
   head "https://github.com/sekrit-twc/zimg.git", branch: "master"
 
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build

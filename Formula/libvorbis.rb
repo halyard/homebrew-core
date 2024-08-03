@@ -11,6 +11,7 @@ class Libvorbis < Formula
     regex(/href=.*?libvorbis[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   head do
     url "https://gitlab.xiph.org/xiph/vorbis.git", branch: "master"
 

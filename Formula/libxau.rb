@@ -5,6 +5,7 @@ class Libxau < Formula
   sha256 "f3fa3282f5570c3f6bd620244438dbfbdd580fc80f02f549587a0f8ab329bbeb"
   license "MIT"
 
+
   depends_on "pkg-config" => :build
   depends_on "util-macros" => :build
   depends_on "xorgproto"

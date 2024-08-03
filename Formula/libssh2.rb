@@ -13,6 +13,7 @@ class Libssh2 < Formula
     regex(/href=.*?libssh2[._-]v?(\d+(?:\.\d+)+)\./i)
   end
 
+
   head do
     url "https://github.com/libssh2/libssh2.git", branch: "master"
 

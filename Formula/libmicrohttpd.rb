@@ -6,6 +6,7 @@ class Libmicrohttpd < Formula
   sha256 "a89e09fc9b4de34dde19f4fcb4faaa1ce10299b9908db1132bbfa1de47882b94"
   license "LGPL-2.1-or-later"
 
+
   depends_on "gnutls"
 
   def install

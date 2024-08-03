@@ -64,6 +64,7 @@ class Readline < Formula
     end
   end
 
+
   keg_only :shadowed_by_macos, "macOS provides BSD libedit"
 
   uses_from_macos "ncurses"

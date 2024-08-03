@@ -6,6 +6,7 @@ class SwitchaudioOsx < Formula
   license "MIT"
   head "https://github.com/deweller/switchaudio-osx.git", branch: "master"
 
+
   depends_on xcode: :build
   depends_on :macos
 
@@ -19,10 +20,10 @@ class SwitchaudioOsx < Formula
                "MACOSX_DEPLOYMENT_TARGET=#{MacOS.version}"
     prefix.install Dir["build/Release/*"]
     bin.write_exec_script "#{prefix}/SwitchAudioSource"
-    chmod 0755, "#{bin}/SwitchAudioSource"
+    chmod 0755, bin/"SwitchAudioSource"
   end
 
   test do
-    system "#{bin}/SwitchAudioSource", "-c"
+    system bin/"SwitchAudioSource", "-c"
   end
 end

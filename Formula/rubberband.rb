@@ -11,6 +11,7 @@ class Rubberband < Formula
     regex(/href=.*?rubberband[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build

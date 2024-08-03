@@ -1,14 +1,15 @@
 class Openjdk < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.java.net/"
-  url "https://github.com/openjdk/jdk21u/archive/refs/tags/jdk-21.0.2-ga.tar.gz"
-  sha256 "17eda717843ffbbacc7de4bdcd934f404a23a57ebb3cda3cec630a668651531f"
+  url "https://github.com/openjdk/jdk22u/archive/refs/tags/jdk-22.0.2-ga.tar.gz"
+  sha256 "c423015bda77bea13e0a13f4dc705972c2185c3c6e6e30b183f733f2b95aa1a4"
   license "GPL-2.0-only" => { with: "Classpath-exception-2.0" }
 
   livecheck do
     url :stable
     regex(/^jdk[._-]v?(\d+(?:\.\d+)*)-ga$/i)
   end
+
 
   keg_only :shadowed_by_macos
 
@@ -33,6 +34,7 @@ class Openjdk < Formula
     depends_on "freetype"
     depends_on "libx11"
     depends_on "libxext"
+    depends_on "libxi"
     depends_on "libxrandr"
     depends_on "libxrender"
     depends_on "libxt"
@@ -45,28 +47,25 @@ class Openjdk < Formula
   resource "boot-jdk" do
     on_macos do
       on_arm do
-        url "https://download.java.net/java/GA/jdk21.0.1/415e3f918a1f4062a0074a2794853d0d/12/GPL/openjdk-21.0.1_macos-aarch64_bin.tar.gz"
-        sha256 "9760eaa019b6d214a06bd44a304f3700ac057d025000bdfb9739b61080969a96"
+        url "https://download.java.net/java/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_macos-aarch64_bin.tar.gz"
+        sha256 "b949a3bc13e3c5152ab55d12e699dfa6c8b00bedeb8302b13be4aec3ee734351"
       end
       on_intel do
-        url "https://download.java.net/java/GA/jdk21.0.1/415e3f918a1f4062a0074a2794853d0d/12/GPL/openjdk-21.0.1_macos-x64_bin.tar.gz"
-        sha256 "1ca6db9e6c09752f842eee6b86a2f7e51b76ae38e007e936b9382b4c3134e9ea"
+        url "https://download.java.net/java/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_macos-x64_bin.tar.gz"
+        sha256 "5daa4f9894cc3a617a5f9fe2c48e5391d3a2e672c91e1597041672f57696846f"
       end
     end
     on_linux do
       on_arm do
-        url "https://download.java.net/java/GA/jdk21.0.1/415e3f918a1f4062a0074a2794853d0d/12/GPL/openjdk-21.0.1_linux-aarch64_bin.tar.gz"
-        sha256 "f5e4e4622756fafe05ac0105a8efefa1152c8aad085a2bbb9466df0721bf2ba4"
+        url "https://download.java.net/java/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_linux-aarch64_bin.tar.gz"
+        sha256 "0887c42b9897f889415a6f7b88549d38af99f6ef2d1117199de012beab0631eb"
       end
       on_intel do
-        url "https://download.java.net/java/GA/jdk21.0.1/415e3f918a1f4062a0074a2794853d0d/12/GPL/openjdk-21.0.1_linux-x64_bin.tar.gz"
-        sha256 "7e80146b2c3f719bf7f56992eb268ad466f8854d5d6ae11805784608e458343f"
+        url "https://download.java.net/java/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_linux-x64_bin.tar.gz"
+        sha256 "133c8b65113304904cdef7c9103274d141cfb64b191ff48ceb6528aca25c67b1"
       end
     end
   end
-
-  # Patch to restore build on macOS 13
-  patch :DATA
 
   def install
     boot_jdk = buildpath/"boot-jdk"
@@ -97,7 +96,10 @@ class Openjdk < Formula
       --with-zlib=system
     ]
 
-    ldflags = ["-Wl,-rpath,#{loader_path.gsub("$", "\\$$")}/server"]
+    ldflags = %W[
+      -Wl,-rpath,#{loader_path.gsub("$", "\\$$")}
+      -Wl,-rpath,#{loader_path.gsub("$", "\\$$")}/server
+    ]
     args += if OS.mac?
       ldflags << "-headerpad_max_install_names"
 
@@ -158,19 +160,3 @@ class Openjdk < Formula
     assert_match "Hello, world!", shell_output("#{bin}/java HelloWorld")
   end
 end
-
-__END__
-diff -pur a/src/jdk.net/macosx/native/libextnet/MacOSXSocketOptions.c b/src/jdk.net/macosx/native/libextnet/MacOSXSocketOptions.c
---- a/src/jdk.net/macosx/native/libextnet/MacOSXSocketOptions.c	2022-08-12 22:24:53.000000000 +0200
-+++ b/src/jdk.net/macosx/native/libextnet/MacOSXSocketOptions.c	2022-10-24 18:27:36.000000000 +0200
-@@ -29,9 +29,9 @@
- #include <unistd.h>
-
- #include <jni.h>
--#include <netinet/tcp.h>
-
- #define __APPLE_USE_RFC_3542
-+#include <netinet/tcp.h>
- #include <netinet/in.h>
-
- #ifndef IP_DONTFRAG

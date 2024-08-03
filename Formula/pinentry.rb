@@ -1,9 +1,9 @@
 class Pinentry < Formula
   desc "Passphrase entry dialog utilizing the Assuan protocol"
   homepage "https://www.gnupg.org/related_software/pinentry/"
-  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.3.0.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.3.0.tar.bz2"
-  sha256 "9b3cd5226e7597f2fded399a3bc659923351536559e9db0826981bca316494de"
+  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.3.1.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.3.1.tar.bz2"
+  sha256 "bc72ee27c7239007ab1896c3c2fae53b076e2c9bd2483dc2769a16902bce8c04"
   license "GPL-2.0-only"
 
   livecheck do
@@ -11,11 +11,15 @@ class Pinentry < Formula
     regex(/href=.*?pinentry[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "pkg-config" => :build
   depends_on "libassuan"
   depends_on "libgpg-error"
 
+  uses_from_macos "ncurses"
+
   on_linux do
+    depends_on "glib"
     depends_on "libsecret"
   end
 
@@ -39,7 +43,7 @@ class Pinentry < Formula
   end
 
   test do
-    system "#{bin}/pinentry", "--version"
-    system "#{bin}/pinentry-tty", "--version"
+    system bin/"pinentry", "--version"
+    system bin/"pinentry-tty", "--version"
   end
 end

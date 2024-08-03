@@ -6,6 +6,7 @@ class Libogg < Formula
   license "BSD-3-Clause"
   head "https://gitlab.xiph.org/xiph/ogg.git", branch: "master"
 
+
   depends_on "cmake" => :build
 
   resource("oggfile") do

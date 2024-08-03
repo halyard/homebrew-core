@@ -5,10 +5,6 @@ class LuaAT53 < Formula
   sha256 "fc5fd69bb8736323f026672b1b7235da613d7177e72558893a0bdcd320466d60"
   license "MIT"
 
-  livecheck do
-    url "https://www.lua.org/ftp/"
-    regex(/href=.*?lua[._-]v?(5\.3(?:\.\d+)*)\.t/i)
-  end
 
   keg_only :versioned_formula
 

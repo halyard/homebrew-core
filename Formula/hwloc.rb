@@ -1,8 +1,8 @@
 class Hwloc < Formula
   desc "Portable abstraction of the hierarchical topology of modern architectures"
   homepage "https://www.open-mpi.org/projects/hwloc/"
-  url "https://download.open-mpi.org/release/hwloc/v2.10/hwloc-2.10.0.tar.bz2"
-  sha256 "0305dd60c9de2fbe6519fe2a4e8fdc6d3db8de574a0ca7812b92e80c05ae1392"
+  url "https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.1.tar.bz2"
+  sha256 "04cdfbffad225ce15f66184f0f4141327dabf288d10a8b84d13f517acb7870c6"
   license "BSD-3-Clause"
 
   livecheck do
@@ -20,6 +20,7 @@ class Hwloc < Formula
   depends_on "pkg-config" => :build
 
   uses_from_macos "libxml2"
+  uses_from_macos "ncurses"
 
   def install
     system "./autogen.sh" if build.head?

@@ -10,6 +10,7 @@ class Lzo < Formula
     regex(/href=.*?lzo[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   def install
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",

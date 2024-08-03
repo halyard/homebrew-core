@@ -6,6 +6,7 @@ class Vde < Formula
   license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
   head "https://github.com/virtualsquare/vde-2.git", branch: "master"
 
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
@@ -17,6 +18,6 @@ class Vde < Formula
   end
 
   test do
-    system "#{bin}/vde_switch", "-v"
+    system bin/"vde_switch", "-v"
   end
 end

@@ -12,6 +12,7 @@ class Mandoc < Formula
     regex(/href=.*?mandoc[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   uses_from_macos "zlib"
 
   def install
@@ -76,7 +77,7 @@ class Mandoc < Formula
   end
 
   test do
-    system "#{bin}/mandoc", "-Thtml",
+    system bin/"mandoc", "-Thtml",
       "-Ostyle=#{share}/examples/example.style.css", "#{man1}/mandoc.1"
   end
 end

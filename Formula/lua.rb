@@ -1,14 +1,15 @@
 class Lua < Formula
   desc "Powerful, lightweight programming language"
   homepage "https://www.lua.org/"
-  url "https://www.lua.org/ftp/lua-5.4.6.tar.gz"
-  sha256 "7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad88"
+  url "https://www.lua.org/ftp/lua-5.4.7.tar.gz"
+  sha256 "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"
   license "MIT"
 
   livecheck do
     url "https://www.lua.org/ftp/"
     regex(/href=.*?lua[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
+
 
   uses_from_macos "unzip" => :build
 

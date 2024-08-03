@@ -5,6 +5,7 @@ class Xtrans < Formula
   sha256 "1ba4b703696bfddbf40bacf25bce4e3efb2a0088878f017a50e9884b0c8fb1bd"
   license "MIT"
 
+
   depends_on "pkg-config" => :build
   depends_on "util-macros" => :build
   depends_on "xorgproto" => :test

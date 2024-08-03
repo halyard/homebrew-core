@@ -11,6 +11,7 @@ class Unixodbc < Formula
     regex(/href=.*?unixODBC[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "libtool"
 
   conflicts_with "virtuoso", because: "both install `isql` binaries"

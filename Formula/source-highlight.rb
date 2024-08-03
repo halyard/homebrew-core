@@ -12,6 +12,7 @@ class SourceHighlight < Formula
     regex(/href=.*?source-highlight[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "boost"
 
   # Fix -flat_namespace being used on Big Sur and later.

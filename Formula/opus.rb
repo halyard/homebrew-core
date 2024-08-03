@@ -1,17 +1,18 @@
 class Opus < Formula
   desc "Audio codec"
   homepage "https://www.opus-codec.org/"
-  url "https://downloads.xiph.org/releases/opus/opus-1.5.1.tar.gz", using: :homebrew_curl
-  sha256 "b84610959b8d417b611aa12a22565e0a3732097c6389d19098d844543e340f85"
+  url "https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.5.2.tar.gz"
+  sha256 "65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1"
   license "BSD-3-Clause"
 
   livecheck do
-    url "https://downloads.xiph.org/releases/opus/"
+    url "https://ftp.osuosl.org/pub/xiph/releases/opus/"
     regex(%r{href=(?:["']?|.*?/)opus[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
+
   head do
-    url "https://gitlab.xiph.org/xiph/opus.git"
+    url "https://gitlab.xiph.org/xiph/opus.git", branch: "main"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build

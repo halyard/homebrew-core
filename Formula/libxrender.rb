@@ -5,6 +5,7 @@ class Libxrender < Formula
   sha256 "6aec3ca02e4273a8cbabf811ff22106f641438eb194a12c0ae93c7e08474b667"
   license "MIT"
 
+
   depends_on "pkg-config" => :build
   depends_on "libx11"
   depends_on "xorgproto"

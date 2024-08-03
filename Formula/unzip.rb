@@ -12,6 +12,7 @@ class Unzip < Formula
     regex(%r{url=.*?(?:%20)?v?(\d+(?:\.\d+)+)/unzip\d+\.t}i)
   end
 
+
   keg_only :provided_by_macos
 
   uses_from_macos "zip" => :test

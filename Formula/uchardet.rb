@@ -5,6 +5,7 @@ class Uchardet < Formula
   sha256 "e97a60cfc00a1c147a674b097bb1422abd9fa78a2d9ce3f3fdcc2e78a34ac5f0"
   head "https://gitlab.freedesktop.org/uchardet/uchardet.git", branch: "master"
 
+
   depends_on "cmake" => :build
 
   def install
@@ -15,6 +16,6 @@ class Uchardet < Formula
   end
 
   test do
-    assert_equal "ASCII", pipe_output("#{bin}/uchardet", "Homebrew").chomp
+    assert_equal "ASCII", pipe_output(bin/"uchardet", "Homebrew").chomp
   end
 end

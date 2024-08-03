@@ -5,6 +5,7 @@ class Netcat < Formula
   sha256 "b55af0bbdf5acc02d1eb6ab18da2acd77a400bafd074489003f3df09676332bb"
   license "GPL-2.0-or-later"
 
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
 

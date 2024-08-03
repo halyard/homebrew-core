@@ -5,6 +5,7 @@ class Libxext < Formula
   sha256 "1a0ac5cd792a55d5d465ced8dbf403ed016c8e6d14380c0ea3646c4415496e3d"
   license "MIT"
 
+
   depends_on "pkg-config" => :build
   depends_on "libx11"
   depends_on "xorgproto"

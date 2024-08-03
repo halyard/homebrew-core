@@ -10,6 +10,7 @@ class Libyubikey < Formula
     regex(/href=.*?libyubikey[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   def install
     system "./configure", "--prefix=#{prefix}"
     system "make", "install"

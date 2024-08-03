@@ -1,10 +1,8 @@
-require "language/node"
-
 class Emscripten < Formula
   desc "LLVM bytecode to JavaScript compiler"
   homepage "https://emscripten.org/"
-  url "https://github.com/emscripten-core/emscripten/archive/refs/tags/3.1.56.tar.gz"
-  sha256 "9a0a265c5f8952206d0e033df28c5914678f93f6e638896b33ea7b7573c594b9"
+  url "https://github.com/emscripten-core/emscripten/archive/refs/tags/3.1.64.tar.gz"
+  sha256 "7ee24e77ed0a026d00c3df2e46bfe53106ef61db57059949a38bc5bfe5399686"
   license all_of: [
     "Apache-2.0", # binaryen
     "Apache-2.0" => { with: "LLVM-exception" }, # llvm
@@ -55,7 +53,7 @@ class Emscripten < Formula
   # Then use the listed binaryen_revision for the revision below.
   resource "binaryen" do
     url "https://github.com/WebAssembly/binaryen.git",
-        revision: "6e8fefe1ea13346f8908075d1f35b23317cfcc0f"
+        revision: "a8066e6618b93ea101e82b64690b9b62d7562609"
   end
 
   # emscripten does not support using the stable version of LLVM.
@@ -63,8 +61,8 @@ class Emscripten < Formula
   # See binaryen resource above for instructions on how to update this.
   # Then use the listed llvm_project_revision for the tarball below.
   resource "llvm" do
-    url "https://github.com/llvm/llvm-project/archive/34ba90745fa55777436a2429a51a3799c83c6d4c.tar.gz"
-    sha256 "ec54a5c05e4c4a971ca5392bc114f740ec9ed3274f6432f00b2273f84cc0abd0"
+    url "https://github.com/llvm/llvm-project/archive/4d8e42ea6a89c73f90941fd1b6e899912e31dd34.tar.gz"
+    sha256 "149721d58bd9e0f93f68750ce0520001daf06480b2168a2d615c7879bba37563"
   end
 
   def install
@@ -81,7 +79,7 @@ class Emscripten < Formula
     libexec.install buildpath.children
 
     # Remove unneeded files. See `tools/install.py`.
-    (libexec/"test/third_party").rmtree
+    rm_r(libexec/"test/third_party")
 
     # emscripten needs an llvm build with the following executables:
     # https://github.com/emscripten-core/emscripten/blob/#{version}/docs/packaging.md#dependencies
@@ -158,13 +156,12 @@ class Emscripten < Formula
     end
 
     cd libexec do
-      system "npm", "install", *Language::Node.local_npm_install_args
-      rm_f "node_modules/ws/builderror.log" # Avoid references to Homebrew shims
+      system "npm", "install", *std_npm_args(prefix: false)
       # Delete native GraalVM image in incompatible platforms.
       if OS.linux?
-        rm_rf "node_modules/google-closure-compiler-linux"
+        rm_r("node_modules/google-closure-compiler-linux")
       elsif Hardware::CPU.arm?
-        rm_rf "node_modules/google-closure-compiler-osx"
+        rm_r("node_modules/google-closure-compiler-osx")
       end
     end
 

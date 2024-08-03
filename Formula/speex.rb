@@ -11,6 +11,7 @@ class Speex < Formula
     regex(/href=.*?speex[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "pkg-config" => :build
   depends_on "libogg"
 

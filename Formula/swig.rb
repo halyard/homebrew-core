@@ -5,6 +5,7 @@ class Swig < Formula
   sha256 "fa045354e2d048b2cddc69579e4256245d4676894858fcf0bab2290ecf59b7d8"
   license "GPL-3.0-or-later"
 
+
   head do
     url "https://github.com/swig/swig.git", branch: "master"
 
@@ -54,7 +55,7 @@ class Swig < Formula
     EOS
 
     ENV.remove_from_cflags(/-march=\S*/)
-    system "#{bin}/swig", "-python", "test.i"
+    system bin/"swig", "-python", "test.i"
     system "python3", "setup.py", "build_ext", "--inplace"
     assert_equal "2", shell_output("python3 ./run.py").strip
   end

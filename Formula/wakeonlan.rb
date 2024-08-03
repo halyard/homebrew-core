@@ -5,6 +5,7 @@ class Wakeonlan < Formula
   sha256 "4f533f109f7f4294f6452b73227e2ce4d2aa81091cf6ae1f4fa2f87bad04a031"
   license "Artistic-1.0-Perl"
 
+
   uses_from_macos "perl"
 
   def install
@@ -15,6 +16,6 @@ class Wakeonlan < Formula
   end
 
   test do
-    system "#{bin}/wakeonlan", "--version"
+    system bin/"wakeonlan", "--version"
   end
 end

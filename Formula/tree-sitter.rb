@@ -1,8 +1,8 @@
 class TreeSitter < Formula
   desc "Parser generator tool and incremental parsing library"
   homepage "https://tree-sitter.github.io/"
-  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.22.2.tar.gz"
-  sha256 "0c829523b876d4a37e1bd46a655c133a93669c0fe98fcd84972b168849c27afc"
+  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.22.6.tar.gz"
+  sha256 "e2b687f74358ab6404730b7fb1a1ced7ddb3780202d37595ecd7b20a8f41861f"
   license "MIT"
   head "https://github.com/tree-sitter/tree-sitter.git", branch: "master"
 
@@ -10,6 +10,7 @@ class TreeSitter < Formula
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
+
 
   depends_on "rust" => :build
   depends_on "node" => :test
@@ -50,7 +51,7 @@ class TreeSitter < Formula
       ---
       (source_file)
     EOS
-    system "#{bin}/tree-sitter", "test"
+    system bin/"tree-sitter", "test"
 
     (testpath/"test_program.c").write <<~EOS
       #include <stdio.h>

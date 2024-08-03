@@ -16,6 +16,7 @@ class Isl < Formula
     regex(/href=.*?isl[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   head do
     url "https://repo.or.cz/isl.git"
 

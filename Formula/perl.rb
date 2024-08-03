@@ -12,6 +12,7 @@ class Perl < Formula
     regex(/href=.*?perl[._-]v?(\d+\.\d*[02468](?:\.\d+)*)\.t/i)
   end
 
+
   depends_on "berkeley-db@5" # keep berkeley-db < 6 to avoid AGPL-3.0 restrictions
   depends_on "gdbm"
 
@@ -74,6 +75,6 @@ class Perl < Formula
 
   test do
     (testpath/"test.pl").write "print 'Perl is not an acronym, but JAPH is a Perl acronym!';"
-    system "#{bin}/perl", "test.pl"
+    system bin/"perl", "test.pl"
   end
 end

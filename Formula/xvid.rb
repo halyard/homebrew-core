@@ -10,6 +10,7 @@ class Xvid < Formula
     regex(/href=.*?xvidcore[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   def install
     cd "build/generic" do
       system "./configure", "--disable-assembly", "--prefix=#{prefix}"

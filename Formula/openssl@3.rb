@@ -1,19 +1,16 @@
 class OpensslAT3 < Formula
   desc "Cryptography and SSL/TLS Toolkit"
-  homepage "https://openssl.org/"
-  url "https://www.openssl.org/source/openssl-3.2.1.tar.gz"
-  mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-3.2.1.tar.gz"
-  mirror "https://www.openssl.org/source/old/3.2/openssl-3.2.1.tar.gz"
-  mirror "https://www.mirrorservice.org/sites/ftp.openssl.org/source/old/3.2/openssl-3.2.1.tar.gz"
-  mirror "http://www.mirrorservice.org/sites/ftp.openssl.org/source/openssl-3.2.1.tar.gz"
-  mirror "http://www.mirrorservice.org/sites/ftp.openssl.org/source/old/3.2/openssl-3.2.1.tar.gz"
-  sha256 "83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39"
+  homepage "https://openssl-library.org"
+  url "https://github.com/openssl/openssl/releases/download/openssl-3.3.1/openssl-3.3.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/openssl-3.3.1.tar.gz"
+  sha256 "777cd596284c883375a2a7a11bf5d2786fc5413255efab20c50d6ffe6d020b7e"
   license "Apache-2.0"
 
   livecheck do
-    url "https://www.openssl.org/source/"
-    regex(/href=.*?openssl[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url "https://openssl-library.org/source/"
+    regex(/href=.*?openssl[._-]v?(3(?:\.\d+)+)\.t/i)
   end
+
 
   depends_on "ca-certificates"
 
@@ -25,9 +22,9 @@ class OpensslAT3 < Formula
     end
 
     resource "Test::More" do
-      url "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302196.tar.gz"
-      mirror "http://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302196.tar.gz"
-      sha256 "020e71da0a479b2d2546304ce6bd23fb9dd428df7d4e161d19612fc1f406fd9f"
+      url "https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302198.tar.gz"
+      mirror "http://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test-Simple-1.302198.tar.gz"
+      sha256 "1dc07bcffd23e49983433c948de3e3f377e6e849ad7fe3432c717fa782024faa"
     end
 
     resource "ExtUtils::MakeMaker" do
@@ -50,7 +47,7 @@ class OpensslAT3 < Formula
     args = %W[
       --prefix=#{prefix}
       --openssldir=#{openssldir}
-      --libdir=#{lib}
+      --libdir=lib
       no-ssl3
       no-ssl3-method
       no-zlib
@@ -98,7 +95,9 @@ class OpensslAT3 < Formula
     system "perl", "./Configure", *(configure_args + arch_args)
     system "make"
     system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl"
-    system "make", "test"
+    # AF_ALG support isn't always enabled (e.g. some containers), which breaks the tests.
+    # AF_ALG is a kernel feature and failures are unlikely to be issues with the formula.
+    system "make", "test", "TESTS=-test_afalg"
   end
 
   def openssldir
@@ -106,7 +105,7 @@ class OpensslAT3 < Formula
   end
 
   def post_install
-    rm_f openssldir/"cert.pem"
+    rm(openssldir/"cert.pem") if (openssldir/"cert.pem").exist?
     openssldir.install_symlink Formula["ca-certificates"].pkgetc/"cert.pem"
   end
 

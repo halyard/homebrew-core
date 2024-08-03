@@ -10,6 +10,7 @@ class Xmlto < Formula
     regex(/href=.*?xmlto[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "docbook"
   depends_on "docbook-xsl"
   # Doesn't strictly depend on GNU getopt, but macOS system getopt(1)

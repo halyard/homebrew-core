@@ -3,8 +3,8 @@ class Netpbm < Formula
   homepage "https://netpbm.sourceforge.net/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4822"
-  version "11.02.07"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4908"
+  version "11.02.09"
   license "GPL-3.0-or-later"
   version_scheme 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
@@ -14,6 +14,7 @@ class Netpbm < Formula
     regex(/Release\s+v?(\d+(?:\.\d+)+)/i)
     strategy :page_match
   end
+
 
   depends_on "jasper"
   depends_on "jpeg-turbo"

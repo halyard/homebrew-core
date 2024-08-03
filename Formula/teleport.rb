@@ -17,6 +17,7 @@ class Teleport < Formula
     strategy :github_releases
   end
 
+
   depends_on "go" => :build
   depends_on "pkg-config" => :build
   depends_on "yarn" => :build
@@ -29,6 +30,7 @@ class Teleport < Formula
   uses_from_macos "zip"
 
   conflicts_with "etsh", because: "both install `tsh` binaries"
+  conflicts_with "tctl", because: "both install `tctl` binaries"
 
   def install
     ENV.deparallelize { system "make", "full", "FIDO2=dynamic" }

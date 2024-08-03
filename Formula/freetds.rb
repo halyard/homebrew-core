@@ -1,8 +1,8 @@
 class Freetds < Formula
   desc "Libraries to talk to Microsoft SQL Server and Sybase databases"
   homepage "https://www.freetds.org/"
-  url "https://www.freetds.org/files/stable/freetds-1.4.12.tar.bz2", using: :homebrew_curl
-  sha256 "a2cb8993a46417e0503e7b8488463d91b8c5d9a4601d6ee2484d28f56d3a7075"
+  url "https://www.freetds.org/files/stable/freetds-1.4.22.tar.bz2", using: :homebrew_curl
+  sha256 "a9a7f24f0a7a871617e76e8cc6e6556ae788042f1c006195665505499b2334b1"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -53,6 +53,6 @@ class Freetds < Formula
   end
 
   test do
-    system "#{bin}/tsql", "-C"
+    system bin/"tsql", "-C"
   end
 end

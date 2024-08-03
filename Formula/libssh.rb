@@ -6,6 +6,7 @@ class Libssh < Formula
   license "LGPL-2.1-or-later"
   head "https://git.libssh.org/projects/libssh.git", branch: "master"
 
+
   depends_on "cmake" => :build
   depends_on "openssl@3"
 

@@ -14,6 +14,7 @@ class Rtmpdump < Formula
     regex(/href=.*?rtmpdump[._-]v?(\d+(?:[.+]\d+)+)[^"' >]*?\.orig\.t/i)
   end
 
+
   depends_on "openssl@3"
 
   uses_from_macos "zlib"
@@ -47,6 +48,6 @@ class Rtmpdump < Formula
   end
 
   test do
-    system "#{bin}/rtmpdump", "-h"
+    system bin/"rtmpdump", "-h"
   end
 end

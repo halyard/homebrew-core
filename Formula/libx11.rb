@@ -1,9 +1,10 @@
 class Libx11 < Formula
   desc "X.Org: Core X11 protocol client library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libX11-1.8.8.tar.gz"
-  sha256 "26997a2bc48c03df7d670f8a4ee961d1d6b039bf947475e5fec6b7635b4efe72"
+  url "https://www.x.org/archive/individual/lib/libX11-1.8.9.tar.gz"
+  sha256 "57ca5f07d263788ad661a86f4139412e8b699662e6b60c20f1f028c25a935e48"
   license "MIT"
+
 
   depends_on "pkg-config" => :build
   depends_on "util-macros" => :build

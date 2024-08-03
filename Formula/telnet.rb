@@ -5,6 +5,7 @@ class Telnet < Formula
   sha256 "04b3e1253eee08e82e705a199f8ee1e99608304797911e9e69ab2c5c63d734c8"
   license all_of: ["BSD-4-Clause-UC", "APSL-1.0"]
 
+
   depends_on xcode: :build
   depends_on :macos
 

@@ -5,6 +5,7 @@ class Imath < Formula
   sha256 "9057849585e49b8b85abe7cc1e76e22963b01bfdc3b6d83eac90c499cd760063"
   license "BSD-3-Clause"
 
+
   depends_on "cmake" => :build
 
   # These used to be provided by `ilmbase`

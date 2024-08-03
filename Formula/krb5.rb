@@ -1,14 +1,15 @@
 class Krb5 < Formula
   desc "Network authentication protocol"
   homepage "https://web.mit.edu/kerberos/"
-  url "https://kerberos.org/dist/krb5/1.21/krb5-1.21.2.tar.gz"
-  sha256 "9560941a9d843c0243a71b17a7ac6fe31c7cebb5bce3983db79e52ae7e850491"
+  url "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"
+  sha256 "b7a4cd5ead67fb08b980b21abd150ff7217e85ea320c9ed0c6dadd304840ad35"
   license :cannot_represent
 
   livecheck do
     url :homepage
     regex(/Current release: .*?>krb5[._-]v?(\d+(?:\.\d+)+)</i)
   end
+
 
   keg_only :provided_by_macos
 
@@ -30,7 +31,7 @@ class Krb5 < Formula
   end
 
   test do
-    system "#{bin}/krb5-config", "--version"
+    system bin/"krb5-config", "--version"
     assert_match include.to_s,
       shell_output("#{bin}/krb5-config --cflags")
   end

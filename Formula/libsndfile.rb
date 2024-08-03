@@ -10,6 +10,7 @@ class Libsndfile < Formula
     strategy :github_latest
   end
 
+
   depends_on "cmake" => :build
   depends_on "flac"
   depends_on "lame"

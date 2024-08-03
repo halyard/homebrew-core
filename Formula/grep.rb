@@ -39,13 +39,15 @@ class Grep < Formula
     system "make", "install"
 
     if OS.mac?
-      %w[grep egrep fgrep].each do |prog|
-        (libexec/"gnubin").install_symlink bin/"g#{prog}" => prog
-        (libexec/"gnuman/man1").install_symlink man1/"g#{prog}.1" => "#{prog}.1"
+      bin.children.each do |file|
+        (libexec/"gnubin").install_symlink file => file.basename.to_s.delete_prefix("g")
+      end
+      man1.children.each do |file|
+        (libexec/"gnuman/man1").install_symlink file => file.basename.to_s.delete_prefix("g")
       end
     end
 
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
   end
 
   def caveats

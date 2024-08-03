@@ -11,6 +11,7 @@ class TidyHtml5 < Formula
     regex(/^v?(\d+\.\d*?[02468](?:\.\d+)*)$/i)
   end
 
+
   depends_on "cmake" => :build
 
   def install

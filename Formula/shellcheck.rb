@@ -6,6 +6,7 @@ class Shellcheck < Formula
   license "GPL-3.0-or-later"
   head "https://github.com/koalaman/shellcheck.git", branch: "master"
 
+
   depends_on "cabal-install" => :build
   depends_on "ghc" => :build
   depends_on "pandoc" => :build

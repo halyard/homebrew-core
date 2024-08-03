@@ -1,9 +1,9 @@
 class Gdbm < Formula
   desc "GNU database manager"
-  homepage "https://www.gnu.org/software/gdbm/"
-  url "https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz"
-  mirror "https://ftpmirror.gnu.org/gdbm/gdbm-1.23.tar.gz"
-  sha256 "74b1081d21fff13ae4bd7c16e5d6e504a4c26f7cde1dca0d963a484174bbcacd"
+  homepage "https://www.gnu.org.ua/software/gdbm/"
+  url "https://ftp.gnu.org/gnu/gdbm/gdbm-1.24.tar.gz"
+  mirror "https://ftpmirror.gnu.org/gdbm/gdbm-1.24.tar.gz"
+  sha256 "695e9827fdf763513f133910bc7e6cfdb9187943a4fec943e57449723d2b8dbf"
   license "GPL-3.0-or-later"
 
   # Fix -flat_namespace being used on Big Sur and later.

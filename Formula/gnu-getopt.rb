@@ -1,8 +1,8 @@
 class GnuGetopt < Formula
   desc "Command-line option parsing utility"
   homepage "https://github.com/util-linux/util-linux"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.tar.xz"
-  sha256 "d57a626081f9ead02fa44c63a6af162ec19c58f53e993f206ab7c3a6641c2cd7"
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-2.40.2.tar.xz"
+  sha256 "d78b37a66f5922d70edf3bdfb01a6b33d34ed3c3cafd6628203b2a2b67c8e8b3"
   license "GPL-2.0-or-later"
 
   keg_only :provided_by_macos
@@ -30,9 +30,9 @@ class GnuGetopt < Formula
   end
 
   test do
-    system "#{bin}/getopt", "-o", "--test"
+    system bin/"getopt", "-o", "--test"
     # Check that getopt is enhanced
-    quiet_system "#{bin}/getopt", "-T"
+    quiet_system bin/"getopt", "-T"
     assert_equal 4, $CHILD_STATUS.exitstatus
   end
 end

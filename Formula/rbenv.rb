@@ -1,10 +1,11 @@
 class Rbenv < Formula
   desc "Ruby version manager"
-  homepage "https://github.com/rbenv/rbenv#readme"
-  url "https://github.com/rbenv/rbenv/archive/refs/tags/v1.2.0.tar.gz"
-  sha256 "3f3a31b8a73c174e3e877ccc1ea453d966b4d810a2aadcd4d8c460bc9ec85e0c"
+  homepage "https://rbenv.org"
+  url "https://github.com/rbenv/rbenv/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "7e49e529ce0c876748fa75a61efdd62efa2634906075431a1818b565825eb758"
   license "MIT"
   head "https://github.com/rbenv/rbenv.git", branch: "master"
+
 
   depends_on "ruby-build"
 
@@ -12,9 +13,6 @@ class Rbenv < Formula
 
   def install
     inreplace "libexec/rbenv" do |s|
-      # TODO: The following line can be removed in the next release.
-      # rbenv/rbenv/pull/1428 (`brew audit` doesn't like URLs of merged PRs.)
-      s.gsub! '"${BASH_SOURCE%/*}"/../libexec', libexec if build.stable?
       s.gsub! ":/usr/local/etc/rbenv.d", ":#{HOMEBREW_PREFIX}/etc/rbenv.d\\0" if HOMEBREW_PREFIX.to_s != "/usr/local"
     end
 
@@ -23,18 +21,11 @@ class Rbenv < Formula
       git_revision = Utils.git_short_head
       inreplace "libexec/rbenv---version", /^(version=)"([^"]+)"/,
                                            %Q(\\1"\\2-g#{git_revision}")
-
-      # Install manpage
-      man1.install "share/man/man1/rbenv.1"
-    else
-      # Compile optional bash extension.
-      # TODO: This can probably be removed in the next release.
-      # rbenv/rbenv/pull/1428 (`brew audit` doesn't like URLs of merged PRs.)
-      system "src/configure"
-      system "make", "-C", "src"
     end
 
+    zsh_completion.install "completions/_rbenv" => "_rbenv"
     prefix.install ["bin", "completions", "libexec", "rbenv.d"]
+    man1.install "share/man/man1/rbenv.1"
   end
 
   test do

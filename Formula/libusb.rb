@@ -10,6 +10,7 @@ class Libusb < Formula
     strategy :github_latest
   end
 
+
   head do
     url "https://github.com/libusb/libusb.git", branch: "master"
 

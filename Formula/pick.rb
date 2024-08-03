@@ -6,7 +6,10 @@ class Pick < Formula
   license "MIT"
   head "https://github.com/mptre/pick.git", branch: "master"
 
+
   uses_from_macos "ncurses"
+
+  conflicts_with "nmh", because: "both install `pick` binaries"
 
   def install
     ENV["PREFIX"] = prefix

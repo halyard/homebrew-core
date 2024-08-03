@@ -4,15 +4,16 @@ class Rust < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   stable do
-    url "https://static.rust-lang.org/dist/rustc-1.77.1-src.tar.gz"
-    sha256 "ee106e4c569f52dba3b5b282b105820f86bd8f6b3d09c06b8dce82fb1bb3a4a1"
+    url "https://static.rust-lang.org/dist/rustc-1.80.0-src.tar.gz"
+    sha256 "6f606c193f230f6b2cae4576f7b24d50f5f9b25dff11dbf9b22f787d3521d672"
 
     # From https://github.com/rust-lang/rust/tree/#{version}/src/tools
     resource "cargo" do
-      url "https://github.com/rust-lang/cargo/archive/refs/tags/0.78.1.tar.gz"
-      sha256 "0283fecebb6d3cbd111688eb0359edaf6676f4b2829201a8afe5a0e3afdb4b48"
+      url "https://github.com/rust-lang/cargo/archive/refs/tags/0.81.0.tar.gz"
+      sha256 "5d2ea954f1a8bf03389fe2cefc5603de180a0c0010aa66628a325007216ef862"
     end
   end
+
 
   head do
     url "https://github.com/rust-lang/rust.git", branch: "master"
@@ -22,7 +23,7 @@ class Rust < Formula
     end
   end
 
-  depends_on "libgit2"
+  depends_on "libgit2@1.7"
   depends_on "libssh2"
   depends_on "llvm"
   depends_on macos: :sierra
@@ -33,32 +34,35 @@ class Rust < Formula
   uses_from_macos "curl"
   uses_from_macos "zlib"
 
-  # From https://github.com/rust-lang/rust/blob/#{version}/src/stage0.json
+  # From https://github.com/rust-lang/rust/blob/#{version}/src/stage0
   resource "cargobootstrap" do
     on_macos do
       on_arm do
-        url "https://static.rust-lang.org/dist/2024-02-08/cargo-1.76.0-aarch64-apple-darwin.tar.xz"
-        sha256 "c963d3bf8f07077b0c87922e53ebb8999c601848def13d6f60a7a102dfa2a8a5"
+        url "https://static.rust-lang.org/dist/2024-06-13/cargo-1.79.0-aarch64-apple-darwin.tar.xz"
+        sha256 "2cc674f17c18b0c01e0e5a8e5caedc26b0f499d2cc10605cf1a838e2cad9ef7d"
       end
       on_intel do
-        url "https://static.rust-lang.org/dist/2024-02-08/cargo-1.76.0-x86_64-apple-darwin.tar.xz"
-        sha256 "c69b9e1167d8c67e46b6c933417af09fd8e26e2ee14c04aadad097977b3cd6a3"
+        url "https://static.rust-lang.org/dist/2024-06-13/cargo-1.79.0-x86_64-apple-darwin.tar.xz"
+        sha256 "e1326c13b7437a72e061a2d662400c114ef87b73c45ef8823ea1b2bdc3140109"
       end
     end
 
     on_linux do
       on_arm do
-        url "https://static.rust-lang.org/dist/2024-02-08/cargo-1.76.0-aarch64-unknown-linux-gnu.tar.xz"
-        sha256 "d0c54d824e64b7313a974409541ca3a157b3ed7299865786bd0c440b0e073091"
+        url "https://static.rust-lang.org/dist/2024-06-13/cargo-1.79.0-aarch64-unknown-linux-gnu.tar.xz"
+        sha256 "4ca5e9bd141b0111387ea1aa0355f87eb8d0da52fbc616cefa4ecde4997aa65b"
       end
       on_intel do
-        url "https://static.rust-lang.org/dist/2024-02-08/cargo-1.76.0-x86_64-unknown-linux-gnu.tar.xz"
-        sha256 "30ec0ad9fca443ec12c544f9ce448dacdde411a45b9042961938b650e918ccfb"
+        url "https://static.rust-lang.org/dist/2024-06-13/cargo-1.79.0-x86_64-unknown-linux-gnu.tar.xz"
+        sha256 "07fcadd27b645ad58ff4dae5ef166fd730311bbae8f25f6640fe1bfd2a1f3c3c"
       end
     end
   end
 
   def install
+    # relates to https://github.com/rust-lang/rust/pull/126507
+    odie "bump to use libgit2 1.8" if version >= "1.81.0"
+
     # Ensure that the `openssl` crate picks up the intended library.
     # https://docs.rs/openssl/latest/openssl/#manual
     ENV["OPENSSL_DIR"] = Formula["openssl@3"].opt_prefix
@@ -80,7 +84,7 @@ class Rust < Formula
     ENV.prepend_path "PATH", buildpath/"cargobootstrap/bin"
 
     cargo_src_path = buildpath/"src/tools/cargo"
-    cargo_src_path.rmtree
+    rm_r(cargo_src_path)
     resource("cargo").stage cargo_src_path
     if OS.mac?
       inreplace cargo_src_path/"Cargo.toml",
@@ -104,9 +108,10 @@ class Rust < Formula
       --tools=#{tools.join(",")}
       --llvm-root=#{Formula["llvm"].opt_prefix}
       --enable-llvm-link-shared
+      --enable-profiler
       --enable-vendor
       --disable-cargo-native-static
-      --enable-profiler
+      --disable-docs
       --set=rust.jemalloc
       --release-description=#{tap.user}
     ]
@@ -122,12 +127,12 @@ class Rust < Formula
     system "make", "install"
 
     (lib/"rustlib/src/rust").install "library"
-    rm_f [
+    rm([
       bin.glob("*.old"),
       lib/"rustlib/install.log",
       lib/"rustlib/uninstall.sh",
       (lib/"rustlib").glob("manifest-*"),
-    ]
+    ])
   end
 
   def post_install
@@ -162,7 +167,7 @@ class Rust < Formula
     # We only check the tools' linkage here. No need to check rustc.
     expected_linkage = {
       bin/"cargo" => [
-        Formula["libgit2"].opt_lib/shared_library("libgit2"),
+        Formula["libgit2@1.7"].opt_lib/shared_library("libgit2"),
         Formula["libssh2"].opt_lib/shared_library("libssh2"),
         Formula["openssl@3"].opt_lib/shared_library("libcrypto"),
         Formula["openssl@3"].opt_lib/shared_library("libssl"),

@@ -1,9 +1,10 @@
 class Libslirp < Formula
   desc "General purpose TCP-IP emulator"
   homepage "https://gitlab.freedesktop.org/slirp/libslirp"
-  url "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.7.0/libslirp-v4.7.0.tar.gz"
-  sha256 "9398f0ec5a581d4e1cd6856b88ae83927e458d643788c3391a39e61b75db3d3b"
+  url "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.8.0/libslirp-v4.8.0.tar.gz"
+  sha256 "2a98852e65666db313481943e7a1997abff0183bd9bea80caec1b5da89fda28c"
   license "BSD-3-Clause"
+
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
@@ -11,8 +12,9 @@ class Libslirp < Formula
   depends_on "glib"
 
   def install
-    system "meson", "build", "-Ddefault_library=both", *std_meson_args
-    system "ninja", "-C", "build", "install", "all"
+    system "meson", "setup", "build", "-Ddefault_library=both", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do

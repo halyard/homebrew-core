@@ -1,10 +1,10 @@
 class Pygobject3 < Formula
   desc "GNOME Python bindings (based on GObject Introspection)"
-  homepage "https://wiki.gnome.org/Projects/PyGObject"
-  url "https://download.gnome.org/sources/pygobject/3.46/pygobject-3.46.0.tar.xz"
-  sha256 "426008b2dad548c9af1c7b03b59df0440fde5c33f38fb5406b103a43d653cafc"
+  homepage "https://pygobject.gnome.org"
+  url "https://download.gnome.org/sources/pygobject/3.48/pygobject-3.48.2.tar.xz"
+  sha256 "0794aeb4a9be31a092ac20621b5f54ec280f9185943d328b105cdae6298ad1a7"
   license "LGPL-2.1-or-later"
-  revision 1
+
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
@@ -34,8 +34,8 @@ class Pygobject3 < Formula
                                          "-Dpython=#{python}",
                                          "-Dpython.platlibdir=#{site_packages(python)}",
                                          "-Dpython.purelibdir=#{site_packages(python)}",
+                                         "-Dtests=false",
                                          *std_meson_args
-
       system "meson", "compile", "-C", builddir, "--verbose"
       system "meson", "install", "-C", builddir
     end

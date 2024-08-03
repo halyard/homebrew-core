@@ -1,10 +1,9 @@
 class Tesseract < Formula
   desc "OCR (Optical Character Recognition) engine"
   homepage "https://github.com/tesseract-ocr/"
-  url "https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.3.4.tar.gz"
-  sha256 "141afc12b34a14bb691a939b4b122db0d51bd38feda7f41696822bacea7710c7"
+  url "https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.4.1.tar.gz"
+  sha256 "c4bc2a81c12a472f445b7c2fb4705a08bd643ef467f51ec84f0e148bd368051b"
   license "Apache-2.0"
-  revision 1
   head "https://github.com/tesseract-ocr/tesseract.git", branch: "main"
 
   livecheck do
@@ -12,15 +11,24 @@ class Tesseract < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "cairo"
+  depends_on "fontconfig"
+  depends_on "glib"
+  depends_on "harfbuzz"
   depends_on "icu4c"
   depends_on "leptonica"
   depends_on "libarchive"
   depends_on "pango"
+
+  on_macos do
+    depends_on "freetype"
+    depends_on "gettext"
+  end
 
   fails_with gcc: "5"
 
@@ -37,11 +45,6 @@ class Tesseract < Formula
   resource "snum" do
     url "https://github.com/USCDataScience/counterfeit-electronics-tesseract/raw/319a6eeacff181dad5c02f3e7a3aff804eaadeca/Training%20Tesseract/snum.traineddata"
     sha256 "36f772980ff17c66a767f584a0d80bf2302a1afa585c01a226c1863afcea1392"
-  end
-
-  resource "test_resource" do
-    url "https://raw.githubusercontent.com/tesseract-ocr/test/6dd816cdaf3e76153271daf773e562e24c928bf5/testing/eurotext.tif"
-    sha256 "7b9bd14aba7d5e30df686fbb6f71782a97f48f81b32dc201a1b75afe6de747d6"
   end
 
   def install
@@ -74,7 +77,12 @@ class Tesseract < Formula
   end
 
   test do
-    resource("test_resource").stage do
+    resource "homebrew-test_resource" do
+      url "https://raw.githubusercontent.com/tesseract-ocr/test/6dd816cdaf3e76153271daf773e562e24c928bf5/testing/eurotext.tif"
+      sha256 "7b9bd14aba7d5e30df686fbb6f71782a97f48f81b32dc201a1b75afe6de747d6"
+    end
+
+    resource("homebrew-test_resource").stage do
       system bin/"tesseract", "./eurotext.tif", "./output", "-l", "eng"
       assert_match "The (quick) [brown] {fox} jumps!\n", File.read("output.txt")
     end

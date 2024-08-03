@@ -10,6 +10,7 @@ class Xorgproto < Formula
     regex(/href=.*?xorgproto[._-]v?(\d+\.\d+(?:\.([0-8]\d*?)?\d(?:\.\d+)*)?)\.t/i)
   end
 
+
   depends_on "pkg-config" => [:build, :test]
   depends_on "util-macros" => :build
 

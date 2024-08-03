@@ -1,8 +1,8 @@
 class Blueutil < Formula
   desc "Get/set bluetooth power and discoverable state"
   homepage "https://github.com/toy/blueutil"
-  url "https://github.com/toy/blueutil/archive/refs/tags/v2.9.1.tar.gz"
-  sha256 "50e50ebfa933f285d934d886a0209332df3088c3d25952c994f8bdb349f435ed"
+  url "https://github.com/toy/blueutil/archive/refs/tags/v2.10.0.tar.gz"
+  sha256 "1558977dd4095ff89768a2f7eaff765e760b56c736a9cd5956b1227ebfee8f2b"
   license "MIT"
   head "https://github.com/toy/blueutil.git", branch: "master"
 

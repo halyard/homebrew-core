@@ -4,13 +4,15 @@ class Ghostscript < Formula
   license "AGPL-3.0-or-later"
 
   stable do
-    url "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10030/ghostpdl-10.03.0.tar.xz"
-    sha256 "854fd1958711b9b5108c052a6d552b906f1e3ebf3262763febf347d77618639d"
+    url "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10031/ghostpdl-10.03.1.tar.xz"
+    sha256 "05eee45268f6bb2c6189f9a40685c4608ca089443a93f2af5f5194d83dc368db"
 
     on_macos do
       # 1. Prevent dependent rebuilds on minor version bumps.
+      # 2. Fix missing pointer dereference
       # Reported upstream at:
       #   https://bugs.ghostscript.com/show_bug.cgi?id=705907
+      #   https://bugs.ghostscript.com/show_bug.cgi?id=707649
       patch :DATA
     end
   end
@@ -59,7 +61,7 @@ class Ghostscript < Formula
   def install
     # Delete local vendored sources so build uses system dependencies
     libs = %w[expat freetype jbig2dec jpeg lcms2mt libpng openjpeg tiff zlib]
-    libs.each { |l| (buildpath/l).rmtree }
+    libs.each { |l| rm_r(buildpath/l) }
 
     configure = build.head? ? "./autogen.sh" : "./configure"
     system configure, *std_configure_args,
@@ -118,3 +120,18 @@ index 89dfa5a..c907831 100644
  #LDFLAGS_SO=-dynamiclib -flat_namespace
  #LDFLAGS_SO_MAC=-dynamiclib -install_name $(GS_SONAME_MAJOR_MINOR)
  #LDFLAGS_SO=-dynamiclib -install_name $(FRAMEWORK_NAME)
+diff --git a/pdf/pdf_sec.c b/pdf/pdf_sec.c
+index 565ae80ca..7e8f6719d 100644
+--- a/pdf/pdf_sec.c
++++ b/pdf/pdf_sec.c
+@@ -183,8 +183,8 @@ static int apply_sasl(pdf_context *ctx, char *Password, int Len, char **NewPassw
+          * this easy: the errors we want to ignore are the ones with
+          * codes less than 100. */
+         if ((int)err < 100) {
+-            NewPassword = Password;
+-            NewLen = Len;
++            *NewPassword = Password;
++            *NewLen = Len;
+             return 0;
+         }
+ 

@@ -10,6 +10,7 @@ class Libsoxr < Formula
     regex(%r{url=.*?/soxr[._-]v?(\d+(?:\.\d+)+)(?:-Source)?\.t}i)
   end
 
+
   depends_on "cmake" => :build
 
   # Fixes the build on 64-bit ARM macOS; the __arm__ define used in the

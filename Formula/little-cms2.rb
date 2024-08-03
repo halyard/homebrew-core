@@ -17,6 +17,7 @@ class LittleCms2 < Formula
     regex(/Little\s*CMS\s+v?(\d+(?:\.\d+)+)\s+released/im)
   end
 
+
   depends_on "jpeg-turbo"
   depends_on "libtiff"
 
@@ -26,7 +27,7 @@ class LittleCms2 < Formula
   end
 
   test do
-    system "#{bin}/jpgicc", test_fixtures("test.jpg"), "out.jpg"
+    system bin/"jpgicc", test_fixtures("test.jpg"), "out.jpg"
     assert_predicate testpath/"out.jpg", :exist?
   end
 end

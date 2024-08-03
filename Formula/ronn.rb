@@ -11,6 +11,7 @@ class Ronn < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+
   depends_on "groff" => :test
 
   uses_from_macos "ruby"
@@ -18,6 +19,8 @@ class Ronn < Formula
   on_linux do
     depends_on "util-linux" => :test # for `col`
   end
+
+  conflicts_with "ronn-ng", because: "both install `ronn` binaries"
 
   def install
     ENV["GEM_HOME"] = libexec

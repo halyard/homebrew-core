@@ -10,6 +10,7 @@ class Mpdecimal < Formula
     regex(/href=.*?mpdecimal[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   def install
     ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath}"
     ENV.append "LDXXFLAGS", "-Wl,-rpath,#{rpath}"

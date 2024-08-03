@@ -5,6 +5,7 @@ class Unibilium < Formula
   sha256 "6f0ee21c8605340cfbb458cbd195b4d074e6d16dd0c0e12f2627ca773f3cabf1"
   license "LGPL-3.0-or-later"
 
+
   depends_on "libtool" => :build
 
   def install

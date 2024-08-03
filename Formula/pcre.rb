@@ -25,6 +25,7 @@ class Pcre < Formula
     skip "PCRE was declared end of life in 2021-06"
   end
 
+
   head do
     url "svn://vcs.exim.org/pcre/code/trunk"
 
@@ -61,6 +62,6 @@ class Pcre < Formula
   end
 
   test do
-    system "#{bin}/pcregrep", "regular expression", "#{prefix}/README"
+    system bin/"pcregrep", "regular expression", prefix/"README"
   end
 end

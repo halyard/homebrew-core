@@ -2,6 +2,7 @@ class Subversion < Formula
   desc "Version control system designed to be a better CVS"
   homepage "https://subversion.apache.org/"
   license "Apache-2.0"
+  revision 1
 
   stable do
     url "https://www.apache.org/dyn/closer.lua?path=subversion/subversion-1.14.3.tar.bz2"
@@ -14,6 +15,7 @@ class Subversion < Formula
       sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
     end
   end
+
 
   head do
     url "https://github.com/apache/subversion.git", branch: "trunk"
@@ -212,7 +214,7 @@ class Subversion < Formula
     # purged by Homebrew's post-install cleaner because that doesn't check
     # "Library" directories. It is however pointless to keep around as it
     # only contains the perllocal.pod installation file.
-    rm_rf prefix/"Library/Perl"
+    rm_r(prefix/"Library/Perl") if (prefix/"Library/Perl").exist?
   end
 
   def caveats

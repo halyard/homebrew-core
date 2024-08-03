@@ -1,15 +1,16 @@
 class Mpg123 < Formula
   desc "MP3 player for Linux and UNIX"
   homepage "https://www.mpg123.de/"
-  url "https://www.mpg123.de/download/mpg123-1.32.5.tar.bz2"
-  mirror "https://downloads.sourceforge.net/project/mpg123/mpg123/1.32.5/mpg123-1.32.5.tar.bz2"
-  sha256 "af908cdf6cdb6544b97bc706a799f79894e69468af5881bf454a0ebb9171ed63"
+  url "https://www.mpg123.de/download/mpg123-1.32.6.tar.bz2"
+  mirror "https://downloads.sourceforge.net/project/mpg123/mpg123/1.32.6/mpg123-1.32.6.tar.bz2"
+  sha256 "ccdd1d0abc31d73d8b435fc658c79049d0a905b30669b6a42a03ad169dc609e6"
   license "LGPL-2.1-only"
 
   livecheck do
     url "https://www.mpg123.de/download/"
     regex(/href=.*?mpg123[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
+
 
   def install
     args = %w[

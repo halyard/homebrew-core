@@ -19,6 +19,7 @@ class Qrencode < Formula
     regex(/href=.*?qrencode[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   head do
     url "https://github.com/fukuchi/libqrencode.git", branch: "master"
 
@@ -39,6 +40,6 @@ class Qrencode < Formula
   end
 
   test do
-    system "#{bin}/qrencode", "123456789", "-o", "test.png"
+    system bin/"qrencode", "123456789", "-o", "test.png"
   end
 end

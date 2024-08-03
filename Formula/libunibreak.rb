@@ -13,6 +13,7 @@ class Libunibreak < Formula
     end
   end
 
+
   def install
     system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"

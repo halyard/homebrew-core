@@ -1,6 +1,6 @@
 class Coreutils < Formula
   desc "GNU File, Shell, and Text utilities"
-  homepage "https://www.gnu.org/software/coreutils"
+  homepage "https://www.gnu.org/software/coreutils/"
   url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.5.tar.xz"
   mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.5.tar.xz"
   sha256 "cd328edeac92f6a665de9f323c93b712af1858bc2e0d88f3f7100469470a1b8a"
@@ -75,7 +75,7 @@ class Coreutils < Formula
     coreutils_filenames(man1).each do |cmd|
       (libexec/"gnuman"/"man1").install_symlink man1/"g#{cmd}" => cmd
     end
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
 
     no_conflict -= breaks_macos_users if OS.mac?
     # Symlink non-conflicting binaries

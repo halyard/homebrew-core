@@ -6,6 +6,7 @@ class Texinfo < Formula
   sha256 "deeec9f19f159e046fdf8ad22231981806dac332cc372f1c763504ad82b30953"
   license "GPL-3.0-or-later"
 
+
   uses_from_macos "ncurses"
   uses_from_macos "perl"
 
@@ -37,7 +38,8 @@ class Texinfo < Formula
       @end ifnottex
       @bye
     EOS
-    system "#{bin}/makeinfo", "test.texinfo"
-    assert_match "Hello World!", File.read("test.info")
+
+    system bin/"makeinfo", "test.texinfo"
+    assert_match "Hello World!", (testpath/"test.info").read
   end
 end

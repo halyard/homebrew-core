@@ -14,6 +14,7 @@ class Icu4c < Formula
     end
   end
 
+
   keg_only :provided_by_macos, "macOS provides libicucore.dylib (but nothing else)"
 
   def install
@@ -33,10 +34,10 @@ class Icu4c < Formula
 
   test do
     if File.exist? "/usr/share/dict/words"
-      system "#{bin}/gendict", "--uchars", "/usr/share/dict/words", "dict"
+      system bin/"gendict", "--uchars", "/usr/share/dict/words", "dict"
     else
       (testpath/"hello").write "hello\nworld\n"
-      system "#{bin}/gendict", "--uchars", "hello", "dict"
+      system bin/"gendict", "--uchars", "hello", "dict"
     end
   end
 end

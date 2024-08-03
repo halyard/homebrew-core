@@ -6,8 +6,6 @@ class Gox < Formula
   license "MPL-2.0"
   head "https://github.com/mitchellh/gox.git", branch: "master"
 
-  deprecate! date: "2024-02-20", because: :repo_archived
-
   depends_on "go"
 
   resource "iochan" do

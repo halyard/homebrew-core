@@ -10,12 +10,12 @@ class Luajit < Formula
   # Get the latest commit with:
   #   `git ls-remote --heads https://github.com/LuaJIT/LuaJIT.git v2.1`
   # This is a rolling release model so take care not to ignore CI failures that may be regressions.
-  url "https://github.com/LuaJIT/LuaJIT/archive/d06beb0480c5d1eb53b3343e78063950275aa281.tar.gz"
+  url "https://github.com/LuaJIT/LuaJIT/archive/04dca7911ea255f37be799c18d74c305b921c1a6.tar.gz"
   # Use the version scheme `2.1.timestamp` where `timestamp` is the Unix timestamp of the
   # latest commit at the time of updating.
   # `brew livecheck luajit` will generate the correct version for you automatically.
-  version "2.1.1710088188"
-  sha256 "6abd146a1dfa240a965748f63221633446affa2a715e3eb03879136e3efb95f4"
+  version "2.1.1720049189"
+  sha256 "346b028d9ba85e04b7e23a43cc51ec076574d2efc0d271d4355141b0145cd6e0"
   license "MIT"
   head "https://luajit.org/git/luajit.git", branch: "v2.1"
 
@@ -26,6 +26,7 @@ class Luajit < Formula
       "2.1.#{DateTime.parse(date).strftime("%s")}"
     end
   end
+
 
   def install
     # 1 - Override the hardcoded gcc.
@@ -68,7 +69,7 @@ class Luajit < Formula
   end
 
   test do
-    assert_includes shell_output("#{bin}/luajit -v"), " #{version} "
+    assert_includes shell_output("#{bin}/luajit -v"), " #{version} " if stable?
 
     system bin/"luajit", "-e", <<~EOS
       local ffi = require("ffi")
@@ -78,18 +79,16 @@ class Luajit < Formula
 
     # Check that LuaJIT can find its own `jit.*` modules
     touch "empty.lua"
-    system bin/"luajit", "-b", "-o", "osx", "-a", "arm64", "empty.lua", "empty.o"
+    system bin/"luajit", "-b", "-o", "osx", "empty.lua", "empty.o"
     assert_predicate testpath/"empty.o", :exist?
 
     # Check that we're not affected by LuaJIT/LuaJIT/issues/865.
     require "macho"
     machobj = MachO.open("empty.o")
-    assert_kind_of MachO::FatFile, machobj
+    # always generate 64 bit non-FAT Mach-O object files
+    # per https://github.com/LuaJIT/LuaJIT/commit/7110b935672489afd6ba3eef3e5139d2f3bd05b6
+    assert_kind_of MachO::MachOFile, machobj
     assert_predicate machobj, :object?
-
-    cputypes = machobj.machos.map(&:cputype)
-    assert_includes cputypes, :arm64
-    assert_includes cputypes, :x86_64
-    assert_equal 2, cputypes.length
+    assert_equal Hardware::CPU.arch, machobj.cputype
   end
 end

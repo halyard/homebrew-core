@@ -1,10 +1,10 @@
 class Tree < Formula
   desc "Display directories as trees (with optional color/HTML output)"
   homepage "https://oldmanprogrammer.net/source.php?dir=projects/tree"
-  url "https://github.com/Old-Man-Programmer/tree/archive/refs/tags/2.1.1.tar.gz"
-  sha256 "1b70253994dca48a59d6ed99390132f4d55c486bf0658468f8520e7e63666a06"
+  url "https://github.com/Old-Man-Programmer/tree/archive/refs/tags/2.1.3.tar.gz"
+  sha256 "3ffe2c8bb21194b088ad1e723f0cf340dd434453c5ff9af6a38e0d47e0c2723b"
   license "GPL-2.0-or-later"
-  revision 1
+
 
   def install
     ENV.append "CFLAGS", "-fomit-frame-pointer"
@@ -20,6 +20,6 @@ class Tree < Formula
   end
 
   test do
-    system "#{bin}/tree", prefix
+    system bin/"tree", prefix
   end
 end

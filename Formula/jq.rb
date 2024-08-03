@@ -10,6 +10,7 @@ class Jq < Formula
     regex(/^(?:jq[._-])?v?(\d+(?:\.\d+)+)$/i)
   end
 
+
   head do
     url "https://github.com/jqlang/jq.git", branch: "master"
 

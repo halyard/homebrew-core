@@ -4,12 +4,14 @@ class Tmux < Formula
   url "https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz"
   sha256 "551ab8dea0bf505c0ad6b7bb35ef567cdde0ccb84357df142c254f35a23e19aa"
   license "ISC"
+  revision 1
 
   livecheck do
     url :stable
     regex(/v?(\d+(?:\.\d+)+[a-z]?)/i)
     strategy :github_latest
   end
+
 
   head do
     url "https://github.com/tmux/tmux.git", branch: "master"
@@ -49,7 +51,7 @@ class Tmux < Formula
       # and uses that as the default `TERM`, but this causes issues for
       # tools that link with the very old ncurses provided by macOS.
       # https://github.com/Homebrew/homebrew-core/issues/102748
-      args << "--with-TERM=screen-256color"
+      args << "--with-TERM=screen-256color" if MacOS.version < :sonoma
       args << "--enable-utf8proc" if MacOS.version >= :high_sierra
     else
       args << "--enable-utf8proc"

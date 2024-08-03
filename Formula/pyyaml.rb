@@ -6,8 +6,9 @@ class Pyyaml < Formula
   license "MIT"
   revision 1
 
-  depends_on "cython" => :build
-  depends_on "python-setuptools" => :build
+
+  disable! date: "2024-10-06", because: "does not meet homebrew/core's requirements for Python library formulae"
+
   depends_on "python@3.11" => [:build, :test]
   depends_on "python@3.12" => [:build, :test]
   depends_on "libyaml"
@@ -19,11 +20,9 @@ class Pyyaml < Formula
   end
 
   def install
-    cythonize = Formula["cython"].bin/"cythonize"
-    system cythonize, "yaml/_yaml.pyx"
     pythons.each do |python|
-      python_exe = python.opt_libexec/"bin/python"
-      system python_exe, "-m", "pip", "install", *std_pip_args, "."
+      python3 = python.opt_libexec/"bin/python"
+      system python3, "-m", "pip", "install", *std_pip_args(build_isolation: true), "."
     end
   end
 
@@ -35,6 +34,11 @@ class Pyyaml < Formula
     <<~EOS
       This formula provides the `yaml` module for Python #{python_versions}.
       If you need `yaml` for a different version of Python, use pip.
+
+      Additional details on upcoming formula removal are available at:
+      * https://github.com/Homebrew/homebrew-core/issues/157500
+      * https://docs.brew.sh/Python-for-Formula-Authors#libraries
+      * https://docs.brew.sh/Homebrew-and-Python#pep-668-python312-and-virtual-environments
     EOS
   end
 

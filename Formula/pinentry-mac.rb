@@ -6,6 +6,7 @@ class PinentryMac < Formula
   license all_of: ["GPL-2.0-or-later", "GPL-3.0-or-later"]
   head "https://github.com/GPGTools/pinentry.git", branch: "master"
 
+
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build

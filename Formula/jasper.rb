@@ -1,14 +1,15 @@
 class Jasper < Formula
   desc "Library for manipulating JPEG-2000 images"
   homepage "https://ece.engr.uvic.ca/~frodo/jasper/"
-  url "https://github.com/jasper-software/jasper/releases/download/version-4.2.3/jasper-4.2.3.tar.gz"
-  sha256 "68131ddf9f62d6944cc4c58977dd177c283adb0228140b76382a2dbdadadaa4f"
+  url "https://github.com/jasper-software/jasper/releases/download/version-4.2.4/jasper-4.2.4.tar.gz"
+  sha256 "6a597613d8d84c500b5b83bf0eec06cd3707c23d19957f70354ac2394c9914e7"
   license "JasPer-2.0"
 
   livecheck do
     url :stable
     regex(/^version[._-]v?(\d+(?:\.\d+)+)$/i)
   end
+
 
   depends_on "cmake" => :build
   depends_on "jpeg-turbo"

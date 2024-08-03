@@ -5,6 +5,7 @@ class Libpaper < Formula
   sha256 "7be50974ce0df0c74e7587f10b04272cd53fd675cb6a1273ae1cc5c9cc9cab09"
   license "LGPL-2.1-or-later"
 
+
   depends_on "help2man" => :build
 
   def install

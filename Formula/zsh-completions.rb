@@ -6,6 +6,7 @@ class ZshCompletions < Formula
   license "MIT-Modern-Variant"
   head "https://github.com/zsh-users/zsh-completions.git", branch: "master"
 
+
   uses_from_macos "zsh" => :test
 
   def install

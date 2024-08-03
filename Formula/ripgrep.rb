@@ -11,6 +11,7 @@ class Ripgrep < Formula
     strategy :github_latest
   end
 
+
   depends_on "asciidoctor" => :build
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
@@ -25,6 +26,6 @@ class Ripgrep < Formula
 
   test do
     (testpath/"Hello.txt").write("Hello World!")
-    system "#{bin}/rg", "Hello World!", testpath
+    system bin/"rg", "Hello World!", testpath
   end
 end

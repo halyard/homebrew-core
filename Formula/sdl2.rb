@@ -1,8 +1,8 @@
 class Sdl2 < Formula
   desc "Low-level access to audio, keyboard, mouse, joystick, and graphics"
   homepage "https://www.libsdl.org/"
-  url "https://github.com/libsdl-org/SDL/releases/download/release-2.30.2/SDL2-2.30.2.tar.gz"
-  sha256 "891d66ac8cae51361d3229e3336ebec1c407a8a2a063b61df14f5fdf3ab5ac31"
+  url "https://github.com/libsdl-org/SDL/releases/download/release-2.30.5/SDL2-2.30.5.tar.gz"
+  sha256 "f374f3fa29c37dfcc20822d4a7d7dc57e58924d1a5f2ad511bfab4c8193de63b"
   license "Zlib"
 
   livecheck do
@@ -10,6 +10,7 @@ class Sdl2 < Formula
     regex(/release[._-](\d+(?:\.\d+)+)/i)
     strategy :github_latest
   end
+
 
   head do
     url "https://github.com/libsdl-org/SDL.git", branch: "SDL2"

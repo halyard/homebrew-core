@@ -1,11 +1,8 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  url "https://c-ares.org/download/c-ares-1.28.1.tar.gz"
-  mirror "https://github.com/c-ares/c-ares/releases/download/cares-1_17_2/c-ares-1.28.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/dns/c-ares-1.28.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/dns/legacy/c-ares-1.28.1.tar.gz"
-  sha256 "675a69fc54ddbf42e6830bc671eeb6cd89eeca43828eb413243fd2c0a760809d"
+  url "https://github.com/c-ares/c-ares/releases/download/v1.32.3/c-ares-1.32.3.tar.gz"
+  sha256 "5f02cc809aac3f6cc5edc1fac6c4423fd5616d7406ce47b904c24adf0ff2cd0f"
   license "MIT"
   head "https://github.com/c-ares/c-ares.git", branch: "main"
 
@@ -43,6 +40,6 @@ class CAres < Formula
     system ENV.cc, "test.c", "-L#{lib}", "-lcares", "-o", "test"
     system "./test"
 
-    system "#{bin}/ahost", "127.0.0.1"
+    system bin/"ahost", "127.0.0.1"
   end
 end

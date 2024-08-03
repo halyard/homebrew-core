@@ -1,8 +1,8 @@
 class Node < Formula
   desc "Platform built on V8 to build network applications"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v21.7.1/node-v21.7.1.tar.xz"
-  sha256 "1272b6e129d564dbde17527b844210b971c20a70ae729268186b7cb9d990a64b"
+  url "https://nodejs.org/dist/v22.5.1/node-v22.5.1.tar.xz"
+  sha256 "924f381a32cf26b6bedbe95feedde348450f4fd321283d3bf3f7965aa45ce831"
   license "MIT"
   head "https://github.com/nodejs/node.git", branch: "main"
 
@@ -10,6 +10,7 @@ class Node < Formula
     url "https://nodejs.org/dist/"
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
+
 
   depends_on "pkg-config" => :build
   depends_on "python@3.12" => :build
@@ -39,8 +40,8 @@ class Node < Formula
   # We track major/minor from upstream Node releases.
   # We will accept *important* npm patch releases when necessary.
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-10.5.0.tgz"
-    sha256 "17ca6e08e7633b624e8f870db81a78f46afe119de62bcaf0a7407574139198fc"
+    url "https://registry.npmjs.org/npm/-/npm-10.8.2.tgz"
+    sha256 "c8c61ba0fa0ab3b5120efd5ba97fdaf0e0b495eef647a97c4413919eda0a878b"
   end
 
   def install
@@ -103,7 +104,7 @@ class Node < Formula
     # This copies back over the vanilla `package.json` to fix this issue.
     cp bootstrap/"package.json", libexec/"lib/node_modules/npm"
     # These symlinks are never used & they've caused issues in the past.
-    rm_rf libexec/"share"
+    rm_r libexec/"share"
 
     bash_completion.install bootstrap/"lib/utils/completion.sh" => "npm"
   end
@@ -112,7 +113,7 @@ class Node < Formula
     node_modules = HOMEBREW_PREFIX/"lib/node_modules"
     node_modules.mkpath
     # Kill npm but preserve all other modules across node updates/upgrades.
-    rm_rf node_modules/"npm"
+    rm_r node_modules/"npm" if (node_modules/"npm").exist?
 
     cp_r libexec/"lib/node_modules/npm", node_modules
     # This symlink doesn't hop into homebrew_prefix/bin automatically so
@@ -130,7 +131,7 @@ class Node < Formula
       # Dirs must exist first: https://github.com/Homebrew/legacy-homebrew/issues/35969
       mkdir_p HOMEBREW_PREFIX/"share/man/#{man}"
       # still needed to migrate from copied file manpages to symlink manpages
-      rm_f Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.,npx.}*"]
+      rm(Dir[HOMEBREW_PREFIX/"share/man/#{man}/{npm.,npm-,npmrc.,package.json.,npx.}*"])
       ln_sf Dir[node_modules/"npm/man/#{man}/{npm,package-,shrinkwrap-,npx}*"], HOMEBREW_PREFIX/"share/man/#{man}"
     end
 

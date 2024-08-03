@@ -7,6 +7,7 @@ class Libunistring < Formula
   sha256 "fd6d5662fa706487c48349a758b57bc149ce94ec6c30624ec9fdc473ceabbc8e"
   license any_of: ["GPL-2.0-only", "LGPL-3.0-or-later"]
 
+
   def install
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",

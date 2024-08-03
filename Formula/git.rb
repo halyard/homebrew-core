@@ -1,9 +1,8 @@
 class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  # Don't forget to update the documentation resources along with the url!
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.44.0.tar.xz"
-  sha256 "e358738dcb5b5ea340ce900a0015c03ae86e804e7ff64e47aa4631ddee681de3"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.46.0.tar.xz"
+  sha256 "7f123462a28b7ca3ebe2607485f7168554c2b10dfc155c7ec46300666ac27f95"
   license "GPL-2.0-only"
   head "https://github.com/git/git.git", branch: "master"
 
@@ -25,13 +24,13 @@ class Git < Formula
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.44.0.tar.xz"
-    sha256 "808f1221940de2a32d7b4a3f675f968a7d0a75058a12a791afcda58b01a6e820"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.46.0.tar.xz"
+    sha256 "175d756b9d5eda6656c8067c7f8f80f15bd0cd9f908c3c4995ee6fe8a4182104"
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.44.0.tar.xz"
-    sha256 "777be83bd54e301988fc49708cae3b5ce4b0971c2ca3b7a720be58e2f4633fcb"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.46.0.tar.xz"
+    sha256 "dc118b1d4036e58d5cc4f4e804d903e1e137dac3e9826a246a7e517afd877bd3"
   end
 
   resource "Net::SMTP::SSL" do
@@ -151,7 +150,7 @@ class Git < Formula
     # purged by Homebrew's post-install cleaner because that doesn't check
     # "Library" directories. It is however pointless to keep around as it
     # only contains the perllocal.pod installation file.
-    rm_rf prefix/"Library/Perl"
+    rm_r(prefix/"Library/Perl")
 
     # Set the macOS keychain credential helper by default
     # (as Apple's CLT's git also does this).

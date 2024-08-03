@@ -1,9 +1,9 @@
 class Findutils < Formula
   desc "Collection of GNU find, xargs, and locate"
   homepage "https://www.gnu.org/software/findutils/"
-  url "https://ftp.gnu.org/gnu/findutils/findutils-4.9.0.tar.xz"
-  mirror "https://ftpmirror.gnu.org/findutils/findutils-4.9.0.tar.xz"
-  sha256 "a2bfb8c09d436770edc59f50fa483e785b161a3b7b9d547573cb08065fd462fe"
+  url "https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
+  mirror "https://ftpmirror.gnu.org/findutils/findutils-4.10.0.tar.xz"
+  sha256 "1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5"
   license "GPL-3.0-or-later"
 
   def install
@@ -31,7 +31,7 @@ class Findutils < Formula
       end
     end
 
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
   end
 
   def post_install

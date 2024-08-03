@@ -1,9 +1,10 @@
 class Tbb < Formula
   desc "Rich and complete approach to parallelism in C++"
   homepage "https://github.com/oneapi-src/oneTBB"
-  url "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2021.11.0.tar.gz"
-  sha256 "782ce0cab62df9ea125cdea253a50534862b563f1d85d4cda7ad4e77550ac363"
+  url "https://github.com/oneapi-src/oneTBB/archive/refs/tags/v2021.13.0.tar.gz"
+  sha256 "3ad5dd08954b39d113dc5b3f8a8dc6dc1fd5250032b7c491eb07aed5c94133e1"
   license "Apache-2.0"
+
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
@@ -17,10 +18,12 @@ class Tbb < Formula
   end
 
   def install
-    # Prevent `setup.py` from installing tbb4py directly into HOMEBREW_PREFIX.
+    # Prevent `setup.py` from installing tbb4py as a deprecated egg directly into HOMEBREW_PREFIX.
     # We need this due to our Python patch.
     site_packages = Language::Python.site_packages(python3)
-    inreplace "python/CMakeLists.txt", "install --prefix build -f", "\\0 --install-lib build/#{site_packages}"
+    inreplace "python/CMakeLists.txt",
+              "install --prefix build -f",
+              "\\0 --install-lib build/#{site_packages} --single-version-externally-managed --record=RECORD"
 
     tbb_site_packages = prefix/site_packages/"tbb"
     ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath},-rpath,#{rpath(source: tbb_site_packages)}"
@@ -44,10 +47,6 @@ class Tbb < Formula
                     *args, *std_cmake_args
     system "cmake", "--build", "build/static"
     lib.install buildpath.glob("build/static/*/libtbb*.a")
-
-    ENV.append_path "CMAKE_PREFIX_PATH", prefix.to_s
-    ENV["TBBROOT"] = prefix
-    system python3, "-m", "pip", "install", *std_pip_args, "./python"
   end
 
   test do

@@ -5,6 +5,7 @@ class Utf8proc < Formula
   sha256 "18c1626e9fc5a2e192311e36b3010bfc698078f692888940f1fa150547abb0c1"
   license all_of: ["MIT", "Unicode-DFS-2015"]
 
+
   def install
     system "make", "install", "prefix=#{prefix}"
   end

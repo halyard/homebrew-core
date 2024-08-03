@@ -1,10 +1,9 @@
 class Ldns < Formula
   desc "DNS library written in C"
   homepage "https://nlnetlabs.nl/projects/ldns/"
-  url "https://nlnetlabs.nl/downloads/ldns/ldns-1.8.3.tar.gz"
-  sha256 "c3f72dd1036b2907e3a56e6acf9dfb2e551256b3c1bbd9787942deeeb70e7860"
+  url "https://nlnetlabs.nl/downloads/ldns/ldns-1.8.4.tar.gz"
+  sha256 "838b907594baaff1cd767e95466a7745998ae64bc74be038dccc62e2de2e4247"
   license "BSD-3-Clause"
-  revision 1
 
   # https://nlnetlabs.nl/downloads/ldns/ since the first-party site has a
   # tendency to lead to an `execution expired` error.
@@ -12,6 +11,7 @@ class Ldns < Formula
     url "https://github.com/NLnetLabs/ldns.git"
     regex(/^(?:release-)?v?(\d+(?:\.\d+)+)$/i)
   end
+
 
   depends_on "python-setuptools" => :build
   depends_on "swig" => :build
@@ -22,12 +22,13 @@ class Ldns < Formula
 
   def install
     python3 = "python3.12"
-    args = *std_configure_args + %W[
+    args = %W[
       --with-drill
       --with-examples
       --with-ssl=#{Formula["openssl@3"].opt_prefix}
       --with-pyldns
-      PYTHON_SITE_PKG=#{prefix/Language::Python.site_packages(python3)}
+      PYTHON_PLATFORM_SITE_PKG=#{prefix/Language::Python.site_packages(python3)}
+      top_builddir=#{buildpath}
       --disable-dane-verify
       --without-xcode-sdk
     ]
@@ -36,6 +37,10 @@ class Ldns < Formula
     inreplace "contrib/python/ldns.i", "#include \"ldns.h\"", "#include <ldns/ldns.h>"
 
     ENV["PYTHON"] = which(python3)
+
+    # Exclude unrecognized options
+    args += std_configure_args.reject { |s| s["--disable-debug"] || s["--disable-dependency-tracking"] }
+
     system "./configure", *args
 
     if OS.mac?
@@ -72,7 +77,7 @@ class Ldns < Formula
       powerdns.com.   10773 IN  DNSKEY  257 3 8  #{l2.tr!("\n", " ")}
     EOS
 
-    system "#{bin}/ldns-key2ds", "powerdns.com.dnskey"
+    system bin/"ldns-key2ds", "powerdns.com.dnskey"
 
     match = "d4c3d5552b8679faeebc317e5f048b614b2e5f607dc57f1553182d49ab2179f7"
     assert_match match, File.read("Kpowerdns.com.+008+44030.ds")

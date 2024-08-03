@@ -5,6 +5,7 @@ class Libvidstab < Formula
   sha256 "9001b6df73933555e56deac19a0f225aae152abbc0e97dc70034814a1943f3d4"
   license "GPL-2.0-or-later"
 
+
   depends_on "cmake" => :build
 
   def install

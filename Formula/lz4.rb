@@ -13,6 +13,7 @@ class Lz4 < Formula
     strategy :github_latest
   end
 
+
   def install
     system "make", "install", "PREFIX=#{prefix}"
   end

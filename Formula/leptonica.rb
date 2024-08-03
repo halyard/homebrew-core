@@ -5,6 +5,7 @@ class Leptonica < Formula
   sha256 "2b3e1254b1cca381e77c819b59ca99774ff43530209b9aeb511e1d46588a64f6"
   license "BSD-2-Clause"
 
+
   depends_on "pkg-config" => :build
   depends_on "giflib"
   depends_on "jpeg-turbo"

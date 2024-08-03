@@ -10,6 +10,7 @@ class Lame < Formula
     regex(%r{url=.*?/lame[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
+
   uses_from_macos "ncurses"
 
   def install
@@ -25,6 +26,6 @@ class Lame < Formula
   end
 
   test do
-    system "#{bin}/lame", "--genre-list", test_fixtures("test.mp3")
+    system bin/"lame", "--genre-list", test_fixtures("test.mp3")
   end
 end

@@ -1,8 +1,8 @@
 class Asciidoctor < Formula
   desc "Text processor and publishing toolchain for AsciiDoc"
   homepage "https://asciidoctor.org/"
-  url "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.22.tar.gz"
-  sha256 "88b56b1fdd1bcfd097addc892c6071c76cb80409847f4765ae3e15d890543e6c"
+  url "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.23.tar.gz"
+  sha256 "72d271de1fccd3610e6f12bba29be1a3b6c8c813c5b2f3a12491ffc423090518"
   license "MIT"
 
   # Some gems require >= ruby 2.7
@@ -23,11 +23,6 @@ class Asciidoctor < Formula
   resource "concurrent-ruby" do
     url "https://rubygems.org/gems/concurrent-ruby-1.2.3.gem"
     sha256 "82fdd3f8a0816e28d513e637bb2b90a45d7b982bdf4f3a0511722d2e495801e2"
-  end
-
-  resource "bigdecimal" do
-    url "https://rubygems.org/gems/bigdecimal-3.1.6.gem"
-    sha256 "bcbc27d449cf8ed1b1814d21308f49c9d22ce73e33fff0d228e38799c02eab01"
   end
 
   resource "ttfunk" do
@@ -61,8 +56,8 @@ class Asciidoctor < Formula
   end
 
   resource "public_suffix" do
-    url "https://rubygems.org/gems/public_suffix-5.0.4.gem"
-    sha256 "35cd648e0d21d06b8dce9331d19619538d1d898ba6d56a6f2258409d2526d1ae"
+    url "https://rubygems.org/gems/public_suffix-5.0.5.gem"
+    sha256 "72c340218bb384610536919988705cc29e09749c0021fd7005f715c7e5dfc493"
   end
 
   resource "addressable" do
@@ -71,13 +66,13 @@ class Asciidoctor < Formula
   end
 
   resource "css_parser" do
-    url "https://rubygems.org/gems/css_parser-1.16.0.gem"
-    sha256 "f70fb492254418522ea77c01d57bf64452d6c7465001926c3620d0b50289b1a2"
+    url "https://rubygems.org/gems/css_parser-1.17.1.gem"
+    sha256 "eb730f2d26591a843e52bd3d0efd76abdfeec8bad728e0b2ac821fc10bb018e6"
   end
 
   resource "prawn-svg" do
-    url "https://rubygems.org/gems/prawn-svg-0.34.1.gem"
-    sha256 "7c04e24bb5dbc8458ad86823f65973b2ef6e8ea68e12e1f7f92f8e3a209f4013"
+    url "https://rubygems.org/gems/prawn-svg-0.34.2.gem"
+    sha256 "afff79d332940f6d59604d0b2810f54d46e9335533a2aa4e892fb7d514777a90"
   end
 
   resource "afm" do
@@ -96,8 +91,8 @@ class Asciidoctor < Formula
   end
 
   resource "Ascii85" do
-    url "https://rubygems.org/gems/Ascii85-1.1.0.gem"
-    sha256 "9ce694467bd69ab2349768afd27c52ad721cdc6f642aeaa895717bfd7ada44b7"
+    url "https://rubygems.org/gems/Ascii85-1.1.1.gem"
+    sha256 "73d760d093bf997e88c2a4d0bfe4328e838e0799915aee6b3162836c5267c2b0"
   end
 
   resource "pdf-reader" do
@@ -121,13 +116,13 @@ class Asciidoctor < Formula
   # formula ensures it's available if users choose to install and enable the Pygments syntax
   # highlighter.
   resource "pygments.rb" do
-    url "https://rubygems.org/gems/pygments.rb-2.4.1.gem"
-    sha256 "61a3c9a00c01d53fa5fe7f6f6d2c461abc5b50cf6db9438c04b812d80f8d94be"
+    url "https://rubygems.org/gems/pygments.rb-3.0.0.gem"
+    sha256 "41729ecc69624bd3fc6bcc13d6ccb6ff0263334c42f66bfcf517a120addbb093"
   end
 
   resource "asciidoctor-pdf" do
-    url "https://rubygems.org/gems/asciidoctor-pdf-2.3.14.gem"
-    sha256 "24c1cc018118b5cbc57bdb35875ffa013bfd1653851e3513f1216cefea68e952"
+    url "https://rubygems.org/gems/asciidoctor-pdf-2.3.15.gem"
+    sha256 "432effdefdcd6433a797b702422b5f6fd4120c495c5f75ae059159aa75aa9a94"
   end
 
   resource "coderay" do
@@ -136,8 +131,8 @@ class Asciidoctor < Formula
   end
 
   resource "rouge" do
-    url "https://rubygems.org/gems/rouge-4.2.0.gem"
-    sha256 "60dd666b3a223467dc72f5b7384764dfd7ad4e50b0df9eff072be58123506eba"
+    url "https://rubygems.org/gems/rouge-4.2.1.gem"
+    sha256 "f371732db127913fe10f13b1c25500b927539167a746dc8ee8089ad868bba1fd"
   end
 
   def install

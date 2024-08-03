@@ -5,6 +5,7 @@ class Libcbor < Formula
   sha256 "89e0a83d16993ce50651a7501355453f5250e8729dfc8d4a251a78ea23bb26d7"
   license "MIT"
 
+
   depends_on "cmake" => :build
 
   def install

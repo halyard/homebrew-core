@@ -10,6 +10,7 @@ class Libgcrypt < Formula
     regex(/href=.*?libgcrypt[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "libgpg-error"
 
   def install

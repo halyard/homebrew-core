@@ -6,6 +6,7 @@ class Openjpeg < Formula
   license "BSD-2-Clause"
   head "https://github.com/uclouvain/openjpeg.git", branch: "master"
 
+
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
   depends_on "libpng"

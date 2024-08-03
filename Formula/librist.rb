@@ -12,6 +12,7 @@ class Librist < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "cjson"

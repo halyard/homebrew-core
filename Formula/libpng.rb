@@ -11,6 +11,7 @@ class Libpng < Formula
     regex(%r{url=.*?/libpng[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
 
+
   head do
     url "https://github.com/glennrp/libpng.git", branch: "libpng16"
 

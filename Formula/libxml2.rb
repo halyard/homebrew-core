@@ -1,8 +1,8 @@
 class Libxml2 < Formula
   desc "GNOME XML library"
   homepage "http://xmlsoft.org/"
-  url "https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.6.tar.xz"
-  sha256 "889c593a881a3db5fdd96cc9318c87df34eb648edfc458272ad46fd607353fbb"
+  url "https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.8.tar.xz"
+  sha256 "43ad877b018bc63deb2468d71f95219c2fac196876ef36d1bee51d226173ec93"
   license "MIT"
 
   # We use a common regex because libxml2 doesn't use GNOME's "even-numbered
@@ -11,6 +11,7 @@ class Libxml2 < Formula
     url :stable
     regex(/libxml2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
+
 
   head do
     url "https://gitlab.gnome.org/GNOME/libxml2.git", branch: "master"

@@ -11,6 +11,7 @@ class Liblinear < Formula
     regex(/href=.*?liblinear[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   # Fix sonames
   patch :p0 do
     url "https://raw.githubusercontent.com/Homebrew/formula-patches/bac35ae9140405dec00f1f700d2ecc27cf82526b/liblinear/patch-Makefile.diff"
@@ -39,6 +40,6 @@ class Liblinear < Formula
       -1 99:1 3057:1 3957:1 5838:0.3
     EOS
 
-    system "#{bin}/train", "train_classification.txt"
+    system bin/"train", "train_classification.txt"
   end
 end

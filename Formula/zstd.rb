@@ -15,6 +15,7 @@ class Zstd < Formula
     strategy :github_latest
   end
 
+
   depends_on "cmake" => :build
   depends_on "lz4"
   depends_on "xz"

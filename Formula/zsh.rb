@@ -16,6 +16,7 @@ class Zsh < Formula
     url "https://sourceforge.net/projects/zsh/rss?path=/zsh"
   end
 
+
   head do
     url "https://git.code.sf.net/p/zsh/code.git", branch: "master"
     depends_on "autoconf" => :build

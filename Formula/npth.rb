@@ -11,6 +11,7 @@ class Npth < Formula
     regex(/href=.*?npth[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   def install
     system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"

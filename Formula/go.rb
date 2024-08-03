@@ -1,9 +1,9 @@
 class Go < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  url "https://go.dev/dl/go1.22.1.src.tar.gz"
-  mirror "https://fossies.org/linux/misc/go1.22.1.src.tar.gz"
-  sha256 "79c9b91d7f109515a25fc3ecdaad125d67e6bdb54f6d4d98580f46799caea321"
+  url "https://go.dev/dl/go1.22.5.src.tar.gz"
+  mirror "https://fossies.org/linux/misc/go1.22.5.src.tar.gz"
+  sha256 "ac9c723f224969aee624bc34fd34c9e13f2a212d75c71c807de644bb46e112f6"
   license "BSD-3-Clause"
   head "https://go.googlesource.com/go.git", branch: "master"
 
@@ -63,7 +63,7 @@ class Go < Formula
       with_env(CC: "cc", CXX: "c++") { system "./make.bash" }
     end
 
-    rm_rf "gobootstrap" # Bootstrap not required beyond compile.
+    rm_r("gobootstrap") # Bootstrap not required beyond compile.
     libexec.install Dir["*"]
     bin.install_symlink Dir[libexec/"bin/go*"]
 
@@ -71,9 +71,9 @@ class Go < Formula
 
     # Remove useless files.
     # Breaks patchelf because folder contains weird debug/test files
-    (libexec/"src/debug/elf/testdata").rmtree
+    rm_r(libexec/"src/debug/elf/testdata")
     # Binaries built for an incompatible architecture
-    (libexec/"src/runtime/pprof/testdata").rmtree
+    rm_r(libexec/"src/runtime/pprof/testdata")
   end
 
   test do

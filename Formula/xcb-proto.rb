@@ -1,9 +1,10 @@
 class XcbProto < Formula
   desc "X.Org: XML-XCB protocol descriptions for libxcb code generation"
   homepage "https://www.x.org/"
-  url "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.16.0.tar.xz"
-  sha256 "a75a1848ad2a89a82d841a51be56ce988ff3c63a8d6bf4383ae3219d8d915119"
+  url "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.17.0.tar.xz"
+  sha256 "2c1bacd2110f4799f74de6ebb714b94cf6f80fb112316b1219480fd22562148c"
   license "MIT"
+
 
   depends_on "pkg-config" => [:build, :test]
   depends_on "python@3.12" => [:build, :test]

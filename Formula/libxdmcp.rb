@@ -5,6 +5,7 @@ class Libxdmcp < Formula
   sha256 "d8a5222828c3adab70adf69a5583f1d32eb5ece04304f7f8392b6a353aa2228c"
   license "MIT"
 
+
   depends_on "pkg-config" => :build
   depends_on "xorgproto"
 

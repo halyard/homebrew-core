@@ -1,14 +1,15 @@
 class JpegXl < Formula
   desc "New file format for still image compression"
   homepage "https://jpeg.org/jpegxl/index.html"
-  url "https://github.com/libjxl/libjxl/archive/refs/tags/v0.10.2.tar.gz"
-  sha256 "95e807f63143856dc4d161c071cca01115d2c6405b3d3209854ac6989dc6bb91"
+  url "https://github.com/libjxl/libjxl/archive/refs/tags/v0.10.3.tar.gz"
+  sha256 "e0191411cfcd927eebe5392d030fe4283fe27ba1685ab7265104936e0b4283a6"
   license "BSD-3-Clause"
 
   livecheck do
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
+
 
   depends_on "asciidoc" => :build
   depends_on "cmake" => :build
@@ -48,6 +49,7 @@ class JpegXl < Formula
                     "-DJPEGXL_FORCE_SYSTEM_BROTLI=ON",
                     "-DJPEGXL_FORCE_SYSTEM_LCMS2=ON",
                     "-DJPEGXL_FORCE_SYSTEM_HWY=ON",
+                    "-DJPEGXL_ENABLE_DEVTOOLS=ON",
                     "-DJPEGXL_ENABLE_JNI=OFF",
                     "-DJPEGXL_ENABLE_JPEGLI=OFF",
                     "-DJPEGXL_ENABLE_SKCMS=OFF",
@@ -62,7 +64,7 @@ class JpegXl < Formula
   end
 
   test do
-    system "#{bin}/cjxl", test_fixtures("test.jpg"), "test.jxl"
+    system bin/"cjxl", test_fixtures("test.jpg"), "test.jxl"
     assert_predicate testpath/"test.jxl", :exist?
 
     (testpath/"jxl_test.c").write <<~EOS

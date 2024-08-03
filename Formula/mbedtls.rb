@@ -12,6 +12,7 @@ class Mbedtls < Formula
     strategy :github_latest
   end
 
+
   depends_on "cmake" => :build
   depends_on "python@3.12" => :build
 
@@ -40,7 +41,7 @@ class Mbedtls < Formula
     system "cmake", "--install", "build"
 
     # Why does Mbedtls ship with a "Hello World" executable. Let's remove that.
-    rm_f bin/"hello"
+    rm(bin/"hello")
     # Rename benchmark & selftest, which are awfully generic names.
     mv bin/"benchmark", bin/"mbedtls-benchmark"
     mv bin/"selftest", bin/"mbedtls-selftest"

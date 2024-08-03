@@ -10,6 +10,7 @@ class LibatomicOps < Formula
     strategy :github_latest
   end
 
+
   def install
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
     system "make"

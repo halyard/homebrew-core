@@ -5,6 +5,7 @@ class Libsamplerate < Formula
   sha256 "16e881487f184250deb4fcb60432d7556ab12cb58caea71ef23960aec6c0405a"
   license "BSD-2-Clause"
 
+
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
 

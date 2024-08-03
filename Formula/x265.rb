@@ -1,10 +1,11 @@
 class X265 < Formula
   desc "H.265/HEVC encoder"
   homepage "https://bitbucket.org/multicoreware/x265_git"
-  url "https://bitbucket.org/multicoreware/x265_git/get/3.5.tar.gz"
-  sha256 "5ca3403c08de4716719575ec56c686b1eb55b078c0fe50a064dcf1ac20af1618"
+  url "https://bitbucket.org/multicoreware/x265_git/get/3.6.tar.gz"
+  sha256 "206329b9599c78d06969a1b7b7bb939f7c99a459ab283b2e93f76854bd34ca7b"
   license "GPL-2.0-only"
   head "https://bitbucket.org/multicoreware/x265_git.git", branch: "master"
+
 
   depends_on "cmake" => :build
 

@@ -12,6 +12,7 @@ class Libidn2 < Formula
     regex(/href=.*?libidn2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   head do
     url "https://gitlab.com/libidn/libidn2.git", branch: "master"
 

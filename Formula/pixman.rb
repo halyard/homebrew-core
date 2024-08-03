@@ -10,6 +10,7 @@ class Pixman < Formula
     regex(/href=.*?pixman[._-]v?(\d+\.\d*[02468](?:\.\d+)*)\.t/i)
   end
 
+
   depends_on "pkg-config" => :build
 
   # Fix NEON intrinsic support build issue

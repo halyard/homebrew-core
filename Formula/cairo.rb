@@ -14,6 +14,7 @@ class Cairo < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "glib"
@@ -26,6 +27,10 @@ class Cairo < Formula
   depends_on "pixman"
 
   uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     args = %w[

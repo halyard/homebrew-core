@@ -11,6 +11,7 @@ class Libtiff < Formula
     regex(/href=.*?tiff[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "jpeg-turbo"
   depends_on "xz"
   depends_on "zstd"

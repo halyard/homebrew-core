@@ -5,18 +5,25 @@ class Wget < Formula
   sha256 "fa2dc35bab5184ecbc46a9ef83def2aaaa3f4c9f3c97d4bd19dcb07d4da637de"
   license "GPL-3.0-or-later"
 
+
   head do
     url "https://git.savannah.gnu.org/git/wget.git"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "xz" => :build
-    depends_on "gettext"
   end
 
   depends_on "pkg-config" => :build
   depends_on "libidn2"
   depends_on "openssl@3"
+
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "gettext"
+    depends_on "libunistring"
+  end
 
   on_linux do
     depends_on "util-linux"

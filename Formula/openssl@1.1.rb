@@ -11,6 +11,7 @@ class OpensslAT11 < Formula
   license "OpenSSL"
   version_scheme 1
 
+
   keg_only :versioned_formula
 
   # See: https://www.openssl.org/policies/releasestrat.html
@@ -101,7 +102,7 @@ class OpensslAT11 < Formula
   end
 
   def post_install
-    rm_f openssldir/"cert.pem"
+    rm(openssldir/"cert.pem") if (openssldir/"cert.pem").exist?
     openssldir.install_symlink Formula["ca-certificates"].pkgetc/"cert.pem"
   end
 

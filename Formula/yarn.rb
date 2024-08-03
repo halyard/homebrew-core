@@ -9,15 +9,18 @@ class Yarn < Formula
     skip("1.x line is frozen and features/bugfixes only happen on 2.x")
   end
 
+
   depends_on "node" => :test
 
   conflicts_with "hadoop", because: "both install `yarn` binaries"
   conflicts_with "corepack", because: "both install `yarn` and `yarnpkg` binaries"
 
+  skip_clean "libexec/bin"
+
   def install
     libexec.install buildpath.glob("*")
     (bin/"yarn").write_env_script libexec/"bin/yarn.js", PREFIX: HOMEBREW_PREFIX
-    (bin/"yarnpkg").write_env_script libexec/"bin/yarn.js", PREFIX: HOMEBREW_PREFIX
+    bin.install_symlink bin/"yarn" => "yarnpkg"
     inreplace libexec/"lib/cli.js", "/usr/local", HOMEBREW_PREFIX
     inreplace libexec/"package.json", '"installationMethod": "tar"',
                                       "\"installationMethod\": \"#{tap.user.downcase}\""

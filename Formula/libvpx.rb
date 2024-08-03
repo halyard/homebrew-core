@@ -6,6 +6,7 @@ class Libvpx < Formula
   license "BSD-3-Clause"
   head "https://chromium.googlesource.com/webm/libvpx.git", branch: "main"
 
+
   on_intel do
     depends_on "yasm" => :build
   end

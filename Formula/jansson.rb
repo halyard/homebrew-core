@@ -5,6 +5,7 @@ class Jansson < Formula
   sha256 "5798d010e41cf8d76b66236cfb2f2543c8d082181d16bc3085ab49538d4b9929"
   license "MIT"
 
+
   def install
     system "./configure", *std_configure_args
     system "make", "install"

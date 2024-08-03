@@ -10,12 +10,13 @@ class Libzip < Formula
     regex(/href=.*?libzip[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+
   depends_on "cmake" => :build
+  depends_on "xz"
   depends_on "zstd"
 
   uses_from_macos "zip" => :test
   uses_from_macos "bzip2"
-  uses_from_macos "xz"
   uses_from_macos "zlib"
 
   on_linux do

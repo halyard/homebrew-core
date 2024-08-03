@@ -1,6 +1,6 @@
 class Screen < Formula
   desc "Terminal multiplexer with VT100/ANSI terminal emulation"
-  homepage "https://www.gnu.org/software/screen"
+  homepage "https://www.gnu.org/software/screen/"
   license "GPL-3.0-or-later"
   head "https://git.savannah.gnu.org/git/screen.git", branch: "master"
 
@@ -16,6 +16,7 @@ class Screen < Formula
       sha256 "9c53320cbe3a24c8fb5d77cf701c47918b3fabe8d6f339a00cfdb59e11af0ad5"
     end
   end
+
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
