@@ -8,7 +8,6 @@ class Libvmaf < Formula
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "vim" => :build
 
   on_intel do
     depends_on "nasm" => :build
