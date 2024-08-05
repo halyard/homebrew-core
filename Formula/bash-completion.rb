@@ -1,4 +1,4 @@
-class BashCompletionAT2 < Formula
+class BashCompletion < Formula
   desc "Programmable completion for Bash 4.2+"
   homepage "https://github.com/scop/bash-completion"
   url "https://github.com/scop/bash-completion/releases/download/2.14.0/bash-completion-2.14.0.tar.xz"
