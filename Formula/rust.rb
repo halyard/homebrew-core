@@ -23,7 +23,7 @@ class Rust < Formula
     end
   end
 
-  depends_on "libgit2@1.7"
+  depends_on "libgit2"
   depends_on "libssh2"
   depends_on "llvm"
   depends_on macos: :sierra
@@ -167,7 +167,7 @@ class Rust < Formula
     # We only check the tools' linkage here. No need to check rustc.
     expected_linkage = {
       bin/"cargo" => [
-        Formula["libgit2@1.7"].opt_lib/shared_library("libgit2"),
+        Formula["libgit2"].opt_lib/shared_library("libgit2"),
         Formula["libssh2"].opt_lib/shared_library("libssh2"),
         Formula["openssl@3"].opt_lib/shared_library("libcrypto"),
         Formula["openssl@3"].opt_lib/shared_library("libssl"),
