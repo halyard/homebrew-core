@@ -11,7 +11,6 @@ class Node < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-
   depends_on "pkg-config" => :build
   depends_on "python@3.12" => :build
   depends_on "brotli"
@@ -104,7 +103,8 @@ class Node < Formula
     # This copies back over the vanilla `package.json` to fix this issue.
     cp bootstrap/"package.json", libexec/"lib/node_modules/npm"
     # These symlinks are never used & they've caused issues in the past.
-    rm_r libexec/"share"
+    share_dir = libexec/"share"
+    rm_r share_dir if share_dir.exist?
 
     bash_completion.install bootstrap/"lib/utils/completion.sh" => "npm"
   end
