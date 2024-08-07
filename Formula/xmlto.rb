@@ -1,8 +1,8 @@
 class Xmlto < Formula
   desc "Convert XML to another format (based on XSL or other tools)"
   homepage "https://pagure.io/xmlto/"
-  url "https://releases.pagure.org/xmlto/xmlto-0.0.28.tar.bz2"
-  sha256 "1130df3a7957eb9f6f0d29e4aa1c75732a7dfb6d639be013859b5c7ec5421276"
+  url "https://pagure.io/xmlto/archive/0.0.29/xmlto-0.0.29.tar.gz"
+  sha256 "40504db68718385a4eaa9154a28f59e51e59d006d1aa14f5bc9d6fded1d6017a"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -16,6 +16,9 @@ class Xmlto < Formula
   # Doesn't strictly depend on GNU getopt, but macOS system getopt(1)
   # does not support longopts in the optstring, so use GNU getopt.
   depends_on "gnu-getopt"
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
 
   uses_from_macos "libxslt"
 
@@ -28,6 +31,8 @@ class Xmlto < Formula
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
 
     ENV.deparallelize
+    system "autoreconf", "-fiv"
+    system "autoconf"
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
     system "make", "install"
   end
