@@ -1,71 +1,41 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 class Terraform < Formula
-  desc "Tool to build, change, and version infrastructure"
+  desc "Terraform"
   homepage "https://www.terraform.io/"
-  # NOTE: Do not bump to v1.6.0+ as license changed to BUSL-1.1
-  # https://github.com/hashicorp/terraform/pull/33661
-  # https://github.com/hashicorp/terraform/pull/33697
-  url "https://github.com/hashicorp/terraform/archive/refs/tags/v1.5.7.tar.gz"
-  sha256 "6742fc87cba5e064455393cda12f0e0241c85a7cb2a3558d13289380bb5f26f5"
-  license "MPL-2.0"
-  head "https://github.com/hashicorp/terraform.git", branch: "main"
+  version "1.11.0"
 
-
-  # https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license
-  deprecate! date: "2024-04-04", because: "changed its license to BUSL on the next release"
-
-  depends_on "go" => :build
-
-  conflicts_with "tenv", because: "both install terraform binary"
-  conflicts_with "tfenv", because: "tfenv symlinks terraform binaries"
-
-  # Needs libraries at runtime:
-  # /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found (required by node)
-  fails_with gcc: "5"
-
-  def install
-    system "go", "build", *std_go_args(ldflags: "-s -w")
+  if OS.mac? && Hardware::CPU.intel?
+    url "https://releases.hashicorp.com/terraform/1.11.0/terraform_1.11.0_darwin_amd64.zip"
+    sha256 "24b45c11c70160f31f7bf3107173b8e9611c072eba3c0cd0b608fc6ad937eaf3"
   end
 
-  def caveats
-    <<~EOS
-      We will not accept any new Terraform releases in homebrew/core (with the BUSL license).
-      The next release changed to a non-open-source license:
-      https://www.hashicorp.com/blog/hashicorp-adopts-business-source-license
-      See our documentation for acceptable licences:
-        https://docs.brew.sh/License-Guidelines
-    EOS
+  if OS.mac? && Hardware::CPU.arm?
+    url "https://releases.hashicorp.com/terraform/1.11.0/terraform_1.11.0_darwin_arm64.zip"
+    sha256 "ce78084f1ad41c008da242faf84f7653b4f00a4b8443ef2bb5724b135cc68766"
+  end
+
+  if OS.linux? && Hardware::CPU.intel?
+    url "https://releases.hashicorp.com/terraform/1.11.0/terraform_1.11.0_linux_amd64.zip"
+    sha256 "069e531fd4651b9b510adbd7e27dd648b88d66d5f369a2059aadbb4baaead1c1"
+  end
+
+  if OS.linux? && Hardware::CPU.arm? && !Hardware::CPU.is_64_bit?
+    url "https://releases.hashicorp.com/terraform/1.11.0/terraform_1.11.0_linux_arm.zip"
+    sha256 "916d151d3dfd4aada61f0a269bfde9484582ba0ade049c9e554b8c998d92f9fd"
+  end
+
+  if OS.linux? && Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+    url "https://releases.hashicorp.com/terraform/1.11.0/terraform_1.11.0_linux_arm64.zip"
+    sha256 "0a7e88cbb431044a16335369f850359def93b2898adc1778063784760db69093"
+  end
+
+  def install
+    bin.install "terraform"
   end
 
   test do
-    minimal = testpath/"minimal.tf"
-    minimal.write <<~EOS
-      variable "aws_region" {
-        default = "us-west-2"
-      }
-
-      variable "aws_amis" {
-        default = {
-          eu-west-1 = "ami-b1cf19c6"
-          us-east-1 = "ami-de7ab6b6"
-          us-west-1 = "ami-3f75767a"
-          us-west-2 = "ami-21f78e11"
-        }
-      }
-
-      # Specify the provider and access details
-      provider "aws" {
-        access_key = "this_is_a_fake_access"
-        secret_key = "this_is_a_fake_secret"
-        region     = var.aws_region
-      }
-
-      resource "aws_instance" "web" {
-        instance_type = "m1.small"
-        ami           = var.aws_amis[var.aws_region]
-        count         = 4
-      }
-    EOS
-    system bin/"terraform", "init"
-    system bin/"terraform", "graph"
+    system "#{bin}/terraform --version"
   end
 end
