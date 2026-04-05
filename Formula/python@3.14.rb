@@ -93,6 +93,8 @@ class PythonAT314 < Formula
   # The HOMEBREW_PREFIX location of site-packages.
   def site_packages = HOMEBREW_PREFIX/"lib/python#{version.major_minor}/site-packages"
 
+  def altinstall? = false
+
   def python3 = bin/"python#{version.major_minor}"
 
   def install
