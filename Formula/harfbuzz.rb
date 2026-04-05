@@ -17,7 +17,7 @@ class Harfbuzz < Formula
   depends_on "freetype"
   depends_on "glib"
   depends_on "graphite2"
-  depends_on "icu4c@78"
+  depends_on "icu4c"
   depends_on "libpng"
 
   on_linux do

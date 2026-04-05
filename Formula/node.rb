@@ -19,7 +19,7 @@ class Node < Formula
   depends_on "brotli"
   depends_on "c-ares"
   depends_on "hdrhistogram_c"
-  depends_on "icu4c@78"
+  depends_on "icu4c"
   depends_on "libnghttp2"
   depends_on "libnghttp3"
   depends_on "libngtcp2"

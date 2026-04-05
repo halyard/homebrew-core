@@ -16,7 +16,7 @@ class Boost < Formula
     end
   end
 
-  depends_on "icu4c@78"
+  depends_on "icu4c"
   depends_on "xz"
   depends_on "zstd"
 

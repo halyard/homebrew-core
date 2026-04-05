@@ -20,7 +20,7 @@ class Tesseract < Formula
   depends_on "fontconfig"
   depends_on "glib"
   depends_on "harfbuzz"
-  depends_on "icu4c@78"
+  depends_on "icu4c"
   depends_on "leptonica"
   depends_on "libarchive"
   depends_on "pango"
