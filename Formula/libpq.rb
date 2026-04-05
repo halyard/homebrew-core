@@ -16,7 +16,7 @@ class Libpq < Formula
   depends_on "docbook" => :build
   depends_on "docbook-xsl" => :build
   depends_on "pkgconf" => :build
-  depends_on "icu4c@78"
+  depends_on "icu4c"
   # GSSAPI provided by Kerberos.framework crashes when forked.
   # See https://github.com/Homebrew/homebrew-core/issues/47494.
   depends_on "krb5"
