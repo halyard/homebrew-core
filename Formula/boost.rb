@@ -44,7 +44,7 @@ class Boost < Formula
     end
 
     # libdir should be set by --prefix but isn't
-    icu4c = deps.map(&:to_formula).find { |f| f.name.match?(/^icu4c@\d+$/) }
+    icu4c = deps.map(&:to_formula).find { |f| f.name.match?(/^icu4c$/) }
     bootstrap_args = %W[
       --prefix=#{prefix}
       --libdir=#{lib}
