@@ -1,9 +1,10 @@
 class Hwloc < Formula
   desc "Portable abstraction of the hierarchical topology of modern architectures"
   homepage "https://www.open-mpi.org/projects/hwloc/"
-  url "https://download.open-mpi.org/release/hwloc/v2.11/hwloc-2.11.1.tar.bz2"
-  sha256 "04cdfbffad225ce15f66184f0f4141327dabf288d10a8b84d13f517acb7870c6"
+  url "https://download.open-mpi.org/release/hwloc/v2.13/hwloc-2.13.0.tar.bz2"
+  sha256 "52e936afb6ebd80f171f763fcf14f7b1f5ce98b125af5dd2f328b873b1fd0dab"
   license "BSD-3-Clause"
+  compatibility_version 1
 
   livecheck do
     url "https://www.open-mpi.org/software/hwloc/current/downloads/latest_release.txt"
@@ -17,18 +18,18 @@ class Hwloc < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", *std_configure_args,
-                          "--enable-shared",
+    system "./configure", "--enable-shared",
                           "--enable-static",
                           "--disable-cairo",
-                          "--without-x"
+                          "--without-x",
+                          *std_configure_args
     system "make", "install", "bashcompletionsdir=#{bash_completion}"
 
     pkgshare.install "tests"

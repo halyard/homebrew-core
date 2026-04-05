@@ -1,9 +1,10 @@
 class Gengetopt < Formula
   desc "Generate C code to parse command-line arguments via getopt_long"
   homepage "https://www.gnu.org/software/gengetopt/"
-  url "https://ftp.gnu.org/gnu/gengetopt/gengetopt-2.23.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gengetopt/gengetopt-2.23.tar.xz"
+  url "https://ftpmirror.gnu.org/gnu/gengetopt/gengetopt-2.23.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/gengetopt/gengetopt-2.23.tar.xz"
   sha256 "b941aec9011864978dd7fdeb052b1943535824169d2aa2b0e7eae9ab807584ac"
+  license "GPL-3.0-or-later"
 
   on_system :linux, macos: :ventura_or_newer do
     depends_on "texinfo" => :build
@@ -28,8 +29,8 @@ class Gengetopt < Formula
     EOS
 
     pipe_output("#{bin}/gengetopt --file-name=test", ggo, 0)
-    assert_predicate testpath/"test.h", :exist?
-    assert_predicate testpath/"test.c", :exist?
+    assert_path_exists testpath/"test.h"
+    assert_path_exists testpath/"test.c"
     assert_match(/verbose_given/, File.read("test.h"))
   end
 end

@@ -1,8 +1,8 @@
 class Tfsec < Formula
   desc "Static analysis security scanner for your terraform code"
   homepage "https://aquasecurity.github.io/tfsec/latest/"
-  url "https://github.com/aquasecurity/tfsec/archive/refs/tags/v1.28.10.tar.gz"
-  sha256 "7eb194c8e489f198126a3e322e8b4a43226a50e544c43b6aefb6f6c4ae836e21"
+  url "https://github.com/aquasecurity/tfsec/archive/refs/tags/v1.28.14.tar.gz"
+  sha256 "61fe8ee670cceaf45d85c2789da66616d0045f8dbba4ec2b9db453436f9b9804"
   license "MIT"
   head "https://github.com/aquasecurity/tfsec.git", branch: "master"
 
@@ -10,7 +10,6 @@ class Tfsec < Formula
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
-
 
   depends_on "go" => :build
 
@@ -20,19 +19,19 @@ class Tfsec < Formula
   end
 
   test do
-    (testpath/"good/brew-validate.tf").write <<~EOS
+    (testpath/"good/brew-validate.tf").write <<~HCL
       resource "aws_alb_listener" "my-alb-listener" {
         port     = "443"
         protocol = "HTTPS"
       }
-    EOS
-    (testpath/"bad/brew-validate.tf").write <<~EOS
+    HCL
+    (testpath/"bad/brew-validate.tf").write <<~HCL
       resource "aws_security_group_rule" "world" {
         description = "A security group triggering tfsec AWS006."
         type        = "ingress"
         cidr_blocks = ["0.0.0.0/0"]
       }
-    EOS
+    HCL
 
     good_output = shell_output("#{bin}/tfsec #{testpath}/good")
     assert_match "No problems detected!", good_output

@@ -2,11 +2,12 @@ class Bison < Formula
   desc "Parser generator"
   homepage "https://www.gnu.org/software/bison/"
   # X.Y.9Z are beta releases that sometimes get accidentally uploaded to the release FTP
-  url "https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz"
-  mirror "https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz"
+  url "https://ftpmirror.gnu.org/gnu/bison/bison-3.8.2.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz"
   sha256 "9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2"
   license "GPL-3.0-or-later"
   version_scheme 1
+  compatibility_version 1
 
   keg_only :provided_by_macos
 
@@ -45,7 +46,7 @@ class Bison < Formula
     EOS
     system bin/"bison", "test.y"
     system ENV.cxx, "test.tab.c", "-o", "test"
-    assert_equal "pass", shell_output("echo \"((()(())))()\" | ./test")
-    assert_equal "fail", shell_output("echo \"())\" | ./test")
+    assert_equal "pass", pipe_output("./test", "((()(())))()\n", 0)
+    assert_equal "fail", pipe_output("./test", "())\n", 0)
   end
 end

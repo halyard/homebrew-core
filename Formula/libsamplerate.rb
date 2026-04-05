@@ -4,31 +4,38 @@ class Libsamplerate < Formula
   url "https://github.com/libsndfile/libsamplerate/archive/refs/tags/0.2.2.tar.gz"
   sha256 "16e881487f184250deb4fcb60432d7556ab12cb58caea71ef23960aec6c0405a"
   license "BSD-2-Clause"
-
+  compatibility_version 1
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
+
+  # Fix CMake deprecation warning CMP0091 (prereq for cmake 4 compatibility fix below)
+  # PR ref: https://github.com/libsndfile/libsamplerate/pull/180
+  patch do
+    url "https://github.com/libsndfile/libsamplerate/commit/e4a0ab46887029e0f65f145ba3987cc592f18200.patch?full_index=1"
+    sha256 "0826fb59d733188645f3dc207c938580970700381b9bc87058b137723cb30bba"
+  end
+  # Fix to cmake 4 compatibility
+  # PR ref: https://github.com/libsndfile/libsamplerate/pull/225
+  patch do
+    url "https://github.com/libsndfile/libsamplerate/commit/1abc639420b2df8b9ff2e0bdcc28cf6613c7c0d0.patch?full_index=1"
+    sha256 "b6fb61c763a0f072ef2ebb3a311037d2429a5e294141f6d5e552ccd25efabdc0"
+  end
 
   def install
-    system "cmake", "-S", ".", "-B", "build/shared",
-      *std_cmake_args,
-      "-DBUILD_SHARED_LIBS=ON",
-      "-DLIBSAMPLERATE_EXAMPLES=OFF",
-      "-DBUILD_TESTING=OFF"
-    system "cmake", "--build", "build/shared"
-    system "cmake", "--build", "build/shared", "--target", "install"
+    args = ["-DLIBSAMPLERATE_EXAMPLES=OFF"]
 
-    system "cmake", "-S", ".", "-B", "build/static",
-      *std_cmake_args,
-      "-DBUILD_SHARED_LIBS=OFF",
-      "-DLIBSAMPLERATE_EXAMPLES=OFF",
-      "-DBUILD_TESTING=OFF"
-    system "cmake", "--build", "build/static"
-    system "cmake", "--build", "build/static", "--target", "install"
+    system "cmake", "-S", ".", "-B", "build_shared", "-DBUILD_SHARED_LIBS=ON", *args, *std_cmake_args
+    system "cmake", "--build", "build_shared"
+    system "cmake", "--install", "build_shared"
+
+    system "cmake", "-S", ".", "-B", "build_static", "-DBUILD_SHARED_LIBS=OFF", *args, *std_cmake_args
+    system "cmake", "--build", "build_static"
+    lib.install "build_static/src/libsamplerate.a"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <samplerate.h>
       int main() {
@@ -44,7 +51,7 @@ class Libsamplerate < Formula
         assert(res == 0);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{opt_lib}", "-lsamplerate", "-o", "test"
     system "./test"
   end

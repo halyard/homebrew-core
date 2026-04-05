@@ -1,15 +1,35 @@
 class Krb5 < Formula
   desc "Network authentication protocol"
   homepage "https://web.mit.edu/kerberos/"
-  url "https://kerberos.org/dist/krb5/1.21/krb5-1.21.3.tar.gz"
-  sha256 "b7a4cd5ead67fb08b980b21abd150ff7217e85ea320c9ed0c6dadd304840ad35"
-  license :cannot_represent
+  url "https://kerberos.org/dist/krb5/1.22/krb5-1.22.2.tar.gz"
+  sha256 "3243ffbc8ea4d4ac22ddc7dd2a1dc54c57874c40648b60ff97009763554eaf13"
+  # From Fedora: https://src.fedoraproject.org/rpms/krb5/blob/rawhide/f/krb5.spec
+  license all_of: [
+    "BSD-2-Clause",
+    "BSD-2-Clause-first-lines",
+    "BSD-3-Clause",
+    "BSD-4-Clause",
+    "Brian-Gladman-2-Clause",
+    "CMU-Mach-nodoc",
+    "FSFULLRWD",
+    "HPND",
+    "HPND-export2-US",
+    "HPND-export-US",
+    "HPND-export-US-acknowledgement",
+    "HPND-export-US-modify",
+    "ISC",
+    "MIT",
+    "MIT-CMU",
+    "OLDAP-2.8",
+    "OpenVision",
+    any_of: ["BSD-2-Clause", "GPL-2.0-or-later"],
+  ]
+  compatibility_version 1
 
   livecheck do
     url :homepage
     regex(/Current release: .*?>krb5[._-]v?(\d+(?:\.\d+)+)</i)
   end
-
 
   keg_only :provided_by_macos
 
@@ -18,13 +38,16 @@ class Krb5 < Formula
   uses_from_macos "bison" => :build
   uses_from_macos "libedit"
 
+  on_linux do
+    depends_on "keyutils"
+  end
+
   def install
     cd "src" do
-      system "./configure", *std_configure_args,
-                            "--disable-nls",
+      system "./configure", "--disable-nls",
                             "--disable-silent-rules",
                             "--without-system-verto",
-                            "--without-keyutils"
+                            *std_configure_args
       system "make"
       system "make", "install"
     end
@@ -32,7 +55,6 @@ class Krb5 < Formula
 
   test do
     system bin/"krb5-config", "--version"
-    assert_match include.to_s,
-      shell_output("#{bin}/krb5-config --cflags")
+    assert_match include.to_s, shell_output("#{bin}/krb5-config --cflags")
   end
 end

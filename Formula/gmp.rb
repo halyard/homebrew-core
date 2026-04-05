@@ -2,10 +2,11 @@ class Gmp < Formula
   desc "GNU multiple precision arithmetic library"
   homepage "https://gmplib.org/"
   # gmplib.org blocks GitHub server IPs, so it should not be the primary URL
-  url "https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz"
+  url "https://ftpmirror.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz"
   mirror "https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz"
   sha256 "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
   license any_of: ["LGPL-3.0-or-later", "GPL-2.0-or-later"]
+  compatibility_version 1
   head "https://gmplib.org/repo/gmp/", using: :hg
 
   livecheck do
@@ -51,7 +52,7 @@ class Gmp < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <gmp.h>
       #include <stdlib.h>
 
@@ -64,7 +65,7 @@ class Gmp < Formula
         if (mpz_get_si (j) != 5 || mpz_get_si (k) != 1) abort();
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-L#{lib}", "-lgmp", "-o", "test"
     system "./test"

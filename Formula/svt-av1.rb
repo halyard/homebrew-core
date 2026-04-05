@@ -1,16 +1,21 @@
 class SvtAv1 < Formula
   desc "AV1 encoder"
   homepage "https://gitlab.com/AOMediaCodec/SVT-AV1"
-  url "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v2.1.2/SVT-AV1-v2.1.2.tar.bz2"
-  sha256 "a1d95875f7539d49f7c8fdec0623fbf984804a168da6289705d53268e3b38412"
+  url "https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v4.1.0/SVT-AV1-v4.1.0.tar.bz2"
+  sha256 "184162d3db3a4448882b17230413b4938ca252eef6b3c5e2f1236b2fcf497881"
   license "BSD-3-Clause"
+  compatibility_version 1
   head "https://gitlab.com/AOMediaCodec/SVT-AV1.git", branch: "master"
-
 
   depends_on "cmake" => :build
   depends_on "nasm" => :build
 
   def install
+    # Features are enabled based on compiler support, and then the appropriate
+    # implementations are chosen at runtime.
+    # See https://gitlab.com/AOMediaCodec/SVT-AV1/-/blob/master/Source/Lib/Codec/common_dsp_rtcd.c
+    ENV.runtime_cpu_detection
+
     system "cmake", "-S", ".", "-B", "build", "-DCMAKE_INSTALL_RPATH=#{rpath}", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
@@ -24,6 +29,6 @@ class SvtAv1 < Formula
 
     testpath.install resource("homebrew-testvideo")
     system bin/"SvtAv1EncApp", "-w", "64", "-h", "64", "-i", "video_64x64_yuv420p_25frames.yuv", "-b", "output.ivf"
-    assert_predicate testpath/"output.ivf", :exist?
+    assert_path_exists testpath/"output.ivf"
   end
 end

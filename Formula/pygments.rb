@@ -3,13 +3,12 @@ class Pygments < Formula
 
   desc "Generic syntax highlighter"
   homepage "https://pygments.org/"
-  url "https://files.pythonhosted.org/packages/8e/62/8336eff65bcbc8e4cb5d05b55faf041285951b6e80f33e2bff2024788f31/pygments-2.18.0.tar.gz"
-  sha256 "786ff802f32e91311bff3889f6e9a86e81505fe99f2735bb6d60ae0c5004f199"
+  url "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152d655522fdcebac55e66de6603a76a02bca1b6414f6c/pygments-2.20.0.tar.gz"
+  sha256 "6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"
   license "BSD-2-Clause"
   head "https://github.com/pygments/pygments.git", branch: "master"
 
-
-  depends_on "python@3.12"
+  depends_on "python@3.14"
 
   def install
     virtualenv_install_with_resources
@@ -17,12 +16,12 @@ class Pygments < Formula
   end
 
   test do
-    (testpath/"test.py").write <<~EOS
+    (testpath/"test.py").write <<~PYTHON
       import os
       print(os.getcwd())
-    EOS
+    PYTHON
 
     system bin/"pygmentize", "-f", "html", "-o", "test.html", testpath/"test.py"
-    assert_predicate testpath/"test.html", :exist?
+    assert_path_exists testpath/"test.html"
   end
 end

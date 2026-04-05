@@ -6,7 +6,12 @@ cask "reikey" do
       verified: "bitbucket.org/objective-see/"
   name "ReiKey"
   desc "Scans, detects, and monitors keyboard taps"
-  homepage "https://objective-see.com/products/reikey.html"
+  homepage "https://objective-see.org/products/reikey.html"
+
+  livecheck do
+    url :homepage
+    regex(/href=.*?ReiKey[._-]v?(\d+(?:\.\d+)+)\.zip/i)
+  end
 
   installer script: {
     executable: "#{staged_path}/ReiKey Installer.app/Contents/MacOS/ReiKey Installer",

@@ -1,9 +1,10 @@
 class Freetds < Formula
   desc "Libraries to talk to Microsoft SQL Server and Sybase databases"
   homepage "https://www.freetds.org/"
-  url "https://www.freetds.org/files/stable/freetds-1.4.22.tar.bz2", using: :homebrew_curl
-  sha256 "a9a7f24f0a7a871617e76e8cc6e6556ae788042f1c006195665505499b2334b1"
+  url "https://www.freetds.org/files/stable/freetds-1.5.16.tar.bz2"
+  sha256 "bc4c8264e8656180eb53e7b08ffcdfca902ceab2dfc6b5c4ef4b2394a263ec42"
   license "GPL-2.0-or-later"
+  compatibility_version 1
 
   livecheck do
     url "https://www.freetds.org/files/stable/"
@@ -19,7 +20,7 @@ class Freetds < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "openssl@3"
   depends_on "unixodbc"
 
@@ -42,11 +43,8 @@ class Freetds < Formula
       --enable-odbc-wide
     ]
 
-    if build.head?
-      system "./autogen.sh", *args
-    else
-      system "./configure", *args
-    end
+    configure = build.head? ? "./autogen.sh" : "./configure"
+    system configure, *args
     system "make"
     ENV.deparallelize # Or fails to install on multi-core machines
     system "make", "install"

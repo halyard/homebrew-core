@@ -6,13 +6,11 @@ class Ykpers < Formula
   license "BSD-2-Clause"
   revision 2
 
-  livecheck do
-    url "https://developers.yubico.com/yubikey-personalization/Releases/"
-    regex(/href=.*?ykpers[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
+  # https://www.yubico.com/support/terms-conditions/yubico-end-of-life-policy/eol-products/
+  deprecate! date: "2025-11-22", because: :unmaintained, replacement_formula: "ykman"
+  disable! date: "2026-11-22", because: :unmaintained, replacement_formula: "ykman"
 
-
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "json-c"
   depends_on "libyubikey"
 
@@ -32,10 +30,11 @@ class Ykpers < Formula
   end
 
   def install
+    # Work around failure from GCC 10+ using default of `-fno-common`
+    ENV.append_to_cflags "-fcommon" if ENV.compiler.to_s.start_with?("gcc")
+
     args = %W[
-      --disable-dependency-tracking
       --disable-silent-rules
-      --prefix=#{prefix}
       --with-libyubikey-prefix=#{Formula["libyubikey"].opt_prefix}
     ]
     args << if OS.mac?
@@ -43,7 +42,7 @@ class Ykpers < Formula
     else
       "--with-backend=libusb-1.0"
     end
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "check"
     system "make", "install"
   end

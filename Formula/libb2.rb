@@ -4,11 +4,11 @@ class Libb2 < Formula
   url "https://github.com/BLAKE2/libb2/releases/download/v0.98.1/libb2-0.98.1.tar.gz"
   sha256 "53626fddce753c454a3fea581cbbc7fe9bbcf0bc70416d48fdbbf5d87ef6c72e"
   license "CC0-1.0"
-
+  compatibility_version 1
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/libtool/configure-big_sur.diff"
     sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
@@ -26,7 +26,7 @@ class Libb2 < Formula
   end
 
   test do
-    (testpath/"blake2test.c").write <<~EOS
+    (testpath/"blake2test.c").write <<~C
       #include <blake2.h>
       #include <stdio.h>
       #include <string.h>
@@ -53,7 +53,7 @@ class Libb2 < Formula
             return 1;
           }
       }
-    EOS
+    C
     system ENV.cc, "blake2test.c", "-L#{lib}", "-lb2", "-o", "b2test"
     system "./b2test"
   end

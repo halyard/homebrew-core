@@ -1,13 +1,14 @@
 class Coreutils < Formula
   desc "GNU File, Shell, and Text utilities"
   homepage "https://www.gnu.org/software/coreutils/"
-  url "https://ftp.gnu.org/gnu/coreutils/coreutils-9.5.tar.xz"
-  mirror "https://ftpmirror.gnu.org/coreutils/coreutils-9.5.tar.xz"
-  sha256 "cd328edeac92f6a665de9f323c93b712af1858bc2e0d88f3f7100469470a1b8a"
+  url "https://ftpmirror.gnu.org/gnu/coreutils/coreutils-9.10.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/coreutils/coreutils-9.10.tar.xz"
+  sha256 "16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25"
   license "GPL-3.0-or-later"
+  compatibility_version 1
 
   head do
-    url "https://git.savannah.gnu.org/git/coreutils.git"
+    url "https://git.savannah.gnu.org/git/coreutils.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -21,20 +22,18 @@ class Coreutils < Formula
   depends_on "gmp"
   uses_from_macos "gperf" => :build
 
-  on_macos do
-    conflicts_with "uutils-coreutils", because: "coreutils and uutils-coreutils install the same binaries"
+  on_sonoma :or_older do
+    conflicts_with "md5sha1sum", because: "both install `md5sum` and `sha1sum` binaries"
   end
 
   on_linux do
+    depends_on "acl"
     depends_on "attr"
   end
 
-  conflicts_with "aardvark_shell_utils", because: "both install `realpath` binaries"
   conflicts_with "b2sum", because: "both install `b2sum` binaries"
-  conflicts_with "ganglia", because: "both install `gstat` binaries"
   conflicts_with "gfold", because: "both install `gfold` binaries"
   conflicts_with "idutils", because: "both install `gid` and `gid.1`"
-  conflicts_with "md5sha1sum", because: "both install `md5sum` and `sha1sum` binaries"
 
   # https://github.com/Homebrew/homebrew-core/pull/36494
   def breaks_macos_users
@@ -42,6 +41,7 @@ class Coreutils < Formula
   end
 
   def install
+    ENV.runtime_cpu_detection
     system "./bootstrap" if build.head?
 
     args = %W[
@@ -73,7 +73,7 @@ class Coreutils < Formula
     end
     # Symlink all man(1) pages into libexec/gnuman without the 'g' prefix
     coreutils_filenames(man1).each do |cmd|
-      (libexec/"gnuman"/"man1").install_symlink man1/"g#{cmd}" => cmd
+      (libexec/"gnuman/man1").install_symlink man1/"g#{cmd}" => cmd
     end
     (libexec/"gnubin").install_symlink "../gnuman" => "man"
 

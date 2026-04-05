@@ -1,44 +1,48 @@
 class BdwGc < Formula
   desc "Garbage collector for C and C++"
   homepage "https://www.hboehm.info/gc/"
-  url "https://github.com/ivmai/bdwgc/releases/download/v8.2.6/gc-8.2.6.tar.gz"
-  sha256 "b9183fe49d4c44c7327992f626f8eaa1d8b14de140f243edb1c9dcff7719a7fc"
+  url "https://github.com/bdwgc/bdwgc/releases/download/v8.2.12/gc-8.2.12.tar.gz"
+  sha256 "42e5194ad06ab6ffb806c83eb99c03462b495d979cda782f3c72c08af833cd4e"
   license "MIT"
+  compatibility_version 1
+  head "https://github.com/bdwgc/bdwgc.git", branch: "master"
 
   livecheck do
     url :stable
     strategy :github_latest
   end
 
-  head do
-    url "https://github.com/ivmai/bdwgc.git", branch: "master"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool"  => :build
-  end
-
-  depends_on "libatomic_ops" => :build
-  depends_on "pkg-config" => :build
-
-  on_linux do
-    depends_on "gcc" => :test
-  end
+  depends_on "cmake" => :build
 
   def install
-    system "./autogen.sh" if build.head?
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--enable-cplusplus",
-                          "--enable-static",
-                          "--enable-large-config"
-    system "make"
-    system "make", "check"
-    system "make", "install"
+    args = %w[
+      -Denable_cplusplus=ON
+      -Denable_large_config=ON
+      -Dwithout_libatomic_ops=OFF
+      -Dwith_libatomic_ops=OFF
+    ]
+
+    system "cmake", "-S", ".", "-B", "build",
+                    "-Dbuild_tests=ON",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *args, *std_cmake_args,
+                    "-DBUILD_TESTING=ON" # Pass this *after* `std_cmake_args`
+    system "cmake", "--build", "build"
+    system "ctest", "--test-dir", "build",
+                    "--parallel", ENV.make_jobs,
+                    "--rerun-failed",
+                    "--output-on-failure",
+                    "--repeat", "until-pass:3"
+    system "cmake", "--install", "build"
+
+    system "cmake", "-S", ".", "-B", "build-static", "-DBUILD_SHARED_LIBS=OFF", *args, *std_cmake_args
+    system "cmake", "--build", "build-static"
+    lib.install buildpath.glob("build-static/*.a")
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <assert.h>
       #include <stdio.h>
       #include "gc.h"
@@ -57,7 +61,7 @@ class BdwGc < Formula
         }
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lgc", "-o", "test"
     system "./test"

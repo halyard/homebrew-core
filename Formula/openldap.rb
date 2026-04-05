@@ -1,23 +1,24 @@
 class Openldap < Formula
   desc "Open source suite of directory software"
   homepage "https://www.openldap.org/software/"
-  url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.8.tgz"
-  mirror "http://fresh-center.net/linux/misc/openldap-2.6.8.tgz"
-  mirror "http://fresh-center.net/linux/misc/legacy/openldap-2.6.8.tgz"
-  sha256 "48969323e94e3be3b03c6a132942dcba7ef8d545f2ad35401709019f696c3c4e"
+  url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.13.tgz"
+  mirror "http://fresh-center.net/linux/misc/openldap-2.6.13.tgz"
+  mirror "http://fresh-center.net/linux/misc/legacy/openldap-2.6.13.tgz"
+  sha256 "d693b49517a42efb85a1a364a310aed16a53d428d1b46c0d31ef3fba78fcb656"
   license "OLDAP-2.8"
+  compatibility_version 1
 
   livecheck do
     url "https://www.openldap.org/software/download/OpenLDAP/openldap-release/"
     regex(/href=.*?openldap[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   keg_only :provided_by_macos
 
   depends_on "openssl@3"
 
   uses_from_macos "mandoc" => :build
+  uses_from_macos "cyrus-sasl"
 
   on_linux do
     depends_on "util-linux"
@@ -25,7 +26,7 @@ class Openldap < Formula
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/libtool/configure-big_sur.diff"
     sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
@@ -50,9 +51,11 @@ class Openldap < Formula
       --enable-refint
       --enable-retcode
       --enable-seqmod
+      --enable-sssvlv
       --enable-translucent
       --enable-unique
       --enable-valsort
+      --with-cyrus-sasl
       --without-systemd
     ]
 
@@ -78,7 +81,7 @@ class Openldap < Formula
     # Passing `build.bottle?` ensures that inreplace failures result in build failures
     # only when building a bottle. This helps avoid problems for users who build from source
     # and may have an old version of these files in `etc`.
-    inreplace etc.glob("openldap/slapd.{conf,ldif}"), prefix, opt_prefix, build.bottle?
+    inreplace etc.glob("openldap/slapd.{conf,ldif}"), prefix, opt_prefix, audit_result: build.bottle?
   end
 
   test do

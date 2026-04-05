@@ -4,12 +4,12 @@ class Libsndfile < Formula
   url "https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2.tar.xz"
   sha256 "3799ca9924d3125038880367bf1468e53a1b7e3686a934f098b7e1d286cdb80e"
   license "LGPL-2.1-or-later"
-
+  revision 1
+  compatibility_version 1
   livecheck do
     url :stable
     strategy :github_latest
   end
-
 
   depends_on "cmake" => :build
   depends_on "flac"
@@ -19,7 +19,7 @@ class Libsndfile < Formula
   depends_on "mpg123"
   depends_on "opus"
 
-  uses_from_macos "python" => :build, since: :catalina
+  uses_from_macos "python" => :build
 
   def install
     args = %W[
@@ -29,12 +29,13 @@ class Libsndfile < Formula
       -DBUILD_EXAMPLES=OFF
       -DCMAKE_INSTALL_RPATH=#{rpath}
       -DPYTHON_EXECUTABLE=#{which("python3")}
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     ]
 
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DBUILD_SHARED_LIBS=ON", *args
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
-    system "cmake", "-S", ".", "-B", "static", *std_cmake_args, "-DBUILD_SHARED_LIBS=OFF", *args
+    system "cmake", "-S", ".", "-B", "static", "-DBUILD_SHARED_LIBS=OFF", *args, *std_cmake_args
     system "cmake", "--build", "static"
     lib.install "static/libsndfile.a"
   end

@@ -1,39 +1,32 @@
 class Libuv < Formula
   desc "Multi-platform support library with a focus on asynchronous I/O"
-  homepage "https://libuv.org"
-  url "https://github.com/libuv/libuv/archive/refs/tags/v1.48.0.tar.gz"
-  sha256 "8c253adb0f800926a6cbd1c6576abae0bc8eb86a4f891049b72f9e5b7dc58f33"
+  homepage "https://libuv.org/"
+  url "https://dist.libuv.org/dist/v1.52.1/libuv-v1.52.1.tar.gz"
+  sha256 "66d511b9e6e334c0e62279eb234fbfb2b3110b1479c09b95b44c7afca8cff9e7"
   license "MIT"
+  compatibility_version 1
   head "https://github.com/libuv/libuv.git", branch: "v1.x"
 
   livecheck do
-    url :stable
+    url :head
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "cmake" => :build
   depends_on "sphinx-doc" => :build
 
   def install
     # This isn't yet handled by the make install process sadly.
-    cd "docs" do
-      system "make", "man"
-      man1.install "build/man/libuv.1"
-    end
+    system "make", "-C", "docs", "man"
+    man1.install "docs/build/man/libuv.1"
 
-    system "./autogen.sh"
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules"
-    system "make"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <uv.h>
       #include <stdlib.h>
 
@@ -45,7 +38,7 @@ class Libuv < Formula
         free(loop);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-luv", "-o", "test"
     system "./test"
   end

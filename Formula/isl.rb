@@ -7,8 +7,8 @@ class Isl < Formula
   # package detection.
   desc "Integer Set Library for the polyhedral model"
   homepage "https://libisl.sourceforge.io/"
-  url "https://libisl.sourceforge.io/isl-0.26.tar.xz"
-  sha256 "a0b5cb06d24f9fa9e77b55fabbe9a3c94a336190345c2555f9915bb38e976504"
+  url "https://libisl.sourceforge.io/isl-0.27.tar.xz"
+  sha256 "6d8babb59e7b672e8cb7870e874f3f7b813b6e00e6af3f8b04f7579965643d5c"
   license "MIT"
 
   livecheck do
@@ -16,9 +16,8 @@ class Isl < Formula
     regex(/href=.*?isl[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   head do
-    url "https://repo.or.cz/isl.git"
+    url "https://repo.or.cz/isl.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -40,7 +39,7 @@ class Isl < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <isl/ctx.h>
 
       int main()
@@ -49,7 +48,7 @@ class Isl < Formula
         isl_ctx_free(ctx);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lisl", "-o", "test"
     system "./test"
   end

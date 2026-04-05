@@ -1,9 +1,10 @@
 class Tesseract < Formula
   desc "OCR (Optical Character Recognition) engine"
-  homepage "https://github.com/tesseract-ocr/"
-  url "https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.4.1.tar.gz"
-  sha256 "c4bc2a81c12a472f445b7c2fb4705a08bd643ef467f51ec84f0e148bd368051b"
+  homepage "https://tesseract-ocr.github.io/"
+  url "https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.5.2.tar.gz"
+  sha256 "6235ea0dae45ea137f59c09320406f5888383741924d98855bd2ce0d16b54f21"
   license "Apache-2.0"
+  compatibility_version 1
   head "https://github.com/tesseract-ocr/tesseract.git", branch: "main"
 
   livecheck do
@@ -11,16 +12,15 @@ class Tesseract < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "cairo"
   depends_on "fontconfig"
   depends_on "glib"
   depends_on "harfbuzz"
-  depends_on "icu4c"
+  depends_on "icu4c@78"
   depends_on "leptonica"
   depends_on "libarchive"
   depends_on "pango"
@@ -29,8 +29,6 @@ class Tesseract < Formula
     depends_on "freetype"
     depends_on "gettext"
   end
-
-  fails_with gcc: "5"
 
   resource "eng" do
     url "https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/eng.traineddata"
@@ -55,9 +53,9 @@ class Tesseract < Formula
     ENV.cxx11
 
     system "./autogen.sh"
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking",
-                          "--datarootdir=#{HOMEBREW_PREFIX}/share"
+    system "./configure", "--datarootdir=#{HOMEBREW_PREFIX}/share",
+                          "--disable-silent-rules",
+                          *std_configure_args
 
     system "make", "training"
 

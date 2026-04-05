@@ -22,6 +22,8 @@ class Gd < Formula
   depends_on "libtiff"
   depends_on "webp"
 
+  conflicts_with "mummer", because: "both install `annotate` binaries"
+
   # revert breaking changes in 2.3.3, remove in next release
   patch do
     url "https://github.com/libgd/libgd/commit/f4bc1f5c26925548662946ed7cfa473c190a104a.patch?full_index=1"
@@ -44,7 +46,7 @@ class Gd < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include "gd.h"
       #include <stdio.h>
 
@@ -63,7 +65,7 @@ class Gd < Formula
         fclose(pngout);
         gdImageDestroy(im);
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lgd", "-o", "test"
     system "./test"
     assert_path_exists "#{testpath}/test.png"

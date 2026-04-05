@@ -10,9 +10,8 @@ class Libtermkey < Formula
     regex(/href=.*?libtermkey[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "unibilium"
 
   uses_from_macos "ncurses"
@@ -26,7 +25,7 @@ class Libtermkey < Formula
     system "make", "install", "PREFIX=#{prefix}"
   end
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <termkey.h>
       #include <stdio.h>
 
@@ -40,7 +39,7 @@ class Libtermkey < Formula
         printf("libtermkey initialized and destroyed successfully\\n");
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test", "-L#{lib}", "-ltermkey", "-I#{include}"
     assert_match "libtermkey initialized and destroyed successfully", shell_output("./test")
   end

@@ -1,10 +1,11 @@
 class GnuTar < Formula
   desc "GNU version of the tar archiving utility"
   homepage "https://www.gnu.org/software/tar/"
-  url "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.gz"
-  mirror "https://ftpmirror.gnu.org/tar/tar-1.35.tar.gz"
+  url "https://ftpmirror.gnu.org/gnu/tar/tar-1.35.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.gz"
   sha256 "14d55e32063ea9526e057fbf35fcabd53378e769787eff7919c3755b02d2b57e"
   license "GPL-3.0-or-later"
+  compatibility_version 1
 
   head do
     url "https://git.savannah.gnu.org/git/tar.git", branch: "master"
@@ -46,7 +47,7 @@ class GnuTar < Formula
     # Symlink the executable into libexec/gnubin as "tar"
     (libexec/"gnubin").install_symlink bin/"gtar" => "tar"
     (libexec/"gnuman/man1").install_symlink man1/"gtar.1" => "tar.1"
-    libexec.install_symlink "gnuman" => "man"
+    (libexec/"gnubin").install_symlink "../gnuman" => "man"
   end
 
   def caveats

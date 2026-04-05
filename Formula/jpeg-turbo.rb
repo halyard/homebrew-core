@@ -1,16 +1,20 @@
 class JpegTurbo < Formula
   desc "JPEG image codec that aids compression and decompression"
   homepage "https://www.libjpeg-turbo.org/"
-  url "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.3/libjpeg-turbo-3.0.3.tar.gz"
-  sha256 "343e789069fc7afbcdfe44dbba7dbbf45afa98a15150e079a38e60e44578865d"
-  license "IJG"
+  url "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.4.1/libjpeg-turbo-3.1.4.1.tar.gz"
+  sha256 "ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022"
+  license all_of: [
+    "IJG", # libjpeg API library and programs
+    "Zlib", # libjpeg-turbo SIMD source code
+    "BSD-3-Clause", # TurboJPEG API library and programs
+  ]
+  compatibility_version 1
   head "https://github.com/libjpeg-turbo/libjpeg-turbo.git", branch: "main"
 
   livecheck do
     url :stable
     strategy :github_latest
   end
-
 
   depends_on "cmake" => :build
 
@@ -44,6 +48,10 @@ class JpegTurbo < Formula
     system "cmake", "--build", "build"
     system "ctest", "--test-dir", "build", "--rerun-failed", "--output-on-failure", "--parallel", ENV.make_jobs
     system "cmake", "--install", "build"
+
+    # Avoid rebuilding dependents that hard-code the prefix.
+    inreplace [lib/"pkgconfig/libjpeg.pc", lib/"pkgconfig/libturbojpeg.pc"],
+              prefix, opt_prefix
   end
 
   test do
@@ -52,6 +60,6 @@ class JpegTurbo < Formula
                            "-perfect",
                            "-outfile", "out.jpg",
                            test_fixtures("test.jpg")
-    assert_predicate testpath/"out.jpg", :exist?
+    assert_path_exists testpath/"out.jpg"
   end
 end

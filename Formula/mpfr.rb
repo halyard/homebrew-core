@@ -1,10 +1,12 @@
 class Mpfr < Formula
   desc "C library for multiple-precision floating-point computations"
   homepage "https://www.mpfr.org/"
-  url "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/mpfr/mpfr-4.2.1.tar.xz"
-  sha256 "277807353a6726978996945af13e52829e3abd7a9a5b7fb2793894e18f1fcbb2"
+  url "https://ftpmirror.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz"
+  sha256 "b67ba0383ef7e8a8563734e2e889ef5ec3c3b898a01d00fa0a6869ad81c6ce01"
   license "LGPL-3.0-or-later"
+  compatibility_version 1
+  head "https://gitlab.inria.fr/mpfr/mpfr.git", branch: "master"
 
   livecheck do
     url "https://www.mpfr.org/mpfr-current/"
@@ -23,28 +25,26 @@ class Mpfr < Formula
     end
   end
 
-
-  head do
-    url "https://gitlab.inria.fr/mpfr/mpfr.git", branch: "master"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "gmp"
+
+  on_system :linux, macos: :ventura_or_newer do
+    depends_on "texinfo" => :build
+  end
 
   def install
     system "./autogen.sh" if build.head?
 
-    system "./configure", *std_configure_args,
-                          "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make"
     system "make", "check"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <mpfr.h>
       #include <math.h>
       #include <stdlib.h>
@@ -62,7 +62,7 @@ class Mpfr < Formula
         if (strcmp("#{version}", mpfr_get_version())) abort();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-L#{Formula["gmp"].opt_lib}",
                    "-lgmp", "-lmpfr", "-o", "test"
     system "./test"

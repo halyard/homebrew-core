@@ -1,15 +1,16 @@
 class Opus < Formula
   desc "Audio codec"
   homepage "https://www.opus-codec.org/"
-  url "https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.5.2.tar.gz"
-  sha256 "65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1"
+  url "https://ftp.osuosl.org/pub/xiph/releases/opus/opus-1.6.1.tar.gz"
+  mirror "https://github.com/xiph/opus/releases/download/v1.6.1/opus-1.6.1.tar.gz"
+  sha256 "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1"
   license "BSD-3-Clause"
+  compatibility_version 1
 
   livecheck do
     url "https://ftp.osuosl.org/pub/xiph/releases/opus/"
     regex(%r{href=(?:["']?|.*?/)opus[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
-
 
   head do
     url "https://gitlab.xiph.org/xiph/opus.git", branch: "main"
@@ -21,13 +22,12 @@ class Opus < Formula
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-doc", "--prefix=#{prefix}"
+    system "./configure", "--disable-doc", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <opus.h>
 
       int main(int argc, char **argv)
@@ -51,7 +51,7 @@ class Opus < Formula
         }
         return err;
       }
-    EOS
+    CPP
     system ENV.cxx, "-I#{include}/opus", testpath/"test.cpp",
            "-L#{lib}", "-lopus", "-o", "test"
     system "./test"

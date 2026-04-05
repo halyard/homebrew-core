@@ -1,10 +1,10 @@
 class Libass < Formula
   desc "Subtitle renderer for the ASS/SSA subtitle format"
   homepage "https://github.com/libass/libass"
-  url "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz"
-  sha256 "eae425da50f0015c21f7b3a9c7262a910f0218af469e22e2931462fed3c50959"
+  url "https://github.com/libass/libass/releases/download/0.17.4/libass-0.17.4.tar.xz"
+  sha256 "78f1179b838d025e9c26e8fef33f8092f65611444ffa1bfc0cfac6a33511a05a"
   license "ISC"
-
+  compatibility_version 1
 
   head do
     url "https://github.com/libass/libass.git", branch: "master"
@@ -14,7 +14,7 @@ class Libass < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "freetype"
   depends_on "fribidi"
   depends_on "harfbuzz"
@@ -29,19 +29,16 @@ class Libass < Formula
   end
 
   def install
-    system "autoreconf", "-i" if build.head?
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-    ]
     # libass uses coretext on macOS, fontconfig on Linux
-    args << "--disable-fontconfig" if OS.mac?
-    system "./configure", *args
+    args = OS.mac? ? ["--disable-fontconfig"] : []
+
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include "ass/ass.h"
       int main() {
         ASS_Library *library;
@@ -63,7 +60,7 @@ class Libass < Formula
           return 1;
         }
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp", "-I#{include}", "-L#{lib}", "-lass", "-o", "test"
     system "./test"
   end

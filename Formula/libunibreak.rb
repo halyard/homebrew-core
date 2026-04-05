@@ -4,6 +4,7 @@ class Libunibreak < Formula
   url "https://github.com/adah1972/libunibreak/releases/download/libunibreak_6_1/libunibreak-6.1.tar.gz"
   sha256 "cc4de0099cf7ff05005ceabff4afed4c582a736abc38033e70fdac86335ce93f"
   license "Zlib"
+  compatibility_version 1
 
   livecheck do
     url :stable
@@ -13,14 +14,13 @@ class Libunibreak < Formula
     end
   end
 
-
   def install
     system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <unibreakbase.h>
       #include <linebreak.h>
       #include <assert.h>
@@ -43,7 +43,7 @@ class Libunibreak < Formula
 
         return memcmp(output, expected, sizeof(output)) != 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-I#{include}",
                    "-L#{lib}", "-lunibreak"
     system "./test"

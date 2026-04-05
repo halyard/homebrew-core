@@ -8,17 +8,17 @@ class Aribb24 < Formula
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libpng"
 
   def install
     system "./bootstrap"
-    system "./configure", *std_configure_args, "--disable-silent-rules"
+    system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <aribb24/aribb24.h>
       #include <stdlib.h>
       int main() {
@@ -28,7 +28,7 @@ class Aribb24 < Formula
         arib_instance_destroy(ptr);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-o", "test", "test.c", "-I#{include}",
                    "-L#{lib}", "-laribb24"
     system "./test"

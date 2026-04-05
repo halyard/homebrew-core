@@ -1,16 +1,16 @@
 class Libvorbis < Formula
-  desc "Vorbis General Audio Compression Codec"
+  desc "Vorbis general audio compression codec"
   homepage "https://xiph.org/vorbis/"
-  url "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz", using: :homebrew_curl
-  mirror "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.xz"
+  url "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.xz"
+  mirror "https://github.com/xiph/vorbis/releases/download/v1.3.7/libvorbis-1.3.7.tar.xz"
   sha256 "b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b"
   license "BSD-3-Clause"
+  compatibility_version 1
 
   livecheck do
     url "https://ftp.osuosl.org/pub/xiph/releases/vorbis/?C=M&O=D"
-    regex(/href=.*?libvorbis[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    regex(%r{href=(?:["']?|.*?/)libvorbis[._-]v?(\d+(?:\.\d+)+)\.t}i)
   end
-
 
   head do
     url "https://gitlab.xiph.org/xiph/vorbis.git", branch: "master"
@@ -20,7 +20,7 @@ class Libvorbis < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libogg"
 
   resource("oggfile") do
@@ -31,13 +31,12 @@ class Libvorbis < Formula
   def install
     system "./autogen.sh" if build.head?
     inreplace "configure", " -force_cpusubtype_ALL", ""
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <assert.h>
       #include "vorbis/vorbisfile.h"
@@ -49,7 +48,7 @@ class Libvorbis < Formula
         printf("Encoded by: %s\\n", ov_comment(&vf,-1)->vendor);
         return 0;
       }
-    EOS
+    C
     testpath.install resource("oggfile")
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lvorbisfile",
                    "-o", "test"

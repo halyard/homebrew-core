@@ -1,23 +1,46 @@
 class Openblas < Formula
   desc "Optimized BLAS library"
   homepage "https://www.openblas.net/"
-  url "https://github.com/xianyi/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz"
-  sha256 "aa2d68b1564fe2b13bc292672608e9cdeeeb6dc34995512e65c3b10f4599e897"
-  license "BSD-3-Clause"
-  head "https://github.com/xianyi/OpenBLAS.git", branch: "develop"
+  url "https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.32.tar.gz"
+  sha256 "f8a1138e01fddca9e4c29f9684fd570ba39dedc9ca76055e1425d5d4b1a4a766"
+  # The main license is BSD-3-Clause. Additionally,
+  # 1. OpenBLAS is based on GotoBLAS2 so some code is under original BSD-2-Clause-Views
+  # 2. lapack-netlib/ is a bundled LAPACK so it is BSD-3-Clause-Open-MPI
+  # 3. interface/{gemmt.c,sbgemmt.c} is BSD-2-Clause
+  # 4. relapack/ is MIT but license is omitted as it is not enabled
+  license all_of: ["BSD-3-Clause", "BSD-2-Clause-Views", "BSD-3-Clause-Open-MPI", "BSD-2-Clause"]
+  compatibility_version 1
+  head "https://github.com/OpenMathLib/OpenBLAS.git", branch: "develop"
 
   livecheck do
     url :stable
     strategy :github_latest
   end
 
-
   keg_only :shadowed_by_macos, "macOS provides BLAS in Accelerate.framework"
 
+  depends_on "pkgconf" => :test
   depends_on "gcc" # for gfortran
-  fails_with :clang
+
+  on_macos do
+    depends_on "libomp"
+  end
 
   def install
+    # Workaround to use Apple Clang, GCC gfortran and link to `libomp`. We do not
+    # want to link GCC's libgomp as it will cause dependents to mix multiple OpenMP:
+    # https://cpufun.substack.com/p/is-mixing-openmp-runtimes-safe
+    if ENV.compiler == :clang
+      inreplace "Makefile.install" do |s|
+        s.gsub! ":= -fopenmp", ":= -I#{Formula["libomp"].opt_include} -Xpreprocessor -fopenmp"
+        s.gsub! "+= -lgomp", "+= -L#{Formula["libomp"].opt_lib} -lomp"
+      end
+      inreplace "Makefile.system" do |s|
+        s.gsub! "+= -fopenmp", "+= -Xpreprocessor -fopenmp"
+        s.gsub! "+= -lgfortran", "+= -L#{Formula["gcc"].opt_lib}/gcc/current -lgfortran"
+      end
+    end
+
     ENV.runtime_cpu_detection
     ENV.deparallelize # build is parallel by default, but setting -j confuses it
 
@@ -38,7 +61,7 @@ class Openblas < Formula
     end
 
     # Apple Silicon does not support SVE
-    # https://github.com/xianyi/OpenBLAS/issues/4212
+    # https://github.com/OpenMathLib/OpenBLAS/issues/4212
     ENV["NO_SVE"] = "1" if Hardware::CPU.arm?
 
     # Must call in two steps
@@ -47,10 +70,19 @@ class Openblas < Formula
 
     lib.install_symlink shared_library("libopenblas") => shared_library("libblas")
     lib.install_symlink shared_library("libopenblas") => shared_library("liblapack")
+    pkgshare.install "cpp_thread_test"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    if OS.mac?
+      require "utils/linkage"
+      libgomp = Formula["gcc"].opt_lib/"gcc/current/libgomp.dylib"
+      libomp = Formula["libomp"].opt_lib/"libomp.dylib"
+      refute Utils.binary_linked_to_library?(lib/"libopenblas.dylib", libgomp), "Unwanted linkage to libgomp!"
+      assert Utils.binary_linked_to_library?(lib/"libopenblas.dylib", libomp), "Missing linkage to libomp!"
+    end
+
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <math.h>
@@ -70,9 +102,19 @@ class Openblas < Formula
         if (fabs(C[4]-21) > 1.e-5) abort();
         return 0;
       }
-    EOS
-    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lopenblas",
-                   "-o", "test"
+    C
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lopenblas", "-o", "test"
     system "./test"
+
+    cp_r pkgshare/"cpp_thread_test/.", testpath
+    ENV.prepend_path "PKG_CONFIG_PATH", lib/"pkgconfig" if OS.mac?
+    flags = shell_output("pkgconf --cflags --libs openblas").chomp.split
+    flags += %W[-L#{Formula["libomp"].lib} -lomp] if OS.mac?
+
+    %w[dgemm_thread_safety dgemv_thread_safety].each do |test|
+      inreplace "#{test}.cpp", '"../cblas.h"', '"cblas.h"'
+      system ENV.cxx, *ENV.cxxflags.to_s.split, "-std=c++11", "#{test}.cpp", "-o", test, *flags
+      system "./#{test}"
+    end
   end
 end

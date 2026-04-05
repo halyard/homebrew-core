@@ -1,6 +1,21 @@
 cask "discord" do
-  version "0.0.313"
-  sha256 "7902cfb70497db8f833b1bd0712dad14e308e8735879dc9c97f5391a7cd1eb0d"
+  on_catalina :or_older do
+    version "0.0.336"
+    sha256 "470fc7ad490d7ad42f01632af16dee69fbec6e3db7e3f79af4f2ee246e382398"
+
+    livecheck do
+      skip "Legacy version"
+    end
+  end
+  on_big_sur :or_newer do
+    version "0.0.383"
+    sha256 "f754bc96aa896cc1bf575a5389a4e7a13cd187ee6ed1c214dbeaf705eb8f2e25"
+
+    livecheck do
+      url "https://discord.com/api/download/stable?platform=osx"
+      strategy :header_match
+    end
+  end
 
   url "https://dl.discordapp.net/apps/osx/#{version}/Discord.dmg",
       verified: "dl.discordapp.net/"
@@ -8,21 +23,19 @@ cask "discord" do
   desc "Voice and text chat software"
   homepage "https://discord.com/"
 
-  livecheck do
-    url "https://discord.com/api/download/stable?platform=osx"
-    strategy :header_match
-  end
-
   auto_updates true
-  depends_on macos: ">= :catalina"
 
   app "Discord.app"
 
   zap trash: [
+    "~/Library/Application Support/com.apple.sharedfilelist/com.apple.LSSharedFileList.ApplicationRecentDocuments/com.hnc.discord.sfl*",
     "~/Library/Application Support/discord",
+    "~/Library/Application%20Support/discord",
     "~/Library/Caches/com.hnc.Discord",
     "~/Library/Caches/com.hnc.Discord.ShipIt",
     "~/Library/Cookies/com.hnc.Discord.binarycookies",
+    "~/Library/HTTPStorages/com.hnc.Discord",
+    "~/Library/HTTPStorages/com.hnc.Discord.binarycookies",
     "~/Library/Preferences/com.hnc.Discord.helper.plist",
     "~/Library/Preferences/com.hnc.Discord.plist",
     "~/Library/Saved Application State/com.hnc.Discord.savedState",

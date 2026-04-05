@@ -4,12 +4,12 @@ class Libyaml < Formula
   url "https://github.com/yaml/libyaml/archive/refs/tags/0.2.5.tar.gz"
   sha256 "fa240dbf262be053f3898006d502d514936c818e422afdcf33921c63bed9bf2e"
   license "MIT"
+  compatibility_version 1
 
   livecheck do
     url :stable
     strategy :github_latest
   end
-
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -22,7 +22,7 @@ class Libyaml < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <yaml.h>
 
       int main()
@@ -32,7 +32,7 @@ class Libyaml < Formula
         yaml_parser_delete(&parser);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lyaml", "-o", "test"
     system "./test"
   end

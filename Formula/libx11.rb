@@ -1,12 +1,12 @@
 class Libx11 < Formula
   desc "X.Org: Core X11 protocol client library"
   homepage "https://www.x.org/"
-  url "https://www.x.org/archive/individual/lib/libX11-1.8.9.tar.gz"
-  sha256 "57ca5f07d263788ad661a86f4139412e8b699662e6b60c20f1f028c25a935e48"
+  url "https://www.x.org/archive/individual/lib/libX11-1.8.13.tar.gz"
+  sha256 "acf0e7cd7541110e6330ecb539441a2d53061f386ec7be6906dfde0de2598470"
   license "MIT"
+  compatibility_version 1
 
-
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "util-macros" => :build
   depends_on "xtrans" => :build
   depends_on "libxcb"
@@ -27,13 +27,13 @@ class Libx11 < Formula
       --enable-specs=no
     ]
 
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <X11/Xlib.h>
       #include <stdio.h>
       int main() {
@@ -63,7 +63,7 @@ class Libx11 < Formula
 
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lX11", "-o", "test", "-I#{include}"
     system "./test"
   end

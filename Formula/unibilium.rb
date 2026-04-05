@@ -1,14 +1,18 @@
 class Unibilium < Formula
   desc "Very basic terminfo library"
   homepage "https://github.com/neovim/unibilium"
-  url "https://github.com/neovim/unibilium/archive/refs/tags/v2.1.1.tar.gz"
-  sha256 "6f0ee21c8605340cfbb458cbd195b4d074e6d16dd0c0e12f2627ca773f3cabf1"
+  url "https://github.com/neovim/unibilium/archive/refs/tags/v2.1.2.tar.gz"
+  sha256 "370ecb07fbbc20d91d1b350c55f1c806b06bf86797e164081ccc977fc9b3af7a"
   license "LGPL-3.0-or-later"
 
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
   depends_on "libtool" => :build
 
   def install
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
+
     # Check Homebrew ncurses terminfo if available.
     terminfo_dirs = [Formula["ncurses"].opt_share/"terminfo"]
 
@@ -31,7 +35,7 @@ class Unibilium < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <unibilium.h>
       #include <stdio.h>
 
@@ -43,7 +47,7 @@ class Unibilium < Formula
         printf("%s", unibi_terminfo_dirs);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "-I#{include}", "test.c", "-L#{lib}", "-lunibilium", "-o", "test"
     assert_match %r{\A#{Formula["ncurses"].opt_share}/terminfo:}o, shell_output("./test")
   end

@@ -1,14 +1,14 @@
 class Six < Formula
   desc "Python 2 and 3 compatibility utilities"
   homepage "https://github.com/benjaminp/six"
-  url "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz"
-  sha256 "1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
+  url "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz"
+  sha256 "ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"
   license "MIT"
-  revision 4
 
+  disable! date: "2025-10-16", because: "does not meet homebrew/core's requirements for Python library formulae"
 
-  depends_on "python@3.11" => [:build, :test]
   depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
 
   def pythons
     deps.map(&:to_formula).sort_by(&:version).select { |f| f.name.start_with?("python@") }
@@ -17,14 +17,12 @@ class Six < Formula
   def install
     pythons.each do |python|
       python_exe = python.opt_libexec/"bin/python"
-      build_isolation = python.version >= "3.12"
-      system python_exe, "-m", "pip", "install", *std_pip_args(build_isolation:), "."
+      system python_exe, "-m", "pip", "install", *std_pip_args(build_isolation: true), "."
     end
   end
 
   def caveats
     python_versions = pythons.map { |p| p.version.major_minor }
-                             .map(&:to_s)
                              .join(", ")
 
     <<~EOS
@@ -35,11 +33,11 @@ class Six < Formula
 
   test do
     pythons.each do |python|
-      system python.opt_libexec/"bin/python", "-c", <<~EOS
+      system python.opt_libexec/"bin/python", "-c", <<~PYTHON
         import six
         assert not six.PY2
         assert six.PY3
-      EOS
+      PYTHON
     end
   end
 end

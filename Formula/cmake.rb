@@ -1,11 +1,12 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  url "https://github.com/Kitware/CMake/releases/download/v3.30.2/cmake-3.30.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/cmake-3.30.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/cmake-3.30.2.tar.gz"
-  sha256 "46074c781eccebc433e98f0bbfa265ca3fd4381f245ca3b140e7711531d60db2"
+  url "https://github.com/Kitware/CMake/releases/download/v4.3.1/cmake-4.3.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/cmake-4.3.1.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/cmake-4.3.1.tar.gz"
+  sha256 "0798f4be7a1a406a419ac32db90c2956936fecbf50db3057d7af47d69a2d7edb"
   license "BSD-3-Clause"
+  compatibility_version 1
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
   # The "latest" release on GitHub has been an unstable version before, and
@@ -22,11 +23,7 @@ class Cmake < Formula
     depends_on "openssl@3"
   end
 
-  # The completions were removed because of problems with system bash
-
-  # The `with-qt` GUI option was removed due to circular dependencies if
-  # CMake is built with Qt support and Qt is built with MySQL support as MySQL uses CMake.
-  # For the GUI application please instead use `brew install --cask cmake`.
+  conflicts_with cask: "cmake-app"
 
   def install
     args = %W[
@@ -51,6 +48,9 @@ class Cmake < Formula
                                        "-DCMake_BUILD_LTO=ON"
     system "make"
     system "make", "install"
+
+    # Move ctest completion because of problems with macOS system bash 3
+    (share/"bash-completion/completions").install bash_completion/"ctest"
   end
 
   def caveats
@@ -61,7 +61,10 @@ class Cmake < Formula
   end
 
   test do
-    (testpath/"CMakeLists.txt").write("find_package(Ruby)")
+    (testpath/"CMakeLists.txt").write <<~CMAKE
+      cmake_minimum_required(VERSION #{version.major_minor})
+      find_package(Ruby)
+    CMAKE
     system bin/"cmake", "."
 
     # These should be supplied in a separate cmake-docs formula.

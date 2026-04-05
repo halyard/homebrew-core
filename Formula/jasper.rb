@@ -1,52 +1,53 @@
 class Jasper < Formula
   desc "Library for manipulating JPEG-2000 images"
   homepage "https://ece.engr.uvic.ca/~frodo/jasper/"
-  url "https://github.com/jasper-software/jasper/releases/download/version-4.2.4/jasper-4.2.4.tar.gz"
-  sha256 "6a597613d8d84c500b5b83bf0eec06cd3707c23d19957f70354ac2394c9914e7"
+  url "https://github.com/jasper-software/jasper/releases/download/version-4.2.9/jasper-4.2.9.tar.gz"
+  sha256 "f71cf643937a5fcaedcfeb30a22ba406912948ad4413148214df280afc425454"
   license "JasPer-2.0"
+  compatibility_version 1
 
   livecheck do
     url :stable
     regex(/^version[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-
   depends_on "cmake" => :build
   depends_on "jpeg-turbo"
 
   def install
-    mkdir "tmp_cmake" do
-      args = std_cmake_args
-      args << "-DJAS_ENABLE_DOC=OFF"
+    args = %w[
+      -DJAS_ENABLE_DOC=OFF
+      -DJAS_ENABLE_AUTOMATIC_DEPENDENCIES=OFF
+    ]
 
-      if OS.mac?
-        # Make sure macOS's GLUT.framework is used, not XQuartz or freeglut
-        # Reported to CMake upstream 4 Apr 2016 https://gitlab.kitware.com/cmake/cmake/issues/16045
-        glut_lib = "#{MacOS.sdk_path}/System/Library/Frameworks/GLUT.framework"
-        args << "-DGLUT_glut_LIBRARY=#{glut_lib}"
-      else
-        args << "-DJAS_ENABLE_OPENGL=OFF"
-      end
-
-      system "cmake", "..",
-        "-DJAS_ENABLE_AUTOMATIC_DEPENDENCIES=false",
-        "-DJAS_ENABLE_SHARED=ON",
-        *args
-      system "make"
-      system "make", "install"
-      system "make", "clean"
-
-      system "cmake", "..",
-        "-DJAS_ENABLE_SHARED=OFF",
-        *args
-      system "make"
-      lib.install "src/libjasper/libjasper.a"
+    args << if OS.mac?
+      # Make sure macOS's GLUT.framework is used, not XQuartz or freeglut
+      # Reported to CMake upstream 4 Apr 2016 https://gitlab.kitware.com/cmake/cmake/issues/16045
+      glut_lib = "#{MacOS.sdk_path}/System/Library/Frameworks/GLUT.framework"
+      "-DGLUT_glut_LIBRARY=#{glut_lib}"
+    else
+      "-DJAS_ENABLE_OPENGL=OFF"
     end
+
+    # Build in the parent of `buildpath` to avoid errors from upstream's in-source build detection.
+    system "cmake", "-S", ".", "-B", "../build-shared", "-DJAS_ENABLE_SHARED=ON", *args, *std_cmake_args
+    system "cmake", "--build", "../build-shared"
+    system "cmake", "--install", "../build-shared"
+
+    system "cmake", "-S", ".", "-B", "../build-static", "-DJAS_ENABLE_SHARED=OFF", *args, *std_cmake_args
+    system "cmake", "--build", "../build-static"
+    lib.install "../build-static/src/libjasper/libjasper.a"
+
+    # Move the build directories into `buildpath` so Homebrew captures log files properly.
+    buildpath.install ["../build-shared", "../build-static"]
+
+    # Avoid rebuilding dependents that hard-code the prefix.
+    inreplace lib/"pkgconfig/jasper.pc", prefix, opt_prefix
   end
 
   test do
     system bin/"jasper", "--input", test_fixtures("test.jpg"),
                          "--output", "test.bmp"
-    assert_predicate testpath/"test.bmp", :exist?
+    assert_path_exists testpath/"test.bmp"
   end
 end

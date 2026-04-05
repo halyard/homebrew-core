@@ -3,10 +3,11 @@ class Netpbm < Formula
   homepage "https://netpbm.sourceforge.net/"
   # Maintainers: Look at https://sourceforge.net/p/netpbm/code/HEAD/tree/
   # for stable versions and matching revisions.
-  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "4908"
-  version "11.02.09"
+  url "https://svn.code.sf.net/p/netpbm/code/stable", revision: "5175"
+  version "11.02.23"
   license "GPL-3.0-or-later"
   version_scheme 1
+  compatibility_version 1
   head "https://svn.code.sf.net/p/netpbm/code/trunk"
 
   livecheck do
@@ -15,17 +16,36 @@ class Netpbm < Formula
     strategy :page_match
   end
 
+  no_autobump! because: :incompatible_version_format
 
+  depends_on "pkgconf" => :build
   depends_on "jasper"
   depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
 
   uses_from_macos "flex" => :build
+  uses_from_macos "python" => :build
   uses_from_macos "libxml2"
-  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   conflicts_with "jbigkit", because: "both install `pbm.5` and `pgm.5` files"
+
+  resource "html" do
+    # Rolling release, latest revision also documents previous software versions
+    # NOTE: Keep "revision" and "version" in sync
+    url "https://svn.code.sf.net/p/netpbm/code/userguide", revision: "5177"
+    version "5177"
+
+    livecheck do
+      url "https://sourceforge.net/p/netpbm/code/HEAD/log/?path=/userguide"
+      regex(/\[r?(\d+)\]/i)
+      strategy :page_match
+    end
+  end
 
   def install
     cp "config.mk.in", "config.mk"
@@ -49,6 +69,7 @@ class Netpbm < Formula
         s.change_make_var! "CFLAGS_SHLIB", "-fPIC"
       end
     end
+    inreplace "buildtools/manpage.mk", "python", "python3"
 
     ENV.deparallelize
 
@@ -70,17 +91,28 @@ class Netpbm < Formula
       (lib/"pkgconfig").install "pkgconfig_template" => "netpbm.pc"
     end
 
-    # We don't run `make install`, so an unversioned library symlink is never generated.
-    # FIXME: Check whether we can call `make install` instead of creating this manually.
+    # Generate unversioned library symlink (upstream does not do this)
     libnetpbm = lib.glob(shared_library("libnetpbm", "*")).reject(&:symlink?).first.basename
     lib.install_symlink libnetpbm => shared_library("libnetpbm")
+
+    resource("html").stage buildpath/"userguide"
+    make_args = %W[
+      USERGUIDE=#{buildpath}/userguide
+      -f
+      #{buildpath}/buildtools/manpage.mk
+    ]
+    mkdir buildpath/"netpbmdoc" do
+      system "make", *make_args, "manpages"
+      [man1, man3, man5].map(&:mkpath)
+      system "make", "MANDIR=#{man}", *make_args, "installman"
+    end
   end
 
   test do
     fwrite = shell_output("#{bin}/pngtopam #{test_fixtures("test.png")} -alphapam")
     (testpath/"test.pam").write fwrite
     system bin/"pamdice", "test.pam", "-outstem", testpath/"testing"
-    assert_predicate testpath/"testing_0_0.pam", :exist?
+    assert_path_exists testpath/"testing_0_0.pam"
     (testpath/"test.xpm").write <<~EOS
       /* XPM */
       static char * favicon_xpm[] = {

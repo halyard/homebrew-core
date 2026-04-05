@@ -1,9 +1,10 @@
 class Dav1d < Formula
   desc "AV1 decoder targeted to be small and fast"
   homepage "https://code.videolan.org/videolan/dav1d"
-  url "https://code.videolan.org/videolan/dav1d/-/archive/1.4.3/dav1d-1.4.3.tar.bz2"
-  sha256 "2a7e68a17b22d1c060d31a7af84c8e033a145fca1d63ef36d57f0f39eb4dd0df"
+  url "https://code.videolan.org/videolan/dav1d/-/archive/1.5.3/dav1d-1.5.3.tar.bz2"
+  sha256 "e099f53253f6c247580c554d53a13f1040638f2066edc3c740e4c2f15174ce22"
   license "BSD-2-Clause"
+  compatibility_version 1
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
@@ -27,7 +28,7 @@ class Dav1d < Formula
     testpath.install resource("homebrew-00000000.ivf")
     system bin/"dav1d", "-i", testpath/"00000000.ivf", "-o", testpath/"00000000.md5"
 
-    assert_predicate (testpath/"00000000.md5"), :exist?
+    assert_path_exists (testpath/"00000000.md5")
     assert_match "0b31f7ae90dfa22cefe0f2a1ad97c620", (testpath/"00000000.md5").read
   end
 end

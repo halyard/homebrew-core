@@ -1,19 +1,18 @@
 class Libgit2AT17 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
-  homepage "https://libgit2.github.com/"
+  homepage "https://libgit2.org/"
   url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.7.2.tar.gz"
   sha256 "de384e29d7efc9330c6cdb126ebf88342b5025d920dcb7c645defad85195ea7f"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
 
-  livecheck do
-    url :stable
-    regex(/^v?(1\.7(?:\.\d+)+)$/i)
-  end
-
   keg_only :versioned_formula
 
+  # https://github.com/libgit2/libgit2/?tab=security-ov-file
+  deprecate! date: "2025-01-08", because: :unsupported
+  disable! date: "2026-01-08", because: :unsupported
+
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libssh2"
   depends_on "openssl@3"
 
@@ -30,7 +29,7 @@ class Libgit2AT17 < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <git2.h>
       #include <assert.h>
 
@@ -39,7 +38,7 @@ class Libgit2AT17 < Formula
         assert(options & GIT_FEATURE_SSH);
         return 0;
       }
-    EOS
+    C
     libssh2 = Formula["libssh2"]
     flags = %W[
       -I#{include}

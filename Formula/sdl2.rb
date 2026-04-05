@@ -1,16 +1,15 @@
 class Sdl2 < Formula
   desc "Low-level access to audio, keyboard, mouse, joystick, and graphics"
   homepage "https://www.libsdl.org/"
-  url "https://github.com/libsdl-org/SDL/releases/download/release-2.30.5/SDL2-2.30.5.tar.gz"
-  sha256 "f374f3fa29c37dfcc20822d4a7d7dc57e58924d1a5f2ad511bfab4c8193de63b"
+  url "https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10.tar.gz"
+  sha256 "5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165"
   license "Zlib"
+  compatibility_version 1
 
   livecheck do
     url :stable
-    regex(/release[._-](\d+(?:\.\d+)+)/i)
-    strategy :github_latest
+    regex(/^(?:release[._-])?v?(2(?:\.\d+)+)$/i)
   end
-
 
   head do
     url "https://github.com/libsdl-org/SDL.git", branch: "SDL2"
@@ -21,13 +20,17 @@ class Sdl2 < Formula
   end
 
   on_linux do
-    depends_on "pkg-config" => :build
-    depends_on "libice"
+    depends_on "mesa" => :build
+    depends_on "pkgconf" => :build
+    depends_on "alsa-lib"
+    depends_on "libx11"
     depends_on "libxcursor"
+    depends_on "libxext"
+    depends_on "libxfixes"
+    depends_on "libxi"
+    depends_on "libxrandr"
     depends_on "libxscrnsaver"
-    depends_on "libxxf86vm"
     depends_on "pulseaudio"
-    depends_on "xinput"
   end
 
   def install
@@ -52,7 +55,6 @@ class Sdl2 < Formula
         --enable-video-x11
         --enable-video-x11-scrnsaver
         --enable-video-x11-xcursor
-        --enable-video-x11-xinerama
         --enable-video-x11-xinput
         --enable-video-x11-xrandr
         --enable-video-x11-xshape

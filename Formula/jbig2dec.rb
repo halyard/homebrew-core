@@ -5,7 +5,6 @@ class Jbig2dec < Formula
   sha256 "a9705369a6633aba532693450ec802c562397e1b824662de809ede92f67aff21"
   license "AGPL-3.0-or-later"
 
-
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
@@ -31,6 +30,6 @@ class Jbig2dec < Formula
     resource("test").stage testpath
     output = shell_output("#{bin}/jbig2dec -t pbm --hash testJBIG2.jb2")
     assert_match "aa35470724c946c7e953ddd49ff5aab9f8289aaf", output
-    assert_predicate testpath/"testJBIG2.pbm", :exist?
+    assert_path_exists testpath/"testJBIG2.pbm"
   end
 end

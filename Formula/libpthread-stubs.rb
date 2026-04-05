@@ -5,16 +5,14 @@ class LibpthreadStubs < Formula
   sha256 "59da566decceba7c2a7970a4a03b48d9905f1262ff94410a649224e33d2442bc"
   license "MIT"
 
-
-  depends_on "pkg-config"
+  depends_on "pkgconf"
 
   def install
-    system "./configure", *std_configure_args.reject { |s| s["--disable-debug"] }
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "pkg-config", "--exists", "pthread-stubs"
-    assert_equal 0, $CHILD_STATUS.exitstatus
+    assert_equal version.to_s, shell_output("pkgconf --modversion pthread-stubs").chomp
   end
 end

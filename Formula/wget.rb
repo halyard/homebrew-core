@@ -1,24 +1,22 @@
 class Wget < Formula
   desc "Internet file retriever"
   homepage "https://www.gnu.org/software/wget/"
-  url "https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz"
-  sha256 "fa2dc35bab5184ecbc46a9ef83def2aaaa3f4c9f3c97d4bd19dcb07d4da637de"
+  url "https://ftpmirror.gnu.org/gnu/wget/wget-1.25.0.tar.gz"
+  sha256 "766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784"
   license "GPL-3.0-or-later"
-
+  compatibility_version 1
 
   head do
-    url "https://git.savannah.gnu.org/git/wget.git"
+    url "https://git.savannah.gnu.org/git/wget.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "xz" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libidn2"
   depends_on "openssl@3"
-
-  uses_from_macos "zlib"
 
   on_macos do
     depends_on "gettext"
@@ -27,6 +25,7 @@ class Wget < Formula
 
   on_linux do
     depends_on "util-linux"
+    depends_on "zlib-ng-compat"
   end
 
   def install
@@ -43,6 +42,6 @@ class Wget < Formula
   end
 
   test do
-    system bin/"wget", "-O", "/dev/null", "https://google.com"
+    system bin/"wget", "-O", File::NULL, "https://google.com"
   end
 end

@@ -1,31 +1,32 @@
 class PinentryMac < Formula
   desc "Pinentry for GPG on Mac"
   homepage "https://github.com/GPGTools/pinentry"
-  url "https://github.com/GPGTools/pinentry/archive/refs/tags/v1.1.1.1.tar.gz"
-  sha256 "1a414f2e172cf8c18a121e60813413f27aedde891c5955151fbf8d50c46a9098"
+  url "https://github.com/GPGTools/pinentry/archive/refs/tags/v1.3.1.1.tar.gz"
+  sha256 "ba929dd1c57b102fbfca12bc2d784be441498e7c82ee97a1231cbe03dcda7ae9"
   license all_of: ["GPL-2.0-or-later", "GPL-3.0-or-later"]
   head "https://github.com/GPGTools/pinentry.git", branch: "master"
 
-
   depends_on "autoconf" => :build
   depends_on "automake" => :build
+  depends_on "gettext" => :build
   depends_on "libtool" => :build
-  depends_on xcode: :build
-  depends_on "gettext"
+  depends_on xcode: :build # for ibtool
   depends_on "libassuan"
+  depends_on "libgpg-error"
   depends_on :macos
 
-  on_ventura :or_newer do
-    depends_on "texinfo" => :build
-  end
-
   def install
-    system "autoreconf", "-fiv"
-    system "autoconf"
-    system "./configure", "--disable-ncurses", "--enable-maintainer-mode"
+    ENV.append_path "ACLOCAL_PATH", Formula["gettext"].pkgshare/"m4"
+
+    system "./autogen.sh"
+    system "./configure", "--disable-doc",
+                          "--disable-ncurses",
+                          "--disable-silent-rules",
+                          "--enable-maintainer-mode",
+                          *std_configure_args
     system "make"
     prefix.install "macosx/pinentry-mac.app"
-    bin.write_exec_script "#{prefix}/pinentry-mac.app/Contents/MacOS/pinentry-mac"
+    bin.write_exec_script prefix/"pinentry-mac.app/Contents/MacOS/pinentry-mac"
   end
 
   def caveats

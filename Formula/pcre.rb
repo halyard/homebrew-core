@@ -1,19 +1,10 @@
 class Pcre < Formula
   desc "Perl compatible regular expressions library"
   homepage "https://www.pcre.org/"
+  url "https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.exim.org/pub/pcre/pcre-8.45.tar.bz2"
+  sha256 "4dae6fdcd2bb0bb6c37b5f97c33c2be954da743985369cddac3546e3218bffb8"
   license "BSD-3-Clause"
-
-  stable do
-    url "https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2"
-    mirror "https://www.mirrorservice.org/sites/ftp.exim.org/pub/pcre/pcre-8.45.tar.bz2"
-    sha256 "4dae6fdcd2bb0bb6c37b5f97c33c2be954da743985369cddac3546e3218bffb8"
-
-    # Fix -flat_namespace being used on Big Sur and later.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
-      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
-    end
-  end
 
   # From the PCRE homepage:
   # "The older, but still widely deployed PCRE library, originally released in
@@ -25,22 +16,20 @@ class Pcre < Formula
     skip "PCRE was declared end of life in 2021-06"
   end
 
+  uses_from_macos "bzip2"
 
-  head do
-    url "svn://vcs.exim.org/pcre/code/trunk"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
+  on_linux do
+    depends_on "zlib-ng-compat"
   end
 
-  uses_from_macos "bzip2"
-  uses_from_macos "zlib"
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
+    args = %w[
       --enable-utf8
       --enable-pcre8
       --enable-pcre16
@@ -50,11 +39,10 @@ class Pcre < Formula
       --enable-pcregrep-libbz2
     ]
 
-    # JIT not currently supported for Apple Silicon or OS older than sierra
-    args << "--enable-jit" if OS.mac? && MacOS.version >= :sierra && !Hardware::CPU.arm?
+    # JIT not currently supported for Apple Silicon
+    args << "--enable-jit" if OS.mac? && !Hardware::CPU.arm?
 
-    system "./autogen.sh" if build.head?
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     ENV.deparallelize
     system "make", "test"

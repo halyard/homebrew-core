@@ -1,9 +1,10 @@
 class Unbound < Formula
   desc "Validating, recursive, caching DNS resolver"
   homepage "https://www.unbound.net"
-  url "https://nlnetlabs.nl/downloads/unbound/unbound-1.20.0.tar.gz"
-  sha256 "56b4ceed33639522000fd96775576ddf8782bb3617610715d7f1e777c5ec1dbf"
+  url "https://nlnetlabs.nl/downloads/unbound/unbound-1.24.2.tar.gz"
+  sha256 "44e7b53e008a6dcaec03032769a212b46ab5c23c105284aa05a4f3af78e59cdb"
   license "BSD-3-Clause"
+  compatibility_version 1
   head "https://github.com/NLnetLabs/unbound.git", branch: "master"
 
   # We check the GitHub repo tags instead of
@@ -14,7 +15,6 @@ class Unbound < Formula
     regex(/^(?:release-)?v?(\d+(?:\.\d+)+)$/i)
   end
 
-
   depends_on "libevent"
   depends_on "libnghttp2"
   depends_on "openssl@3"
@@ -22,6 +22,7 @@ class Unbound < Formula
   uses_from_macos "expat"
 
   def install
+    expat_prefix = OS.mac? ? "#{MacOS.sdk_for_formula(self).path}/usr" : Formula["expat"].opt_prefix
     args = %W[
       --prefix=#{prefix}
       --sysconfdir=#{etc}
@@ -29,12 +30,11 @@ class Unbound < Formula
       --enable-tfo-client
       --enable-tfo-server
       --with-libevent=#{Formula["libevent"].opt_prefix}
+      --with-libexpat=#{expat_prefix}
       --with-libnghttp2=#{Formula["libnghttp2"].opt_prefix}
       --with-ssl=#{Formula["openssl@3"].opt_prefix}
     ]
 
-    args << "--with-libexpat=#{MacOS.sdk_path}/usr" if OS.mac? && MacOS.sdk_path_if_needed
-    args << "--with-libexpat=#{Formula["expat"].opt_prefix}" if OS.linux?
     system "./configure", *args
 
     inreplace "doc/example.conf", 'username: "unbound"', 'username: "@@HOMEBREW-UNBOUND-USER@@"'

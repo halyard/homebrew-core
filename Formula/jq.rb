@@ -1,15 +1,15 @@
 class Jq < Formula
   desc "Lightweight and flexible command-line JSON processor"
   homepage "https://jqlang.github.io/jq/"
-  url "https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz"
-  sha256 "478c9ca129fd2e3443fe27314b455e211e0d8c60bc8ff7df703873deeee580c2"
+  url "https://github.com/jqlang/jq/releases/download/jq-1.8.1/jq-1.8.1.tar.gz"
+  sha256 "2be64e7129cecb11d5906290eba10af694fb9e3e7f9fc208a311dc33ca837eb0"
   license "MIT"
+  compatibility_version 1
 
   livecheck do
     url :stable
     regex(/^(?:jq[._-])?v?(\d+(?:\.\d+)+)$/i)
   end
-
 
   head do
     url "https://github.com/jqlang/jq.git", branch: "master"

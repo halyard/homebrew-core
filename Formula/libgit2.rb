@@ -1,9 +1,11 @@
 class Libgit2 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
-  homepage "https://libgit2.github.com/"
-  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.8.1.tar.gz"
-  sha256 "8c1eaf0cf07cba0e9021920bfba9502140220786ed5d8a8ec6c7ad9174522f8e"
+  homepage "https://libgit2.org/"
+  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.2.tar.gz"
+  sha256 "6f097c82fc06ece4f40539fb17e9d41baf1a5a2fc26b1b8562d21b89bc355fe6"
   license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
+  revision 1
+  compatibility_version 1
   head "https://github.com/libgit2/libgit2.git", branch: "main"
 
   livecheck do
@@ -11,14 +13,17 @@ class Libgit2 < Formula
     strategy :github_latest
   end
 
-
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libssh2"
-  depends_on "openssl@3"
+
+  on_linux do
+    depends_on "openssl@3" # Uses SecureTransport on macOS
+    depends_on "zlib-ng-compat"
+  end
 
   def install
-    args = %w[-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DUSE_SSH=ON]
+    args = %w[-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DUSE_SSH=ON -DUSE_BUNDLED_ZLIB=OFF]
 
     system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", *args, *std_cmake_args
     system "cmake", "--build", "build"
@@ -30,7 +35,7 @@ class Libgit2 < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <git2.h>
       #include <assert.h>
 
@@ -39,7 +44,7 @@ class Libgit2 < Formula
         assert(options & GIT_FEATURE_SSH);
         return 0;
       }
-    EOS
+    C
     libssh2 = Formula["libssh2"]
     flags = %W[
       -I#{include}

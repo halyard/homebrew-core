@@ -1,11 +1,11 @@
 class Nettle < Formula
   desc "Low-level cryptographic library"
   homepage "https://www.lysator.liu.se/~nisse/nettle/"
-  url "https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz"
-  mirror "https://ftpmirror.gnu.org/nettle/nettle-3.10.tar.gz"
-  sha256 "b4c518adb174e484cb4acea54118f02380c7133771e7e9beb98a0787194ee47c"
+  url "https://ftpmirror.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz"
+  sha256 "fe9ff51cb1f2abb5e65a6b8c10a92da0ab5ab6eaf26e7fc2b675c45f1fb519b5"
   license any_of: ["GPL-2.0-or-later", "LGPL-3.0-or-later"]
-
+  compatibility_version 1
 
   depends_on "gmp"
 
@@ -19,7 +19,7 @@ class Nettle < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <nettle/sha1.h>
       #include <stdio.h>
 
@@ -41,7 +41,7 @@ class Nettle < Formula
         printf("\\n");
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lnettle", "-o", "test"
     system "./test"
   end

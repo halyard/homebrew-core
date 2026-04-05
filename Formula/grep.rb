@@ -1,10 +1,11 @@
 class Grep < Formula
   desc "GNU grep, egrep and fgrep"
   homepage "https://www.gnu.org/software/grep/"
-  url "https://ftp.gnu.org/gnu/grep/grep-3.11.tar.xz"
-  mirror "https://ftpmirror.gnu.org/grep/grep-3.11.tar.xz"
-  sha256 "1db2aedde89d0dea42b16d9528f894c8d15dae4e190b59aecc78f5a951276eab"
+  url "https://ftpmirror.gnu.org/gnu/grep/grep-3.12.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/grep/grep-3.12.tar.xz"
+  sha256 "2649b27c0e90e632eadcd757be06c6e9a4f48d941de51e7c0f83ff76408a07b9"
   license "GPL-3.0-or-later"
+  compatibility_version 1
 
   head do
     url "https://git.savannah.gnu.org/git/grep.git", branch: "master"
@@ -18,23 +19,21 @@ class Grep < Formula
     uses_from_macos "gperf" => :build
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "pcre2"
 
   def install
     system "./bootstrap" if build.head?
 
     args = %W[
-      --disable-dependency-tracking
       --disable-nls
-      --prefix=#{prefix}
       --infodir=#{info}
       --mandir=#{man}
       --with-packager=Homebrew
     ]
 
     args << "--program-prefix=g" if OS.mac?
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
 

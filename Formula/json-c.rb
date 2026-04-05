@@ -1,9 +1,9 @@
 class JsonC < Formula
   desc "JSON parser for C"
   homepage "https://github.com/json-c/json-c/wiki"
-  url "https://github.com/json-c/json-c/archive/refs/tags/json-c-0.17-20230812.tar.gz"
-  version "0.17"
-  sha256 "024d302a3aadcbf9f78735320a6d5aedf8b77876c8ac8bbb95081ca55054c7eb"
+  url "https://github.com/json-c/json-c/archive/refs/tags/json-c-0.18-20240915.tar.gz"
+  version "0.18"
+  sha256 "3112c1f25d39eca661fe3fc663431e130cc6e2f900c081738317fba49d29e298"
   license "MIT"
   head "https://github.com/json-c/json-c.git", branch: "master"
 
@@ -12,11 +12,14 @@ class JsonC < Formula
     regex(/^json-c[._-](\d+(?:\.\d+)+)(?:[._-]\d{6,8})?$/i)
   end
 
+  no_autobump! because: :incompatible_version_format
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    # We pass `BUILD_APPS=OFF` since any built apps are never installed. See:
+    #   https://github.com/json-c/json-c/blob/master/apps/CMakeLists.txt#L119-L121
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_APPS=OFF", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

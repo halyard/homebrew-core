@@ -1,48 +1,47 @@
 class Libbluray < Formula
   desc "Blu-Ray disc playback library for media players like VLC"
   homepage "https://www.videolan.org/developers/libbluray.html"
-  url "https://download.videolan.org/videolan/libbluray/1.3.4/libbluray-1.3.4.tar.bz2"
-  sha256 "478ffd68a0f5dde8ef6ca989b7f035b5a0a22c599142e5cd3ff7b03bbebe5f2b"
+  url "https://download.videolan.org/videolan/libbluray/1.4.1/libbluray-1.4.1.tar.xz"
+  sha256 "76b5dc40097f28dca4ebb009c98ed51321b2927453f75cc72cf74acd09b9f449"
   license "LGPL-2.1-or-later"
+  compatibility_version 1
+  head "https://code.videolan.org/videolan/libbluray.git", branch: "master"
 
   livecheck do
     url "https://download.videolan.org/pub/videolan/libbluray/"
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-
-  head do
-    url "https://code.videolan.org/videolan/libbluray.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
-  depends_on "pkg-config" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
   depends_on "fontconfig"
   depends_on "freetype"
+  depends_on "libudfread"
 
   uses_from_macos "libxml2"
 
   def install
-    args = %W[--prefix=#{prefix} --disable-dependency-tracking --disable-silent-rules --disable-bdjava-jar]
-
-    system "./bootstrap" if build.head?
-    system "./configure", *args
-    system "make"
-    system "make", "install"
+    args = %w[
+      -Dbdj_jar=disabled
+      -Dfontconfig=enabled
+      -Dfreetype=enabled
+      -Dlibxml2=enabled
+    ]
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libbluray/bluray.h>
       int main(void) {
         BLURAY *bluray = bd_init();
         bd_close(bluray);
         return 0;
       }
-    EOS
+    C
 
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lbluray", "-o", "test"
     system "./test"

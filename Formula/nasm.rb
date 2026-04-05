@@ -1,15 +1,14 @@
 class Nasm < Formula
   desc "Netwide Assembler (NASM) is an 80x86 assembler"
   homepage "https://www.nasm.us/"
-  url "https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.xz"
-  sha256 "1412a1c760bbd05db026b6c0d1657affd6631cd0a63cddb6f73cc6d4aa616148"
+  url "https://www.nasm.us/pub/nasm/releasebuilds/3.01/nasm-3.01.tar.xz"
+  sha256 "b7324cbe86e767b65f26f467ed8b12ad80e124e3ccb89076855c98e43a9eddd4"
   license "BSD-2-Clause"
 
   livecheck do
     url "https://www.nasm.us/pub/nasm/releasebuilds/"
     regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
-
 
   head do
     url "https://github.com/netwide-assembler/nasm.git", branch: "master"
@@ -27,11 +26,11 @@ class Nasm < Formula
   end
 
   test do
-    (testpath/"foo.s").write <<~EOS
+    (testpath/"foo.s").write <<~ASM
       mov eax, 0
       mov ebx, 0
       int 0x80
-    EOS
+    ASM
 
     system bin/"nasm", "foo.s"
     code = File.open("foo", "rb") { |f| f.read.unpack("C*") }

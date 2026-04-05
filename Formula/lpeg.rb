@@ -5,12 +5,13 @@ class Lpeg < Formula
   mirror "https://github.com/neovim/deps/raw/master/opt/lpeg-1.1.0.tar.gz"
   sha256 "4b155d67d2246c1ffa7ad7bc466c1ea899bbc40fef0257cc9c03cecbaed4352a"
   license "MIT"
+  revision 2
+  compatibility_version 1
 
   livecheck do
     url :homepage
     regex(/href=.*?lpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
-
 
   depends_on "lua" => [:build, :test]
   depends_on "luajit" => [:build, :test]
@@ -22,15 +23,20 @@ class Lpeg < Formula
     system "make", "clean"
   end
 
+  def luas
+    deps.map(&:to_formula).select { |f| f.name.match?(/^lua(@\d+(\.\d+)*)?$/) }
+  end
+
+  def luajit = Formula["luajit"]
+
   def install
     dllflags = %w[-shared -fPIC]
     dllflags << "-Wl,-undefined,dynamic_lookup" if OS.mac?
 
-    luajit = Formula["luajit"]
-    lua = Formula["lua"]
-
     make_install_lpeg_so(luajit.opt_include/"luajit-2.1", dllflags, "5.1")
-    make_install_lpeg_so(lua.opt_include/"lua", dllflags, lua.version.major_minor)
+    luas.each do |lua|
+      make_install_lpeg_so(lua.opt_include/"lua", dllflags, lua.version.major_minor)
+    end
 
     doc.install "lpeg.html", "re.html"
     pkgshare.install "test.lua", "re.lua"
@@ -39,7 +45,9 @@ class Lpeg < Formula
   end
 
   test do
-    system "lua", pkgshare/"test.lua"
-    system "luajit", pkgshare/"test.lua"
+    luas.each do |lua|
+      system lua.bin/"lua", pkgshare/"test.lua"
+    end
+    system luajit.bin/"luajit", pkgshare/"test.lua"
   end
 end

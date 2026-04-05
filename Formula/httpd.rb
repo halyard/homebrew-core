@@ -1,10 +1,11 @@
 class Httpd < Formula
   desc "Apache HTTP server"
   homepage "https://httpd.apache.org/"
-  url "https://dlcdn.apache.org/httpd/httpd-2.4.62.tar.bz2"
-  mirror "https://downloads.apache.org/httpd/httpd-2.4.62.tar.bz2"
-  sha256 "674188e7bf44ced82da8db522da946849e22080d73d16c93f7f4df89e25729ec"
+  url "https://www.apache.org/dyn/closer.lua?path=httpd/httpd-2.4.66.tar.bz2"
+  mirror "https://downloads.apache.org/httpd/httpd-2.4.66.tar.bz2"
+  sha256 "94d7ff2b42acbb828e870ba29e4cbad48e558a79c623ad3596e4116efcfea25a"
   license "Apache-2.0"
+  compatibility_version 1
 
   depends_on "apr"
   depends_on "apr-util"
@@ -15,12 +16,15 @@ class Httpd < Formula
 
   uses_from_macos "libxcrypt"
   uses_from_macos "libxml2"
-  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   def install
     # fixup prefix references in favour of opt_prefix references
     inreplace "Makefile.in",
-      '#@@ServerRoot@@#$(prefix)#', '#@@ServerRoot@@'"##{opt_prefix}#"
+      '#@@ServerRoot@@#$(prefix)#', "\#@@ServerRoot@@##{opt_prefix}#"
     inreplace "docs/conf/extra/httpd-autoindex.conf.in",
       "@exp_iconsdir@", "#{opt_pkgshare}/icons"
     inreplace "docs/conf/extra/httpd-multilang-errordoc.conf.in",
@@ -39,11 +43,11 @@ class Httpd < Formula
     end
 
     if OS.mac?
-      libxml2 = "#{MacOS.sdk_path_if_needed}/usr"
-      zlib = "#{MacOS.sdk_path_if_needed}/usr"
+      libxml2 = "#{MacOS.sdk_for_formula(self).path}/usr"
+      zlib = "#{MacOS.sdk_for_formula(self).path}/usr"
     else
       libxml2 = Formula["libxml2"].opt_prefix
-      zlib = Formula["zlib"].opt_prefix
+      zlib = Formula["zlib-ng-compat"].opt_prefix
     end
 
     system "./configure", "--enable-layout=Slackware-FHS",
@@ -110,9 +114,7 @@ class Httpd < Formula
       s.gsub! "${prefix}/lib/httpd/modules", HOMEBREW_PREFIX/"lib/httpd/modules"
       s.gsub! Superenv.shims_path, HOMEBREW_PREFIX/"bin"
     end
-  end
 
-  def post_install
     (var/"cache/httpd").mkpath
     (var/"www").mkpath
   end
@@ -134,9 +136,9 @@ class Httpd < Formula
 
   test do
     # Ensure modules depending on zlib and xml2 have been compiled
-    assert_predicate lib/"httpd/modules/mod_deflate.so", :exist?
-    assert_predicate lib/"httpd/modules/mod_proxy_html.so", :exist?
-    assert_predicate lib/"httpd/modules/mod_xml2enc.so", :exist?
+    assert_path_exists lib/"httpd/modules/mod_deflate.so"
+    assert_path_exists lib/"httpd/modules/mod_proxy_html.so"
+    assert_path_exists lib/"httpd/modules/mod_xml2enc.so"
 
     begin
       port = free_port
@@ -155,10 +157,10 @@ class Httpd < Formula
         LoadModule mpm_prefork_module #{lib}/httpd/modules/mod_mpm_prefork.so
       EOS
 
-      pid = fork do
-        exec bin/"httpd", "-X", "-f", "#{testpath}/httpd.conf"
-      end
+      pid = spawn bin/"httpd", "-X", "-f", testpath/"httpd.conf"
+
       sleep 3
+      sleep 2 if OS.mac? && Hardware::CPU.intel?
 
       assert_match expected_output, shell_output("curl -s 127.0.0.1:#{port}")
 

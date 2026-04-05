@@ -1,11 +1,11 @@
 class Libmpc < Formula
   desc "C library for the arithmetic of high precision complex numbers"
   homepage "https://www.multiprecision.org/"
-  url "https://ftp.gnu.org/gnu/mpc/mpc-1.3.1.tar.gz"
-  mirror "https://ftpmirror.gnu.org/mpc/mpc-1.3.1.tar.gz"
-  sha256 "ab642492f5cf882b74aa0cb730cd410a81edcdbec895183ce930e706c1c759b8"
+  url "https://ftpmirror.gnu.org/gnu/mpc/mpc-1.4.0.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/mpc/mpc-1.4.0.tar.xz"
+  sha256 "3210b3a546b1cb00c296ca360891d7740ee6ff06deb02a27a35b20cd3c0bb1a5"
   license "LGPL-3.0-or-later"
-
+  compatibility_version 1
 
   head do
     url "https://gitlab.inria.fr/mpc/mpc.git", branch: "master"
@@ -28,7 +28,7 @@ class Libmpc < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <mpc.h>
       #include <assert.h>
       #include <math.h>
@@ -42,7 +42,7 @@ class Libmpc < Formula
         mpc_clear (x);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-L#{Formula["mpfr"].opt_lib}",
                    "-L#{Formula["gmp"].opt_lib}", "-lmpc", "-lmpfr",
                    "-lgmp", "-o", "test"

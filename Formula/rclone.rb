@@ -1,18 +1,21 @@
 class Rclone < Formula
   desc "Rsync for cloud storage"
   homepage "https://rclone.org/"
-  url "https://github.com/rclone/rclone/archive/refs/tags/v1.67.0.tar.gz"
-  sha256 "4ecf2e99eb98c9bb678be5b0cd28550c4a2a2d63b5f2ed66962a4f4b9b36c402"
+  url "https://github.com/rclone/rclone/archive/refs/tags/v1.73.3.tar.gz"
+  sha256 "91a2189140b90b40cf113f974f6441f22b3a21434b00f85cd2dfdc56e6eab3d6"
   license "MIT"
+  compatibility_version 1
   head "https://github.com/rclone/rclone.git", branch: "master"
-
 
   depends_on "go" => :build
 
   def install
-    args = *std_go_args(ldflags: "-s -w -X github.com/rclone/rclone/fs.Version=v#{version}")
-    args += ["-tags", "brew"] if OS.mac?
-    system "go", "build", *args
+    ldflags = %W[
+      -s -w
+      -X github.com/rclone/rclone/fs.Version=v#{version}
+    ]
+    tags = "brew" if OS.mac?
+    system "go", "build", *std_go_args(ldflags:, tags:)
     man1.install "rclone.1"
     system bin/"rclone", "genautocomplete", "bash", "rclone.bash"
     system bin/"rclone", "genautocomplete", "zsh", "_rclone"

@@ -1,22 +1,31 @@
 class Pango < Formula
   desc "Framework for layout and rendering of i18n text"
-  homepage "https://pango.gnome.org"
-  url "https://download.gnome.org/sources/pango/1.54/pango-1.54.0.tar.xz"
-  sha256 "8a9eed75021ee734d7fc0fdf3a65c3bba51dfefe4ae51a9b414a60c70b2d1ed8"
+  homepage "https://www.gtk.org/docs/architecture/pango"
+  url "https://download.gnome.org/sources/pango/1.57/pango-1.57.1.tar.xz"
+  sha256 "e65d6d117080dc3aeeb7d8b4b3b518f7383aa2e6cfce23117c623cd624764c2f"
   license "LGPL-2.0-or-later"
+  compatibility_version 1
   head "https://gitlab.gnome.org/GNOME/pango.git", branch: "main"
 
+  # Pango doesn't follow GNOME's "even-numbered minor is stable" version
+  # scheme but they do appear to use 90+ minor/patch versions, which may
+  # indicate unstable versions (e.g., 1.90, etc.).
+  livecheck do
+    url "https://download.gnome.org/sources/pango/cache.json"
+    regex(/pango[._-]v?(\d+(?:(?!\.9\d)\.\d+)+)\.t/i)
+  end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => [:build, :test]
+  depends_on "pkgconf" => [:build, :test]
   depends_on "cairo"
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "fribidi"
   depends_on "glib"
   depends_on "harfbuzz"
+  depends_on "libthai"
 
   def install
     args = %w[
@@ -25,6 +34,7 @@ class Pango < Formula
       -Dfontconfig=enabled
       -Dcairo=enabled
       -Dfreetype=enabled
+      -Dlibthai=enabled
     ]
 
     system "meson", "setup", "build", *args, *std_meson_args
@@ -34,7 +44,7 @@ class Pango < Formula
 
   test do
     system bin/"pango-view", "--version"
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <pango/pangocairo.h>
 
       int main(int argc, char *argv[]) {
@@ -46,9 +56,9 @@ class Pango < Formula
         g_free(families);
         return 0;
       }
-    EOS
+    C
 
-    flags = shell_output("pkg-config --cflags --libs pangocairo").chomp.split
+    flags = shell_output("pkgconf --cflags --libs pangocairo").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

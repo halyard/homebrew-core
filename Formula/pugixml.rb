@@ -1,8 +1,8 @@
 class Pugixml < Formula
   desc "Light-weight C++ XML processing library"
   homepage "https://pugixml.org/"
-  url "https://github.com/zeux/pugixml/releases/download/v1.14/pugixml-1.14.tar.gz"
-  sha256 "2f10e276870c64b1db6809050a75e11a897a8d7456c4be5c6b2e35a11168a015"
+  url "https://github.com/zeux/pugixml/releases/download/v1.15/pugixml-1.15.tar.gz"
+  sha256 "655ade57fa703fb421c2eb9a0113b5064bddb145d415dd1f88c79353d90d511a"
   license "MIT"
 
   livecheck do
@@ -10,19 +10,21 @@ class Pugixml < Formula
     strategy :github_latest
   end
 
-
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
-                    "-DBUILD_SHARED_LIBS=ON",
-                    "-DPUGIXML_BUILD_SHARED_AND_STATIC_LIBS=ON"
+    args = %w[
+      -DBUILD_SHARED_LIBS=ON
+      -DPUGIXML_BUILD_SHARED_AND_STATIC_LIBS=ON
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <pugixml.hpp>
       #include <cassert>
       #include <cstring>
@@ -34,14 +36,13 @@ class Pugixml < Formula
         assert(result);
         assert(strcmp(doc.child_value("root"), "Hello world!") == 0);
       }
-    EOS
+    CPP
 
-    (testpath/"test.xml").write <<~EOS
+    (testpath/"test.xml").write <<~XML
       <root>Hello world!</root>
-    EOS
+    XML
 
-    system ENV.cxx, "test.cpp", "-o", "test", "-I#{include}",
-                    "-L#{lib}", "-lpugixml"
+    system ENV.cxx, "test.cpp", "-o", "test", "-I#{include}", "-L#{lib}", "-lpugixml"
     system "./test"
   end
 end

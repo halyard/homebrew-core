@@ -1,15 +1,14 @@
+# This is an exception to Homebrew policy on Python libraries. See:
+# https://github.com/Homebrew/homebrew-core/issues/167905#issuecomment-2328118401
 class PythonPackaging < Formula
   desc "Core utilities for Python packages"
   homepage "https://packaging.pypa.io/"
-  url "https://files.pythonhosted.org/packages/51/65/50db4dda066951078f0a96cf12f4b9ada6e4b811516bf0262c0f4f7064d4/packaging-24.1.tar.gz"
-  sha256 "026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002"
+  url "https://files.pythonhosted.org/packages/65/ee/299d360cdc32edc7d2cf530f3accf79c4fca01e96ffc950d8a52213bd8e4/packaging-26.0.tar.gz"
+  sha256 "00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4"
   license any_of: ["Apache-2.0", "BSD-2-Clause"]
 
-
-  disable! date: "2024-10-05", because: "does not meet homebrew/core's requirements for Python library formulae"
-
-  depends_on "python@3.11" => [:build, :test]
-  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
+  depends_on "python@3.14" => [:build, :test]
 
   def pythons
     deps.map(&:to_formula)
@@ -21,15 +20,6 @@ class PythonPackaging < Formula
     pythons.each do |python|
       system python, "-m", "pip", "install", *std_pip_args(build_isolation: true), "."
     end
-  end
-
-  def caveats
-    <<~EOS
-      Additional details on upcoming formula removal are available at:
-      * https://github.com/Homebrew/homebrew-core/issues/157500
-      * https://docs.brew.sh/Python-for-Formula-Authors#libraries
-      * https://docs.brew.sh/Homebrew-and-Python#pep-668-python312-and-virtual-environments
-    EOS
   end
 
   test do

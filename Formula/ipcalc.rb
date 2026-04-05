@@ -5,7 +5,6 @@ class Ipcalc < Formula
   sha256 "a4dbfaeb7511b81830793ab9936bae9d7b1b561ad33e29106faaaf97ba1c117e"
   license "GPL-2.0-or-later"
 
-
   def install
     bin.install "ipcalc"
   end

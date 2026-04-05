@@ -1,10 +1,15 @@
 class Swig < Formula
   desc "Generate scripting interfaces to C/C++ code"
   homepage "https://www.swig.org/"
-  url "https://downloads.sourceforge.net/project/swig/swig/swig-4.2.1/swig-4.2.1.tar.gz"
-  sha256 "fa045354e2d048b2cddc69579e4256245d4676894858fcf0bab2290ecf59b7d8"
+  url "https://downloads.sourceforge.net/project/swig/swig/swig-4.4.1/swig-4.4.1.tar.gz"
+  sha256 "40162a706c56f7592d08fd52ef5511cb7ac191f3593cf07306a0a554c6281fcf"
   license "GPL-3.0-or-later"
+  compatibility_version 1
 
+  livecheck do
+    url "https://sourceforge.net/projects/swig/rss?path=/swig"
+    regex(%r{url=.*?/swig[._-]v?(\d+(?:\.\d+)+)\.t}i)
+  end
 
   head do
     url "https://github.com/swig/swig.git", branch: "master"
@@ -13,50 +18,53 @@ class Swig < Formula
     depends_on "automake" => :build
   end
 
-  depends_on "python-setuptools" => :test
-  depends_on "python@3.12" => :test
   depends_on "pcre2"
+
+  uses_from_macos "python" => :test
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   def install
     ENV.append "CXXFLAGS", "-std=c++11" # Fix `nullptr` support detection.
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
-      int add(int x, int y)
-      {
+    (testpath/"test.c").write <<~C
+      int add(int x, int y) {
         return x + y;
       }
-    EOS
+    C
     (testpath/"test.i").write <<~EOS
       %module test
       %inline %{
       extern int add(int x, int y);
       %}
     EOS
-    (testpath/"setup.py").write <<~EOS
-      #!/usr/bin/env python3
-      from distutils.core import setup, Extension
-      test_module = Extension("_test", sources=["test_wrap.c", "test.c"])
-      setup(name="test",
-            version="0.1",
-            ext_modules=[test_module],
-            py_modules=["test"])
-    EOS
-    (testpath/"run.py").write <<~EOS
-      #!/usr/bin/env python3
+    (testpath/"pyproject.toml").write <<~TOML
+      [project]
+      name = "test"
+      version = "0.1"
+
+      [tool.setuptools]
+      ext-modules = [
+        {name = "_test", sources = ["test_wrap.c", "test.c"]}
+      ]
+    TOML
+    (testpath/"run.py").write <<~PYTHON
       import test
       print(test.add(1, 1))
-    EOS
+    PYTHON
 
     ENV.remove_from_cflags(/-march=\S*/)
     system bin/"swig", "-python", "test.i"
-    system "python3", "setup.py", "build_ext", "--inplace"
-    assert_equal "2", shell_output("python3 ./run.py").strip
+    system "python3", "-m", "venv", ".venv"
+    system testpath/".venv/bin/pip", "install", *std_pip_args(prefix: false, build_isolation: true), "."
+    assert_equal "2", shell_output("#{testpath}/.venv/bin/python3 ./run.py").strip
   end
 end

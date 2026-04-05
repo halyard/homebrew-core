@@ -3,9 +3,10 @@ class X264 < Formula
   homepage "https://www.videolan.org/developers/x264.html"
   # the latest commit on the stable branch
   url "https://code.videolan.org/videolan/x264.git",
-      revision: "31e19f92f00c7003fa115047ce50978bc98c3a0d"
-  version "r3108"
-  license "GPL-2.0-only"
+      revision: "b35605ace3ddf7c1a5d67a2eb553f034aef41d55"
+  version "r3222"
+  license "GPL-2.0-or-later"
+  compatibility_version 1
   head "https://code.videolan.org/videolan/x264.git", branch: "master"
 
   # Cross-check the abbreviated commit hashes from the release filenames with
@@ -38,19 +39,10 @@ class X264 < Formula
     end
   end
 
-
-  on_macos do
-    depends_on "gcc" if DevelopmentTools.clang_build_version <= 902
-  end
+  no_autobump! because: :incompatible_version_format
 
   on_intel do
     depends_on "nasm" => :build
-  end
-
-  # https://code.videolan.org/videolan/x264/-/commit/b5bc5d69c580429ff716bafcd43655e855c31b02
-  fails_with :clang do
-    build 902
-    cause "Stack realignment requires newer Clang"
   end
 
   def install
@@ -70,7 +62,7 @@ class X264 < Formula
 
   test do
     assert_match version.to_s.delete("r"), shell_output("#{bin}/x264 --version").lines.first
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdint.h>
       #include <x264.h>
 
@@ -82,7 +74,7 @@ class X264 < Formula
           x264_picture_clean(&pic);
           return 0;
       }
-    EOS
+    C
     system ENV.cc, "-L#{lib}", "test.c", "-lx264", "-o", "test"
     system "./test"
   end

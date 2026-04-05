@@ -1,9 +1,10 @@
 class Z3 < Formula
   desc "High-performance theorem prover"
   homepage "https://github.com/Z3Prover/z3"
-  url "https://github.com/Z3Prover/z3/archive/refs/tags/z3-4.13.0.tar.gz"
-  sha256 "01bcc61c8362e37bb89fd2430f7e3385e86df7915019bd2ce45de9d9bd934502"
+  url "https://github.com/Z3Prover/z3/archive/refs/tags/z3-4.15.4.tar.gz"
+  sha256 "dae526252cb0585c8c863292ebec84cace4901a014b190a73f14087dd08d252b"
   license "MIT"
+  compatibility_version 1
   head "https://github.com/Z3Prover/z3.git", branch: "master"
 
   livecheck do
@@ -12,24 +13,13 @@ class Z3 < Formula
     strategy :github_latest
   end
 
-
   depends_on "cmake" => :build
   # Has Python bindings but are supplementary to the main library
   # which does not need Python.
-  depends_on "python@3.12" => [:build, :test]
-
-  fails_with gcc: "5"
-
-  fails_with :clang do
-    build 1000
-    cause <<-EOS
-      Z3 uses modern C++17 features, which is not supported by Apple's clang until
-      later macOS (10.14).
-    EOS
-  end
+  depends_on "python@3.14" => [:build, :test]
 
   def python3
-    which("python3.12")
+    which("python3.14")
   end
 
   def install

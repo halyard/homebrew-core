@@ -1,22 +1,38 @@
 class Gettext < Formula
   desc "GNU internationalization (i18n) and localization (l10n) library"
   homepage "https://www.gnu.org/software/gettext/"
-  url "https://ftp.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz"
-  mirror "https://ftpmirror.gnu.org/gettext/gettext-0.22.5.tar.gz"
-  mirror "http://ftp.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz"
-  sha256 "ec1705b1e969b83a9f073144ec806151db88127f5e40fe5a94cb6c8fa48996a0"
-  license "GPL-3.0-or-later"
+  url "https://ftpmirror.gnu.org/gnu/gettext/gettext-1.0.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/gettext/gettext-1.0.tar.gz"
+  mirror "http://ftp.gnu.org/gnu/gettext/gettext-1.0.tar.gz"
+  sha256 "85d99b79c981a404874c02e0342176cf75c7698e2b51fe41031cf6526d974f1a"
+  license all_of: [
+    "GPL-3.0-or-later",
+    "LGPL-2.1-or-later", # libintl, libasprintf
+  ]
+  compatibility_version 1
+
+  depends_on "libunistring"
 
   uses_from_macos "libxml2"
   uses_from_macos "ncurses"
 
+  on_linux do
+    depends_on "acl"
+  end
+
   def install
+    # Workaround for newer Clang
+    ENV.append_to_cflags "-Wno-incompatible-function-pointer-types" if DevelopmentTools.clang_build_version >= 1500
+
+    # macOS iconv implementation is slightly broken since Sonoma.
+    # upstream bug report, https://savannah.gnu.org/bugs/index.php?66541
+    ENV["am_cv_func_iconv_works"] = "yes" if OS.mac? && MacOS.version >= :sequoia
+
     args = [
+      "--with-libunistring-prefix=#{Formula["libunistring"].opt_prefix}",
       "--disable-silent-rules",
       "--with-included-glib",
       "--with-included-libcroco",
-      "--with-included-libunistring",
-      "--with-included-libxml",
       "--with-emacs",
       "--with-lispdir=#{elisp}",
       "--disable-java",

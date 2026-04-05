@@ -1,9 +1,10 @@
 class Liblinear < Formula
   desc "Library for large linear classification"
   homepage "https://www.csie.ntu.edu.tw/~cjlin/liblinear/"
-  url "https://www.csie.ntu.edu.tw/~cjlin/liblinear/oldfiles/liblinear-2.47.tar.gz"
-  sha256 "99ce98ca3ce7cfb31f2544c42f23ba5bc6c226e536f95d6cd21fe012f94c65e0"
+  url "https://www.csie.ntu.edu.tw/~cjlin/liblinear/oldfiles/liblinear-2.50.tar.gz"
+  sha256 "e5eeafe2159c41148b59304da2ba0ed12648e3d491ce2b9625058e174e96ca29"
   license "BSD-3-Clause"
+  compatibility_version 1
   head "https://github.com/cjlin1/liblinear.git", branch: "master"
 
   livecheck do
@@ -11,19 +12,18 @@ class Liblinear < Formula
     regex(/href=.*?liblinear[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   # Fix sonames
   patch :p0 do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/bac35ae9140405dec00f1f700d2ecc27cf82526b/liblinear/patch-Makefile.diff"
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/liblinear/patch-Makefile.diff"
     sha256 "11a47747918f665d219b108fac073c626779555b5022903c9b240a4c29bbc2a0"
   end
 
   def install
     soversion_regex = /^SHVER = (\d+)$/
     soversion = (buildpath/"Makefile").read
-                                      .lines
-                                      .grep(soversion_regex)
-                                      .first[soversion_regex, 1]
+                .lines
+                .grep(soversion_regex)
+                .first[soversion_regex, 1]
     system "make", "all"
     bin.install "predict", "train"
     lib.install shared_library("liblinear", soversion)

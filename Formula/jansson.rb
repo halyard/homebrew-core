@@ -1,10 +1,10 @@
 class Jansson < Formula
   desc "C library for encoding, decoding, and manipulating JSON"
   homepage "https://digip.org/jansson/"
-  url "https://github.com/akheron/jansson/releases/download/v2.14/jansson-2.14.tar.gz"
-  sha256 "5798d010e41cf8d76b66236cfb2f2543c8d082181d16bc3085ab49538d4b9929"
+  url "https://github.com/akheron/jansson/releases/download/v2.15.0/jansson-2.15.0.tar.gz"
+  sha256 "070a629590723228dc3b744ae90e965a569efb9c535b3309b52e80e75d8eb3be"
   license "MIT"
-
+  compatibility_version 1
 
   def install
     system "./configure", *std_configure_args
@@ -12,7 +12,7 @@ class Jansson < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <jansson.h>
       #include <assert.h>
 
@@ -25,7 +25,7 @@ class Jansson < Formula
         json_decref(json);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-ljansson", "-o", "test"
     system "./test"
   end

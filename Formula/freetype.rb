@@ -1,21 +1,25 @@
 class Freetype < Formula
   desc "Software library to render fonts"
   homepage "https://www.freetype.org/"
-  url "https://downloads.sourceforge.net/project/freetype/freetype2/2.13.2/freetype-2.13.2.tar.xz"
-  mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz"
-  sha256 "12991c4e55c506dd7f9b765933e62fd2be2e06d421505d7950a132e4f1bb484d"
+  url "https://downloads.sourceforge.net/project/freetype/freetype2/2.14.3/freetype-2.14.3.tar.xz"
+  mirror "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.xz"
+  sha256 "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f"
   license "FTL"
+  compatibility_version 1
 
   livecheck do
     url :stable
     regex(/url=.*?freetype[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libpng"
 
   uses_from_macos "bzip2"
-  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   def install
     # This file will be installed to bindir, so we want to avoid embedding the

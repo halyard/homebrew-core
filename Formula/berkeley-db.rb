@@ -18,12 +18,15 @@ class BerkeleyDb < Formula
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/libtool/configure-pre-0.4.2.418-big_sur.diff"
     sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
     directory "dist"
   end
 
   def install
+    # Work around undefined NULL causing incorrect detection of thread local storage class
+    ENV.append "CFLAGS", "-include stddef.h" if DevelopmentTools.clang_build_version >= 1500
+
     # BerkeleyDB dislikes parallel builds
     ENV.deparallelize
 
@@ -53,7 +56,7 @@ class BerkeleyDb < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <assert.h>
       #include <string.h>
       #include <db_cxx.h>
@@ -73,7 +76,7 @@ class BerkeleyDb < Formula
 
         assert(db.close(0) == 0);
       }
-    EOS
+    CPP
     flags = %W[
       -I#{include}
       -L#{lib}
@@ -81,6 +84,6 @@ class BerkeleyDb < Formula
     ]
     system ENV.cxx, "test.cpp", "-o", "test", *flags
     system "./test"
-    assert_predicate testpath/"test.db", :exist?
+    assert_path_exists testpath/"test.db"
   end
 end

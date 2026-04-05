@@ -6,18 +6,19 @@
 class Luajit < Formula
   desc "Just-In-Time Compiler (JIT) for the Lua programming language"
   homepage "https://luajit.org/luajit.html"
-  # Update this to the tip of the `v2.1` branch at the start of every month.
+  # Update this to the tip of the `v2.1` branch.
   # Get the latest commit with:
   #   `git ls-remote --heads https://github.com/LuaJIT/LuaJIT.git v2.1`
   # This is a rolling release model so take care not to ignore CI failures that may be regressions.
-  url "https://github.com/LuaJIT/LuaJIT/archive/04dca7911ea255f37be799c18d74c305b921c1a6.tar.gz"
+  url "https://github.com/LuaJIT/LuaJIT/archive/18b087cd2cd4ddc4a79782bf155383a689d5093d.tar.gz"
   # Use the version scheme `2.1.timestamp` where `timestamp` is the Unix timestamp of the
   # latest commit at the time of updating.
   # `brew livecheck luajit` will generate the correct version for you automatically.
-  version "2.1.1720049189"
-  sha256 "346b028d9ba85e04b7e23a43cc51ec076574d2efc0d271d4355141b0145cd6e0"
+  version "2.1.1774896198"
+  sha256 "88a592afa9907d6b0c6e1e7ac9b39982622e3ca086f0646d4ea89b0e4e81f093"
   license "MIT"
-  head "https://luajit.org/git/luajit.git", branch: "v2.1"
+  compatibility_version 7
+  head "https://github.com/LuaJIT/LuaJIT.git", branch: "v2.1"
 
   livecheck do
     url "https://api.github.com/repos/LuaJIT/LuaJIT/branches/v2.1"
@@ -27,6 +28,7 @@ class Luajit < Formula
     end
   end
 
+  no_autobump! because: :incompatible_version_format
 
   def install
     # 1 - Override the hardcoded gcc.
@@ -42,7 +44,7 @@ class Luajit < Formula
     ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s if OS.mac?
 
     # Help the FFI module find Homebrew-installed libraries.
-    ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath(target: HOMEBREW_PREFIX/"lib")}" if HOMEBREW_PREFIX.to_s != "/usr/local"
+    ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath(target: HOMEBREW_PREFIX/"lib")}"
 
     # Pass `Q= E=@:` to build verbosely.
     verbose_args = %w[Q= E=@:]
@@ -69,7 +71,7 @@ class Luajit < Formula
   end
 
   test do
-    assert_includes shell_output("#{bin}/luajit -v"), " #{version} " if stable?
+    assert_includes shell_output("#{bin}/luajit -v"), " #{version} "
 
     system bin/"luajit", "-e", <<~EOS
       local ffi = require("ffi")
@@ -80,7 +82,7 @@ class Luajit < Formula
     # Check that LuaJIT can find its own `jit.*` modules
     touch "empty.lua"
     system bin/"luajit", "-b", "-o", "osx", "empty.lua", "empty.o"
-    assert_predicate testpath/"empty.o", :exist?
+    assert_path_exists testpath/"empty.o"
 
     # Check that we're not affected by LuaJIT/LuaJIT/issues/865.
     require "macho"

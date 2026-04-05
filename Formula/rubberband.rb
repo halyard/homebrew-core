@@ -1,8 +1,8 @@
 class Rubberband < Formula
   desc "Audio time stretcher tool and library"
   homepage "https://breakfastquay.com/rubberband/"
-  url "https://breakfastquay.com/files/releases/rubberband-3.3.0.tar.bz2"
-  sha256 "d9ef89e2b8ef9f85b13ac3c2faec30e20acf2c9f3a9c8c45ce637f2bc95e576c"
+  url "https://breakfastquay.com/files/releases/rubberband-4.0.0.tar.bz2"
+  sha256 "af050313ee63bc18b35b2e064e5dce05b276aaf6d1aa2b8a82ced1fe2f8028e9"
   license "GPL-2.0-or-later"
   head "https://hg.sr.ht/~breakfastquay/rubberband", using: :hg
 
@@ -11,10 +11,9 @@ class Rubberband < Formula
     regex(/href=.*?rubberband[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libsamplerate"
   depends_on "libsndfile"
 
@@ -23,8 +22,6 @@ class Rubberband < Formula
     depends_on "ladspa-sdk"
     depends_on "vamp-plugin-sdk"
   end
-
-  fails_with gcc: "5"
 
   def install
     args = ["-Dresampler=libsamplerate"]

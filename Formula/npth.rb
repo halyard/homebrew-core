@@ -1,9 +1,9 @@
 class Npth < Formula
   desc "New GNU portable threads library"
   homepage "https://gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/npth/npth-1.7.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/npth/npth-1.7.tar.bz2"
-  sha256 "8589f56937b75ce33b28d312fccbf302b3b71ec3f3945fde6aaa74027914ad05"
+  url "https://gnupg.org/ftp/gcrypt/npth/npth-1.8.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/npth/npth-1.8.tar.bz2"
+  sha256 "8bd24b4f23a3065d6e5b26e98aba9ce783ea4fd781069c1b35d149694e90ca3e"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,14 +11,13 @@ class Npth < Formula
     regex(/href=.*?npth[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   def install
     system "./configure", "--disable-silent-rules", *std_configure_args
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <npth.h>
 
@@ -42,7 +41,7 @@ class Npth < Formula
           return 0;
       }
 
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lnpth", "-o", "test"
     assert_match "Hello from nPth thread!", shell_output("./test")
   end

@@ -1,10 +1,9 @@
 class Telnet < Formula
   desc "User interface to the TELNET protocol"
   homepage "https://opensource.apple.com/"
-  url "https://github.com/apple-oss-distributions/remote_cmds/archive/refs/tags/remote_cmds-302.tar.gz"
-  sha256 "04b3e1253eee08e82e705a199f8ee1e99608304797911e9e69ab2c5c63d734c8"
+  url "https://github.com/apple-oss-distributions/remote_cmds/archive/refs/tags/remote_cmds-306.tar.gz"
+  sha256 "7f014f7eebb115460ea782e6bcade6d16effa56da17ee30f00012af07bc96c36"
   license all_of: ["BSD-4-Clause-UC", "APSL-1.0"]
-
 
   depends_on xcode: :build
   depends_on :macos

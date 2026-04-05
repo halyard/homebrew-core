@@ -1,20 +1,18 @@
 class Rbenv < Formula
   desc "Ruby version manager"
   homepage "https://rbenv.org"
-  url "https://github.com/rbenv/rbenv/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "7e49e529ce0c876748fa75a61efdd62efa2634906075431a1818b565825eb758"
+  url "https://github.com/rbenv/rbenv/archive/refs/tags/v1.3.2.tar.gz"
+  sha256 "e2104f6472d7a8477409c46d4de39562b4d01899148a3dbed73c1d99a0b4bb2a"
   license "MIT"
   head "https://github.com/rbenv/rbenv.git", branch: "master"
-
 
   depends_on "ruby-build"
 
   uses_from_macos "ruby" => :test
 
   def install
-    inreplace "libexec/rbenv" do |s|
-      s.gsub! ":/usr/local/etc/rbenv.d", ":#{HOMEBREW_PREFIX}/etc/rbenv.d\\0" if HOMEBREW_PREFIX.to_s != "/usr/local"
-    end
+    # Build an `:all` bottle.
+    inreplace "libexec/rbenv", "/usr/local", HOMEBREW_PREFIX
 
     if build.head?
       # Record exact git revision for `rbenv --version` output
@@ -23,6 +21,7 @@ class Rbenv < Formula
                                            %Q(\\1"\\2-g#{git_revision}")
     end
 
+    # bash completion handled by rbenv-init
     zsh_completion.install "completions/_rbenv" => "_rbenv"
     prefix.install ["bin", "completions", "libexec", "rbenv.d"]
     man1.install "share/man/man1/rbenv.1"

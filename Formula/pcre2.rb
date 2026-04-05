@@ -1,18 +1,19 @@
 class Pcre2 < Formula
   desc "Perl compatible regular expressions library with a new API"
   homepage "https://www.pcre.org/"
-  url "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.44/pcre2-10.44.tar.bz2"
-  sha256 "d34f02e113cf7193a1ebf2770d3ac527088d485d4e047ed10e5d217c6ef5de96"
+  url "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+  sha256 "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
   license "BSD-3-Clause"
+  revision 1
+  compatibility_version 1
 
   livecheck do
     url :stable
     regex(/^pcre2[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
-
   head do
-    url "https://github.com/PCRE2Project/pcre2.git", branch: "master"
+    url "https://github.com/PCRE2Project/pcre2.git", branch: "main"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -20,7 +21,10 @@ class Pcre2 < Formula
   end
 
   uses_from_macos "bzip2"
-  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   def install
     args = %W[

@@ -10,7 +10,6 @@ class Xvid < Formula
     regex(/href=.*?xvidcore[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   def install
     cd "build/generic" do
       system "./configure", "--disable-assembly", "--prefix=#{prefix}"
@@ -21,7 +20,7 @@ class Xvid < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <xvid.h>
       #define NULL 0
       int main() {
@@ -29,7 +28,7 @@ class Xvid < Formula
         xvid_global(NULL, XVID_GBL_INIT, &xvid_gbl_init, NULL);
         return 0;
       }
-    EOS
+    CPP
     system ENV.cc, "test.cpp", "-L#{lib}", "-lxvidcore", "-o", "test"
     system "./test"
   end

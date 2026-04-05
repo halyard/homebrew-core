@@ -1,16 +1,19 @@
 class Unixodbc < Formula
   desc "ODBC 3 connectivity for UNIX"
   homepage "https://www.unixodbc.org/"
-  url "https://www.unixodbc.org/unixODBC-2.3.12.tar.gz"
-  mirror "https://fossies.org/linux/privat/unixODBC-2.3.12.tar.gz"
-  sha256 "f210501445ce21bf607ba51ef8c125e10e22dffdffec377646462df5f01915ec"
-  license "LGPL-2.1-or-later"
+  url "https://www.unixodbc.org/unixODBC-2.3.14.tar.gz"
+  mirror "https://fossies.org/linux/privat/unixODBC-2.3.14.tar.gz"
+  sha256 "4e2814de3e01fc30b0b9f75e83bb5aba91ab0384ee951286504bb70205524771"
+  license all_of: [
+    "LGPL-2.1-or-later", # libraries
+    "GPL-2.0-or-later",  # programs
+  ]
+  compatibility_version 1
 
   livecheck do
     url "https://www.unixodbc.org/download.html"
     regex(/href=.*?unixODBC[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
-
 
   depends_on "libtool"
 
@@ -22,12 +25,10 @@ class Unixodbc < Formula
   link_overwrite "lib/libodbc.a", "lib/libodbc.so"
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
+    system "./configure", "--disable-gui",
                           "--enable-static",
-                          "--enable-gui=no"
+                          "--sysconfdir=#{etc}",
+                          *std_configure_args
     system "make", "install"
   end
 

@@ -1,14 +1,14 @@
 class Snappy < Formula
   desc "Compression/decompression library aiming for high speed"
   homepage "https://google.github.io/snappy/"
-  url "https://github.com/google/snappy/archive/refs/tags/1.2.1.tar.gz"
-  sha256 "736aeb64d86566d2236ddffa2865ee5d7a82d26c9016b36218fcc27ea4f09f86"
+  url "https://github.com/google/snappy/archive/refs/tags/1.2.2.tar.gz"
+  sha256 "90f74bc1fbf78a6c56b3c4a082a05103b3a56bb17bca1a27e052ea11723292dc"
   license "BSD-3-Clause"
-  head "https://github.com/google/snappy.git", branch: "master"
-
+  compatibility_version 1
+  head "https://github.com/google/snappy.git", branch: "main"
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
 
   # Fix issue where Mojave clang fails due to entering a __GNUC__ block
   on_macos do
@@ -25,26 +25,22 @@ class Snappy < Formula
   patch :DATA
 
   def install
-    ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
-
-    # Disable tests/benchmarks used for Snappy development
-    args = std_cmake_args + %w[
+    args = %w[
       -DSNAPPY_BUILD_TESTS=OFF
       -DSNAPPY_BUILD_BENCHMARKS=OFF
     ]
 
-    system "cmake", ".", *args
-    system "make", "install"
-    system "make", "clean"
-    system "cmake", ".", "-DBUILD_SHARED_LIBS=ON", *args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build/static", *args, *std_cmake_args
+    system "cmake", "--build", "build/static"
+    system "cmake", "--install", "build/static"
+
+    system "cmake", "-S", ".", "-B", "build/shared", "-DBUILD_SHARED_LIBS=ON", *args, *std_cmake_args
+    system "cmake", "--build", "build/shared"
+    system "cmake", "--install", "build/shared"
   end
 
   test do
-    # Force use of Clang on Mojave
-    ENV.clang if OS.mac?
-
-    (testpath/"test.cpp").write <<~EOS
+    (testpath/"test.cpp").write <<~CPP
       #include <assert.h>
       #include <snappy.h>
       #include <string>
@@ -60,7 +56,7 @@ class Snappy < Formula
         assert(source == decompressed);
         return 0;
       }
-    EOS
+    CPP
 
     system ENV.cxx, "-std=c++11", "test.cpp", "-L#{lib}", "-lsnappy", "-o", "test"
     system "./test"
@@ -69,10 +65,21 @@ end
 
 __END__
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 672561e..2f97b73 100644
+index cd71a47..ef040d1 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -76,10 +76,6 @@ else(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+@@ -51,10 +51,6 @@ if(MSVC)
+   string(REGEX REPLACE "/EH[a-z]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs-c-")
+   add_definitions(-D_HAS_EXCEPTIONS=0)
+-
+-  # Disable RTTI.
+-  string(REGEX REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+ else(MSVC)
+   # Use -Wall for clang and gcc.
+   if(NOT CMAKE_CXX_FLAGS MATCHES "-Wall")
+@@ -81,10 +77,6 @@ else(MSVC)
    # Disable C++ exceptions.
    string(REGEX REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
@@ -80,6 +87,6 @@ index 672561e..2f97b73 100644
 -  # Disable RTTI.
 -  string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 -  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
- endif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+ endif(MSVC)
 
  # BUILD_SHARED_LIBS is a standard CMake variable, but we declare it here to make

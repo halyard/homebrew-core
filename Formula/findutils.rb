@@ -1,24 +1,21 @@
 class Findutils < Formula
   desc "Collection of GNU find, xargs, and locate"
   homepage "https://www.gnu.org/software/findutils/"
-  url "https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
-  mirror "https://ftpmirror.gnu.org/findutils/findutils-4.10.0.tar.xz"
+  url "https://ftpmirror.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
   sha256 "1387e0b67ff247d2abde998f90dfbf70c1491391a59ddfecb8ae698789f0a4f5"
   license "GPL-3.0-or-later"
 
   def install
     args = %W[
-      --prefix=#{prefix}
-      --localstatedir=#{var}/locate
-      --disable-dependency-tracking
-      --disable-debug
       --disable-nls
+      --localstatedir=#{var}/locate
       --with-packager=Homebrew
       --with-packager-bug-reports=#{tap.issues_url}
     ]
-
     args << "--program-prefix=g" if OS.mac?
-    system "./configure", *args
+
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
     if OS.mac?
@@ -32,9 +29,6 @@ class Findutils < Formula
     end
 
     (libexec/"gnubin").install_symlink "../gnuman" => "man"
-  end
-
-  def post_install
     (var/"locate").mkpath
   end
 

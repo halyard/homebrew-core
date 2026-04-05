@@ -6,7 +6,6 @@ class SwitchaudioOsx < Formula
   license "MIT"
   head "https://github.com/deweller/switchaudio-osx.git", branch: "master"
 
-
   depends_on xcode: :build
   depends_on :macos
 

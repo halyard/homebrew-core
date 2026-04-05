@@ -1,24 +1,24 @@
 class Libtool < Formula
   desc "Generic library support script"
   homepage "https://www.gnu.org/software/libtool/"
-  url "https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
-  mirror "https://ftpmirror.gnu.org/libtool/libtool-2.4.7.tar.xz"
-  sha256 "4f7f217f057ce655ff22559ad221a0fd8ef84ad1fc5fcb6990cecc333aa1635d"
+  url "https://ftpmirror.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz"
+  sha256 "f81f5860666b0bc7d84baddefa60d1cb9fa6fceb2398cc3baca6afaa60266675"
   license "GPL-2.0-or-later"
-
+  compatibility_version 1
 
   depends_on "m4"
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
+    ENV["M4"] = Formula["m4"].opt_bin/"m4"
+
+    args = %w[
+      --disable-silent-rules
       --enable-ltdl-install
     ]
-
     args << "--program-prefix=g" if OS.mac?
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
     if OS.mac?
@@ -27,9 +27,7 @@ class Libtool < Formula
         (libexec/"gnuman/man1").install_symlink man1/"g#{prog}.1" => "#{prog}.1"
       end
       (libexec/"gnubin").install_symlink "../gnuman" => "man"
-    end
-
-    if OS.linux?
+    else
       bin.install_symlink "libtool" => "glibtool"
       bin.install_symlink "libtoolize" => "glibtoolize"
 
@@ -52,15 +50,17 @@ class Libtool < Formula
   test do
     system bin/"glibtool", "execute", File.executable?("/usr/bin/true") ? "/usr/bin/true" : "/bin/true"
 
-    (testpath/"hello.c").write <<~EOS
+    (testpath/"hello.c").write <<~C
       #include <stdio.h>
       int main() { puts("Hello, world!"); return 0; }
-    EOS
+    C
 
     system bin/"glibtool", "--mode=compile", "--tag=CC",
       ENV.cc, "-c", "hello.c", "-o", "hello.o"
     system bin/"glibtool", "--mode=link", "--tag=CC",
       ENV.cc, "hello.o", "-o", "hello"
     assert_match "Hello, world!", shell_output("./hello")
+
+    system bin/"glibtoolize", "--ltdl"
   end
 end

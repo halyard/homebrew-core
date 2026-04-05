@@ -1,8 +1,8 @@
 class Cairo < Formula
   desc "Vector graphics library with cross-device output support"
   homepage "https://cairographics.org/"
-  url "https://cairographics.org/releases/cairo-1.18.0.tar.xz"
-  sha256 "243a0736b978a33dee29f9cca7521733b78a65b5418206fef7bd1c3d4cf10b64"
+  url "https://cairographics.org/releases/cairo-1.18.4.tar.xz"
+  sha256 "445ed8208a6e4823de1226a74ca319d3600e83f6369f99b14265006599c32ccb"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
   head "https://gitlab.freedesktop.org/cairo/cairo.git", branch: "master"
 
@@ -13,7 +13,7 @@ class Cairo < Formula
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => [:build, :test]
 
   depends_on "fontconfig"
   depends_on "freetype"
@@ -26,14 +26,17 @@ class Cairo < Formula
   depends_on "lzo"
   depends_on "pixman"
 
-  uses_from_macos "zlib"
-
   on_macos do
     depends_on "gettext"
   end
 
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
   def install
     args = %w[
+      --default-library=both
       -Dfontconfig=enabled
       -Dfreetype=enabled
       -Dpng=enabled
@@ -51,7 +54,7 @@ class Cairo < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <cairo.h>
 
       int main(int argc, char *argv[]) {
@@ -61,25 +64,9 @@ class Cairo < Formula
 
         return 0;
       }
-    EOS
-    fontconfig = Formula["fontconfig"]
-    freetype = Formula["freetype"]
-    gettext = Formula["gettext"]
-    glib = Formula["glib"]
-    libpng = Formula["libpng"]
-    pixman = Formula["pixman"]
-    flags = %W[
-      -I#{fontconfig.opt_include}
-      -I#{freetype.opt_include}/freetype2
-      -I#{gettext.opt_include}
-      -I#{glib.opt_include}/glib-2.0
-      -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/cairo
-      -I#{libpng.opt_include}/libpng16
-      -I#{pixman.opt_include}/pixman-1
-      -L#{lib}
-      -lcairo
-    ]
+    C
+
+    flags = shell_output("pkgconf --cflags --libs cairo").chomp.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

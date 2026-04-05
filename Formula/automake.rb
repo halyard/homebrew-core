@@ -1,10 +1,11 @@
 class Automake < Formula
   desc "Tool for generating GNU Standards-compliant Makefiles"
   homepage "https://www.gnu.org/software/automake/"
-  url "https://ftp.gnu.org/gnu/automake/automake-1.17.tar.xz"
-  mirror "https://ftpmirror.gnu.org/automake/automake-1.17.tar.xz"
-  sha256 "8920c1fc411e13b90bf704ef9db6f29d540e76d232cb3b2c9f4dc4cc599bd990"
+  url "https://ftpmirror.gnu.org/gnu/automake/automake-1.18.1.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.xz"
+  sha256 "168aa363278351b89af56684448f525a5bce5079d0b6842bd910fdd3f1646887"
   license "GPL-2.0-or-later"
+  compatibility_version 1
 
   depends_on "autoconf"
 
@@ -23,9 +24,9 @@ class Automake < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       int main() { return 0; }
-    EOS
+    C
     (testpath/"configure.ac").write <<~EOS
       AC_INIT(test, 1.0)
       AM_INIT_AUTOMAKE

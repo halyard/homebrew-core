@@ -1,15 +1,15 @@
 class Libarchive < Formula
   desc "Multi-format archive and compression library"
   homepage "https://www.libarchive.org"
-  url "https://www.libarchive.org/downloads/libarchive-3.7.4.tar.xz"
-  sha256 "f887755c434a736a609cbd28d87ddbfbe9d6a3bb5b703c22c02f6af80a802735"
+  url "https://www.libarchive.org/downloads/libarchive-3.8.6.tar.xz"
+  sha256 "8ac57c1f5e99550948d1fe755c806d26026e71827da228f36bef24527e372e6f"
   license "BSD-2-Clause"
+  compatibility_version 1
 
   livecheck do
     url :homepage
     regex(/href=.*?libarchive[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
-
 
   keg_only :provided_by_macos
 
@@ -20,23 +20,24 @@ class Libarchive < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "expat"
-  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   def install
-    system "./configure", *std_configure_args,
-           "--without-lzo2",    # Use lzop binary instead of lzo2 due to GPL
-           "--without-nettle",  # xar hashing option but GPLv3
-           "--without-xml2",    # xar hashing option but tricky dependencies
-           "--without-openssl", # mtree hashing now possible without OpenSSL
-           "--with-expat"       # best xar hashing option
-
+    args = [
+      "--without-lzo2",    # Use lzop binary instead of lzo2 due to GPL
+      "--without-nettle",  # xar hashing option but GPLv3
+      "--without-xml2",    # xar hashing option but tricky dependencies
+      "--without-openssl", # mtree hashing now possible without OpenSSL
+      "--with-expat",      # best xar hashing option
+    ]
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
-    # fixes https://github.com/libarchive/libarchive/issues/1819
-    if OS.mac?
-      inreplace lib/"pkgconfig/libarchive.pc", "Libs.private: ", "Libs.private: -liconv "
-      inreplace lib/"pkgconfig/libarchive.pc", "Requires.private: iconv", ""
-    end
+    # Avoid hardcoding Cellar paths in dependents.
+    inreplace lib/"pkgconfig/libarchive.pc", prefix.to_s, opt_prefix.to_s
 
     return unless OS.mac?
 

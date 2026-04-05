@@ -1,10 +1,11 @@
 class Guile < Formula
   desc "GNU Ubiquitous Intelligent Language for Extensions"
   homepage "https://www.gnu.org/software/guile/"
-  url "https://ftp.gnu.org/gnu/guile/guile-3.0.10.tar.xz"
-  mirror "https://ftpmirror.gnu.org/guile/guile-3.0.10.tar.xz"
-  sha256 "bd7168517fd526333446d4f7ab816527925634094fbd37322e17e2b8d8e76388"
+  url "https://ftpmirror.gnu.org/gnu/guile/guile-3.0.11.tar.xz"
+  mirror "https://ftp.gnu.org/gnu/guile/guile-3.0.11.tar.xz"
+  sha256 "818c79d236657a7fa96fb364137cc7b41b3bdee0d65c6174ca03769559579460"
   license "LGPL-3.0-or-later"
+  compatibility_version 1
 
   head do
     url "https://git.savannah.gnu.org/git/guile.git", branch: "main"
@@ -24,11 +25,11 @@ class Guile < Formula
   depends_on "gmp"
   depends_on "libtool"
   depends_on "libunistring"
-  depends_on "pkg-config" # guile-config is a wrapper around pkg-config.
+  depends_on "pkgconf" # guile-config is a wrapper around pkg-config.
   depends_on "readline"
 
   uses_from_macos "gperf"
-  uses_from_macos "libffi", since: :catalina
+  uses_from_macos "libffi"
   uses_from_macos "libxcrypt"
 
   def install
@@ -36,14 +37,14 @@ class Guile < Formula
     ENV.append "LDFLAGS", "-Wl,-rpath,#{HOMEBREW_PREFIX}/lib"
 
     # Avoid superenv shim
-    inreplace "meta/guile-config.in", "@PKG_CONFIG@", Formula["pkg-config"].opt_bin/"pkg-config"
+    inreplace "meta/guile-config.in", "@PKG_CONFIG@", Formula["pkgconf"].opt_bin/"pkg-config"
 
     system "./autogen.sh" unless build.stable?
 
-    system "./configure", *std_configure_args,
+    system "./configure", "--disable-nls",
                           "--with-libreadline-prefix=#{Formula["readline"].opt_prefix}",
                           "--with-libgmp-prefix=#{Formula["gmp"].opt_prefix}",
-                          "--disable-nls"
+                          *std_configure_args
     system "make", "install"
 
     # A really messed up workaround required on macOS --mkhl
@@ -57,7 +58,7 @@ class Guile < Formula
     # of opt_prefix usage everywhere.
     inreplace lib/"pkgconfig/guile-3.0.pc" do |s|
       s.gsub! Formula["bdw-gc"].prefix.realpath, Formula["bdw-gc"].opt_prefix
-      s.gsub! Formula["libffi"].prefix.realpath, Formula["libffi"].opt_prefix if !OS.mac? || MacOS.version < :catalina
+      s.gsub! Formula["libffi"].prefix.realpath, Formula["libffi"].opt_prefix unless OS.mac?
     end
 
     (share/"gdb/auto-load").install Dir["#{lib}/*-gdb.scm"]
@@ -86,10 +87,10 @@ class Guile < Formula
 
   test do
     hello = testpath/"hello.scm"
-    hello.write <<~EOS
+    hello.write <<~SCHEME
       (display "Hello World")
       (newline)
-    EOS
+    SCHEME
 
     ENV["GUILE_AUTO_COMPILE"] = "0"
 

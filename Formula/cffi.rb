@@ -1,15 +1,19 @@
 class Cffi < Formula
   desc "C Foreign Function Interface for Python"
   homepage "https://cffi.readthedocs.io/en/latest/"
-  url "https://files.pythonhosted.org/packages/1e/bf/82c351342972702867359cfeba5693927efe0a8dd568165490144f554b18/cffi-1.17.0.tar.gz"
-  sha256 "f3157624b7558b914cb039fd1af735e5e8049a87c817cc215109ad1c8779df76"
+  url "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz"
+  sha256 "44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529"
   license "MIT"
+  revision 1
+  compatibility_version 1
 
-  depends_on "python@3.11" => [:build, :test]
-  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
+  depends_on "python@3.14" => [:build, :test]
   depends_on "pycparser"
 
   uses_from_macos "libffi"
+
+  pypi_packages exclude_packages: "pycparser"
 
   def pythons
     deps.map(&:to_formula)
@@ -25,9 +29,9 @@ class Cffi < Formula
 
   test do
     assert_empty resources, "This formula should not have any resources!"
-    (testpath/"sum.c").write <<~EOS
+    (testpath/"sum.c").write <<~C
       int sum(int a, int b) { return a + b; }
-    EOS
+    C
 
     libsum = testpath/shared_library("libsum")
     system ENV.cc, "-shared", "sum.c", "-o", libsum

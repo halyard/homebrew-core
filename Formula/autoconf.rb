@@ -1,13 +1,14 @@
 class Autoconf < Formula
   desc "Automatic configure script builder"
   homepage "https://www.gnu.org/software/autoconf/"
-  url "https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.gz"
-  mirror "https://ftpmirror.gnu.org/autoconf/autoconf-2.72.tar.gz"
-  sha256 "afb181a76e1ee72832f6581c0eddf8df032b83e2e0239ef79ebedc4467d92d6e"
+  url "https://ftpmirror.gnu.org/gnu/autoconf/autoconf-2.73.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/autoconf/autoconf-2.73.tar.gz"
+  sha256 "259ddfa3bddc799cfb81489cc0f17dfdf1bd6d1505dda53c0f45ff60d6a4f9a7"
   license all_of: [
     "GPL-3.0-or-later",
     "GPL-3.0-or-later" => { with: "Autoconf-exception-3.0" },
   ]
+  compatibility_version 1
 
   depends_on "m4"
   uses_from_macos "perl"
@@ -42,7 +43,7 @@ class Autoconf < Formula
 
     system bin/"autoconf"
     system "./configure"
-    assert_predicate testpath/"config.status", :exist?
+    assert_path_exists testpath/"config.status"
     assert_match(/\nCC=.*#{ENV.cc}/, (testpath/"config.log").read)
   end
 end

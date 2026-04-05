@@ -1,23 +1,23 @@
 class SourceHighlight < Formula
   desc "Source-code syntax highlighter"
   homepage "https://www.gnu.org/software/src-highlite/"
-  url "https://ftp.gnu.org/gnu/src-highlite/source-highlight-3.1.9.tar.gz"
-  mirror "https://ftpmirror.gnu.org/src-highlite/source-highlight-3.1.9.tar.gz"
+  url "https://ftpmirror.gnu.org/gnu/src-highlite/source-highlight-3.1.9.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/src-highlite/source-highlight-3.1.9.tar.gz"
   sha256 "3a7fd28378cb5416f8de2c9e77196ec915145d44e30ff4e0ee8beb3fe6211c91"
   license "GPL-3.0-or-later"
-  revision 5
+  revision 6
+  compatibility_version 1
 
   livecheck do
     url :stable
     regex(/href=.*?source-highlight[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   depends_on "boost"
 
   # Fix -flat_namespace being used on Big Sur and later.
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/libtool/configure-big_sur.diff"
     sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 

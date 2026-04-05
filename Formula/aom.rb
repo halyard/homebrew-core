@@ -2,12 +2,13 @@ class Aom < Formula
   desc "Codec library for encoding and decoding AV1 video streams"
   homepage "https://aomedia.googlesource.com/aom"
   url "https://aomedia.googlesource.com/aom.git",
-      tag:      "v3.9.1",
-      revision: "8ad484f8a18ed1853c094e7d3a4e023b2a92df28"
+      tag:      "v3.13.3",
+      revision: "92d4c37fbdd08944a0e721bbaeb13318f10aebb0"
   license "BSD-2-Clause"
+  head "https://aomedia.googlesource.com/aom.git", branch: "main"
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "jpeg-xl"
   depends_on "libvmaf"
 
@@ -29,7 +30,7 @@ class Aom < Formula
       "-DCONFIG_TUNE_VMAF=1",
     ]
 
-    system "cmake", "-S", ".", "-B", "brewbuild", *std_cmake_args, *args
+    system "cmake", "-S", ".", "-B", "brewbuild", *args, *std_cmake_args
     system "cmake", "--build", "brewbuild"
     system "cmake", "--install", "brewbuild"
   end
@@ -43,13 +44,13 @@ class Aom < Formula
     testpath.install resource("homebrew-bus_qcif_15fps.y4m")
 
     system bin/"aomenc", "--webm",
-                            "--tile-columns=2",
-                            "--tile-rows=2",
-                            "--cpu-used=8",
-                            "--output=bus_qcif_15fps.webm",
-                            "bus_qcif_15fps.y4m"
+                         "--tile-columns=2",
+                         "--tile-rows=2",
+                         "--cpu-used=8",
+                         "--output=bus_qcif_15fps.webm",
+                         "bus_qcif_15fps.y4m"
 
     system bin/"aomdec", "--output=bus_qcif_15fps_decode.y4m",
-                            "bus_qcif_15fps.webm"
+                         "bus_qcif_15fps.webm"
   end
 end

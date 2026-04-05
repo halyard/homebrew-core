@@ -4,12 +4,12 @@ class Libsoxr < Formula
   url "https://downloads.sourceforge.net/project/soxr/soxr-0.1.3-Source.tar.xz"
   sha256 "b111c15fdc8c029989330ff559184198c161100a59312f5dc19ddeb9b5a15889"
   license "LGPL-2.1-or-later"
+  compatibility_version 1
 
   livecheck do
     url :stable
     regex(%r{url=.*?/soxr[._-]v?(\d+(?:\.\d+)+)(?:-Source)?\.t}i)
   end
-
 
   depends_on "cmake" => :build
 
@@ -17,17 +17,21 @@ class Libsoxr < Formula
   # code isn't defined on 64-bit Apple Silicon.
   # Upstream pull request: https://sourceforge.net/p/soxr/code/merge-requests/5/
   patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/76868b36263be42440501d3692fd3a258f507d82/libsoxr/arm64_defines.patch"
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/1cf441a0/Patches/libsoxr/arm64_defines.patch"
     sha256 "9df5737a21b9ce70cc136c302e195fad9f9f6c14418566ad021f14bb34bb022c"
   end
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    args = %w[
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    ]
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <soxr.h>
 
       int main()
@@ -40,7 +44,8 @@ class Libsoxr < Formula
         }
         return 0;
       }
-    EOS
+    C
+
     system ENV.cc, "-L#{lib}", "test.c", "-lsoxr", "-o", "test"
     system "./test"
   end

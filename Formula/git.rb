@@ -1,9 +1,11 @@
 class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.46.0.tar.xz"
-  sha256 "7f123462a28b7ca3ebe2607485f7168554c2b10dfc155c7ec46300666ac27f95"
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.53.0.tar.xz"
+  sha256 "5818bd7d80b061bbbdfec8a433d609dc8818a05991f731ffc4a561e2ca18c653"
   license "GPL-2.0-only"
+  revision 1
+  compatibility_version 1
   head "https://github.com/git/git.git", branch: "master"
 
   livecheck do
@@ -11,31 +13,53 @@ class Git < Formula
     regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  depends_on "pkgconf" => :build
   depends_on "gettext"
   depends_on "pcre2"
 
-  uses_from_macos "curl", since: :catalina # macOS < 10.15.6 has broken cert path logic
+  uses_from_macos "curl"
   uses_from_macos "expat"
-  uses_from_macos "zlib", since: :high_sierra
+
+  # Don't try to add a libiconv dependency without reading this PR first:
+  # https://github.com/Homebrew/homebrew-core/pull/258461
 
   on_linux do
-    depends_on "linux-headers@5.15" => :build
     depends_on "openssl@3" # Uses CommonCrypto on macOS
+    depends_on "zlib-ng-compat"
+  end
+
+  resource "Authen::SASL" do
+    url "https://cpan.metacpan.org/authors/id/E/EH/EHUELS/Authen-SASL-2.2000.tar.gz"
+    sha256 "8cdf5a7f185448b614471675dae5b26f8c6e330b62264c3ff5d91172d6889b99"
   end
 
   resource "html" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.46.0.tar.xz"
-    sha256 "175d756b9d5eda6656c8067c7f8f80f15bd0cd9f908c3c4995ee6fe8a4182104"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.53.0.tar.xz"
+    sha256 "994b93cbf25a9c13f1206dcc1751f0559633d5152155e16fc025ab776af08e0d"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   resource "man" do
-    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.46.0.tar.xz"
-    sha256 "dc118b1d4036e58d5cc4f4e804d903e1e137dac3e9826a246a7e517afd877bd3"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.53.0.tar.xz"
+    sha256 "957ffe4409eeb90c7332bff4abee8d5169d28ef5c7c3bf08419f4239be13f77f"
+
+    livecheck do
+      formula :parent
+    end
   end
 
   resource "Net::SMTP::SSL" do
     url "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Net-SMTP-SSL-1.04.tar.gz"
     sha256 "7b29c45add19d3d5084b751f7ba89a8e40479a446ce21cfd9cc741e558332a00"
+  end
+
+  # https://lore.kernel.org/git/pull.2046.v2.git.1770775169908.gitgitgadget@gmail.com/
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/homebrew-core/532a668f0f725a69342cbac3414475a28bd0575d/Patches/git/2.53.0-osxkeychain-top-level-makefile.patch"
+    sha256 "ef3f390f940e080548474950380edb008f31e5fd500c8ad1d470fc764b6e65ac"
   end
 
   def install
@@ -124,6 +148,11 @@ class Git < Formula
       git_core.install "git-subtree"
     end
 
+    # Install git-jump
+    cd "contrib/git-jump" do
+      git_core.install "git-jump"
+    end
+
     # install the completion script first because it is inside "contrib"
     bash_completion.install "contrib/completion/git-completion.bash"
     bash_completion.install "contrib/completion/git-prompt.sh"
@@ -141,9 +170,13 @@ class Git < Formula
     chmod 0644, Dir["#{share}/doc/git-doc/**/*.{html,txt}"]
     chmod 0755, Dir["#{share}/doc/git-doc/{RelNotes,howto,technical}"]
 
-    # git-send-email needs Net::SMTP::SSL or Net::SMTP >= 2.34
+    # git-send-email needs Net::SMTP::SSL or Net::SMTP >= 2.34 and Authen::SASL
     resource("Net::SMTP::SSL").stage do
       (share/"perl5").install "lib/Net"
+    end
+
+    resource("Authen::SASL").stage do
+      (share/"perl5").install "lib/Authen"
     end
 
     # This is only created when building against system Perl, but it isn't

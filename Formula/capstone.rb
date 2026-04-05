@@ -1,10 +1,20 @@
 class Capstone < Formula
   desc "Multi-platform, multi-architecture disassembly framework"
   homepage "https://www.capstone-engine.org/"
-  url "https://github.com/capstone-engine/capstone/archive/refs/tags/5.0.1.tar.gz"
-  sha256 "2b9c66915923fdc42e0e32e2a9d7d83d3534a45bb235e163a70047951890c01a"
+  url "https://github.com/capstone-engine/capstone/archive/refs/tags/5.0.7.tar.gz"
+  sha256 "6427a724726d161d1e05fb49fff8cd0064f67836c04ffca3c11d6d859e719caa"
   license "BSD-3-Clause"
+  compatibility_version 1
   head "https://github.com/capstone-engine/capstone.git", branch: "next"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
+  on_macos do
+    depends_on "gettext"
+  end
 
   def install
     ENV["HOMEBREW_CAPSTONE"] = "1"
@@ -15,7 +25,7 @@ class Capstone < Formula
 
   test do
     # code comes from https://www.capstone-engine.org/lang_c.html
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <inttypes.h>
       #include <capstone/capstone.h>
@@ -40,7 +50,7 @@ class Capstone < Formula
         cs_close(&handle);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lcapstone", "-o", "test"
     system "./test"
   end

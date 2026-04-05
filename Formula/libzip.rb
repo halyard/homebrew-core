@@ -1,15 +1,16 @@
 class Libzip < Formula
   desc "C library for reading, creating, and modifying zip archives"
   homepage "https://libzip.org/"
-  url "https://libzip.org/download/libzip-1.10.1.tar.xz", using: :homebrew_curl
-  sha256 "dc3c8d5b4c8bbd09626864f6bcf93de701540f761d76b85d7c7d710f4bd90318"
+  url "https://libzip.org/download/libzip-1.11.4.tar.xz"
+  sha256 "8a247f57d1e3e6f6d11413b12a6f28a9d388de110adc0ec608d893180ed7097b"
   license "BSD-3-Clause"
+  revision 1
+  compatibility_version 1
 
   livecheck do
     url "https://libzip.org/download/"
     regex(/href=.*?libzip[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
-
 
   depends_on "cmake" => :build
   depends_on "xz"
@@ -17,25 +18,24 @@ class Libzip < Formula
 
   uses_from_macos "zip" => :test
   uses_from_macos "bzip2"
-  uses_from_macos "zlib"
 
   on_linux do
     depends_on "openssl@3"
+    depends_on "zlib-ng-compat"
   end
 
-  conflicts_with "libtcod", because: "libtcod and libzip install a `zip.h` header"
-
   def install
-    crypto_args = %w[
+    args = %w[
       -DENABLE_GNUTLS=OFF
       -DENABLE_MBEDTLS=OFF
+      -DBUILD_REGRESS=OFF
+      -DBUILD_EXAMPLES=OFF
     ]
-    crypto_args << "-DENABLE_OPENSSL=OFF" if OS.mac? # Use CommonCrypto instead.
-    system "cmake", ".", *std_cmake_args,
-                         *crypto_args,
-                         "-DBUILD_REGRESS=OFF",
-                         "-DBUILD_EXAMPLES=OFF"
-    system "make", "install"
+    args << "-DENABLE_OPENSSL=OFF" if OS.mac? # Use CommonCrypto instead.
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

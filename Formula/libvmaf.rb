@@ -1,13 +1,14 @@
 class Libvmaf < Formula
   desc "Perceptual video quality assessment based on multi-method fusion"
   homepage "https://github.com/Netflix/vmaf"
-  url "https://github.com/Netflix/vmaf/archive/refs/tags/v3.0.0.tar.gz"
-  sha256 "7178c4833639e6b989ecae73131d02f70735fdb3fc2c7d84bc36c9c3461d93b1"
+  url "https://github.com/Netflix/vmaf/archive/refs/tags/v3.1.0.tar.gz"
+  sha256 "80090e29d7fd0db472ddc663513f5be89bc936815e62b767e630c1d627279fe2"
   license "BSD-2-Clause-Patent"
-
+  compatibility_version 1
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
+  uses_from_macos "vim" => :build # needed for xxd
 
   on_intel do
     depends_on "nasm" => :build
@@ -21,12 +22,12 @@ class Libvmaf < Formula
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <libvmaf/libvmaf.h>
       int main() {
         return 0;
       }
-    EOS
+    C
 
     flags = [
       "-I#{HOMEBREW_PREFIX}/include/libvmaf",

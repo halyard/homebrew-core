@@ -1,8 +1,8 @@
 class GhcAT96 < Formula
   desc "Glorious Glasgow Haskell Compilation System"
   homepage "https://haskell.org/ghc/"
-  url "https://downloads.haskell.org/~ghc/9.6.6/ghc-9.6.6-src.tar.xz"
-  sha256 "008f7a04d89ad10baae6486c96645d7d726aaac7e1476199f6dd86c6bd9977ad"
+  url "https://downloads.haskell.org/~ghc/9.6.7/ghc-9.6.7-src.tar.xz"
+  sha256 "d053bf6ce1d588a75cfe8c9316269486e9d8fb89dcdf6fd92836fa2e3df61305"
   # We build bundled copies of libffi and GMP so GHC inherits the licenses
   license all_of: [
     "BSD-3-Clause",
@@ -11,15 +11,15 @@ class GhcAT96 < Formula
   ]
 
   livecheck do
-    url "https://www.haskell.org/ghc/download.html"
-    regex(/href=.*?download[._-]ghc[._-][^"' >]+?\.html[^>]*?>\s*?v?(9\.6(?:\.\d+)+)\s*?</i)
+    url "https://gitlab.haskell.org/ghc/ghc/-/wikis/GHC%20Status#all-released-ghc-versions"
+    regex(/v?(9\.6(?:\.\d+)+)[._-]notes/i)
   end
 
   keg_only :versioned_formula
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
-  depends_on "python@3.12" => :build
+  depends_on "python@3.14" => :build
   depends_on "sphinx-doc" => :build
 
   uses_from_macos "m4" => :build
@@ -88,18 +88,18 @@ class GhcAT96 < Formula
     sha256 "f7e921f7096c97bd4e63ac488186a132eb0cc508d04f0c5a99e9ded51bf16b25"
   end
 
-  # Backport fix for building docs with sphinx-doc 7.
-  # TODO: Remove patch if fix is backported to 9.6.
-  # Ref: https://gitlab.haskell.org/ghc/ghc/-/merge_requests/10520
-  patch do
-    url "https://gitlab.haskell.org/ghc/ghc/-/commit/70526f5bd8886126f49833ef20604a2c6477780a.diff"
-    sha256 "54cdde1ca5d1b6fe3bbad8d0eac2b8c112ca1f346c4086d1e7361fa9510f1f44"
-  end
-
   def install
-    ENV["CC"] = ENV["ac_cv_path_CC"] = ENV.cc
+    # ENV.cc and ENV.cxx return specific compiler versions on Ubuntu, e.g.
+    # gcc-11 and g++-11 on Ubuntu 22.04. Using such values effectively causes
+    # the bottle (binary package) to only run on systems where gcc-11 and g++-11
+    # binaries are available. This breaks on many systems including Arch Linux,
+    # Fedora and Ubuntu 24.04, as they provide g** but not g**-11 specifically.
+    #
+    # The workaround here is to hard-code both CC and CXX on Linux.
+    ENV["CC"] = ENV["ac_cv_path_CC"] = OS.linux? ? "cc" : ENV.cc
+    ENV["CXX"] = ENV["ac_cv_path_CXX"] = OS.linux? ? "c++" : ENV.cxx
     ENV["LD"] = "ld"
-    ENV["PYTHON"] = which("python3.12")
+    ENV["PYTHON"] = which("python3.14")
 
     binary = buildpath/"binary"
     resource("binary").stage do

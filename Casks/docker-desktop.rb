@@ -1,12 +1,12 @@
-cask "docker" do
+cask "docker-desktop" do
   arch arm: "arm64", intel: "amd64"
 
-  version "4.33.0,160616"
-  sha256 arm:   "33070a04c96d8778fd7aaa6f06b4b656b6d9cad243f6db7111b4aa560f6dedc4",
-         intel: "2b74ad908f9ad7b6472df72f920fe71a9eb955d5537c027a79b3a22402b9d37d"
+  version "4.67.0,222858"
+  sha256 arm:   "33a369da24b8a8d77c4d73130bd8deb9a71bd9aca0fc353b1d96c6549eb0f595",
+         intel: "e75d10bc0e8e2e215c44e44b586e128621a1be594e211310da90fdd07932543c"
 
   on_intel do
-    binary "Docker.app/Contents/Resources/bin/com.docker.hyperkit",
+    binary "#{appdir}/Docker.app/Contents/Resources/bin/com.docker.hyperkit",
            target: "/usr/local/bin/hyperkit"
   end
 
@@ -23,21 +23,10 @@ cask "docker" do
   end
 
   auto_updates true
-  conflicts_with formula: %w[
-    docker
-    docker-completion
-    docker-compose
-    docker-credential-helper-ecr
-  ]
-  depends_on macos: ">= :monterey"
+  conflicts_with cask: "rancher"
+  depends_on macos: ">= :sonoma"
 
   app "Docker.app"
-  binary "Docker.app/Contents/Resources/etc/docker-compose.bash-completion",
-         target: "#{HOMEBREW_PREFIX}/etc/bash_completion.d/docker-compose"
-  binary "Docker.app/Contents/Resources/etc/docker-compose.zsh-completion",
-         target: "#{HOMEBREW_PREFIX}/share/zsh/site-functions/_docker-compose"
-  binary "Docker.app/Contents/Resources/etc/docker-compose.fish-completion",
-         target: "#{HOMEBREW_PREFIX}/share/fish/vendor_completions.d/docker-compose.fish"
   binary "#{appdir}/Docker.app/Contents/Resources/bin/docker",
          target: "/usr/local/bin/docker"
   binary "#{appdir}/Docker.app/Contents/Resources/bin/docker-credential-desktop",
@@ -46,20 +35,18 @@ cask "docker" do
          target: "/usr/local/bin/docker-credential-ecr-login"
   binary "#{appdir}/Docker.app/Contents/Resources/bin/docker-credential-osxkeychain",
          target: "/usr/local/bin/docker-credential-osxkeychain"
-  binary "#{appdir}/Docker.app/Contents/Resources/bin/docker-index",
-         target: "/usr/local/bin/docker-index"
   binary "#{appdir}/Docker.app/Contents/Resources/bin/hub-tool",
          target: "/usr/local/bin/hub-tool"
   binary "#{appdir}/Docker.app/Contents/Resources/bin/kubectl",
          target: "/usr/local/bin/kubectl.docker"
   binary "#{appdir}/Docker.app/Contents/Resources/cli-plugins/docker-compose",
          target: "/usr/local/cli-plugins/docker-compose"
-  binary "Docker.app/Contents/Resources/etc/docker.bash-completion",
-         target: "#{HOMEBREW_PREFIX}/etc/bash_completion.d/docker"
-  binary "Docker.app/Contents/Resources/etc/docker.zsh-completion",
-         target: "#{HOMEBREW_PREFIX}/share/zsh/site-functions/_docker"
-  binary "Docker.app/Contents/Resources/etc/docker.fish-completion",
-         target: "#{HOMEBREW_PREFIX}/share/fish/vendor_completions.d/docker.fish"
+  bash_completion "#{appdir}/Docker.app/Contents/Resources/etc/docker-compose.bash-completion"
+  bash_completion "#{appdir}/Docker.app/Contents/Resources/etc/docker.bash-completion"
+  fish_completion "#{appdir}/Docker.app/Contents/Resources/etc/docker-compose.fish-completion"
+  fish_completion "#{appdir}/Docker.app/Contents/Resources/etc/docker.fish-completion"
+  zsh_completion "#{appdir}/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion"
+  zsh_completion "#{appdir}/Docker.app/Contents/Resources/etc/docker.zsh-completion"
 
   postflight do
     kubectl_target = Pathname("/usr/local/bin/kubectl")
@@ -67,14 +54,14 @@ cask "docker" do
     # Only link if `kubernetes-cli` is not installed.
     next if kubectl_target.exist?
 
-    system_command "/bin/ln", args: ["-sfn", staged_path/"Docker.app/Contents/Resources/bin/kubectl", kubectl_target],
+    system_command "/bin/ln", args: ["-sfn", appdir/"Docker.app/Contents/Resources/bin/kubectl", kubectl_target],
                               sudo: !kubectl_target.dirname.writable?
   end
 
   uninstall_postflight do
     kubectl_target = Pathname("/usr/local/bin/kubectl")
 
-    if kubectl_target.symlink? && kubectl_target.readlink == staged_path/"Docker.app/Contents/Resources/bin/kubectl"
+    if kubectl_target.symlink? && kubectl_target.readlink == appdir/"Docker.app/Contents/Resources/bin/kubectl"
       system_command "/bin/rm", args: [kubectl_target],
                                 sudo: !kubectl_target.dirname.writable?
     end

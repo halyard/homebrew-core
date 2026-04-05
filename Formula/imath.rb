@@ -1,10 +1,10 @@
 class Imath < Formula
   desc "Library of 2D and 3D vector, matrix, and math operations"
-  homepage "https://www.openexr.com/"
-  url "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v3.1.11.tar.gz"
-  sha256 "9057849585e49b8b85abe7cc1e76e22963b01bfdc3b6d83eac90c499cd760063"
+  homepage "https://imath.readthedocs.io/en/latest/"
+  url "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v3.2.2.tar.gz"
+  sha256 "b4275d83fb95521510e389b8d13af10298ed5bed1c8e13efd961d91b1105e462"
   license "BSD-3-Clause"
-
+  compatibility_version 1
 
   depends_on "cmake" => :build
 
@@ -19,7 +19,7 @@ class Imath < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~'EOS'
+    (testpath/"test.cpp").write <<~'CPP'
       #include <ImathRoots.h>
       #include <algorithm>
       #include <iostream>
@@ -34,7 +34,7 @@ class Imath < Formula
 
         std::cout << n << ", " << x[0] << ", " << x[1] << "\n";
       }
-    EOS
+    CPP
     system ENV.cxx, "-std=c++11", "-I#{include}/Imath", "-o", testpath/"test", "test.cpp"
     assert_equal "2, -2, -1\n", shell_output("./test")
   end

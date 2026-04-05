@@ -1,9 +1,11 @@
 class Node < Formula
-  desc "Platform built on V8 to build network applications"
+  desc "Open-source, cross-platform JavaScript runtime environment"
   homepage "https://nodejs.org/"
-  url "https://nodejs.org/dist/v22.5.1/node-v22.5.1.tar.xz"
-  sha256 "924f381a32cf26b6bedbe95feedde348450f4fd321283d3bf3f7965aa45ce831"
+  url "https://nodejs.org/dist/v25.9.0/node-v25.9.0.tar.xz"
+  sha256 "8f78af3ee55fb278668b5f801db58bd1a38ea161318eb5ce2128ddbc9cd813aa"
   license "MIT"
+  revision 1
+  compatibility_version 1
   head "https://github.com/nodejs/node.git", branch: "main"
 
   livecheck do
@@ -11,79 +13,154 @@ class Node < Formula
     regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "python@3.12" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python@3.14" => :build
+  depends_on "ada-url"
   depends_on "brotli"
   depends_on "c-ares"
-  depends_on "icu4c"
+  depends_on "hdrhistogram_c"
+  depends_on "icu4c@78"
   depends_on "libnghttp2"
+  depends_on "libnghttp3"
+  depends_on "libngtcp2"
   depends_on "libuv"
+  depends_on "llhttp"
   depends_on "openssl@3"
+  depends_on "simdjson"
+  depends_on "sqlite" # Fails with macOS sqlite.
+  depends_on "uvwasi"
+  depends_on "zstd"
 
-  uses_from_macos "python", since: :catalina
-  uses_from_macos "zlib"
+  uses_from_macos "python"
 
   on_macos do
-    depends_on "llvm" => [:build, :test] if DevelopmentTools.clang_build_version <= 1100
+    depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1699
   end
 
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
+  link_overwrite "bin/npm", "bin/npx"
+
+  # https://github.com/swiftlang/llvm-project/commit/078651b6de4b767b91e3e6a51e5df11a06d7bc4f
   fails_with :clang do
-    build 1100
-    cause <<~EOS
-      error: calling a private constructor of class 'v8::internal::(anonymous namespace)::RegExpParserImpl<uint8_t>'
-    EOS
+    build 1699
+    cause "needs SFINAE-friendly std::pointer_traits"
   end
 
-  fails_with gcc: "5"
+  # https://github.com/nodejs/node/blob/main/BUILDING.md#supported-toolchains
+  # https://github.com/ada-url/ada?tab=readme-ov-file#requirements
+  fails_with :gcc do
+    version "11"
+    cause "needs GCC 12 or newer"
+  end
 
   # We track major/minor from upstream Node releases.
   # We will accept *important* npm patch releases when necessary.
   resource "npm" do
-    url "https://registry.npmjs.org/npm/-/npm-10.8.2.tgz"
-    sha256 "c8c61ba0fa0ab3b5120efd5ba97fdaf0e0b495eef647a97c4413919eda0a878b"
+    url "https://registry.npmjs.org/npm/-/npm-11.12.1.tgz"
+    sha256 "e679850e663b16f5f146ee425d0eb0e3442c1d2bda3d513bbfd7c81f5ee5db38"
+
+    livecheck do
+      url "https://raw.githubusercontent.com/nodejs/node/refs/tags/v#{LATEST_VERSION}/deps/npm/package.json"
+      strategy :json do |json|
+        json["version"]
+      end
+    end
   end
 
   def install
-    ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
-
-    # The new linker crashed during LTO due to high memory usage.
-    ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.clang_build_version >= 1500
+    # Backport fix for bundled LIEF's bundled spdlog's bundled fmt.
+    # Should be fixed when new LIEF version with following commit is released and used by node:
+    # https://github.com/lief-project/LIEF/commit/710637216b1f6f19569002d62e43fca201b9d91c
+    inreplace "deps/LIEF/third-party/spdlog/include/spdlog/fmt/bundled/format.h",
+              "#ifndef FMT_MODULE\n#  include <cmath>",
+              "#ifndef FMT_MODULE\n#  include <stdlib.h>\n#  include <cmath>"
 
     # make sure subprocesses spawned by make are using our Python 3
-    ENV["PYTHON"] = which("python3.12")
+    ENV["PYTHON"] = which("python3.14")
+
+    # Ensure Homebrew deps are used
+    rm_r(["deps/icu-small", "deps/npm"])
 
     # Never install the bundled "npm", always prefer our
     # installation from tarball for better packaging control.
     args = %W[
       --prefix=#{prefix}
       --without-npm
-      --without-corepack
       --with-intl=system-icu
-      --shared-libuv
-      --shared-nghttp2
-      --shared-openssl
-      --shared-zlib
-      --shared-brotli
-      --shared-cares
-      --shared-libuv-includes=#{Formula["libuv"].include}
-      --shared-libuv-libpath=#{Formula["libuv"].lib}
-      --shared-nghttp2-includes=#{Formula["libnghttp2"].include}
-      --shared-nghttp2-libpath=#{Formula["libnghttp2"].lib}
-      --shared-openssl-includes=#{Formula["openssl@3"].include}
-      --shared-openssl-libpath=#{Formula["openssl@3"].lib}
-      --shared-brotli-includes=#{Formula["brotli"].include}
-      --shared-brotli-libpath=#{Formula["brotli"].lib}
-      --shared-cares-includes=#{Formula["c-ares"].include}
-      --shared-cares-libpath=#{Formula["c-ares"].lib}
+      --shared
       --openssl-use-def-ca-store
     ]
     args << "--tag=head" if build.head?
 
+    # Devendor libraries available as formulae. The following maps the name
+    # used in configure (e.g. `--shared-<flag>`) to the bundled subdirectory
+    # and corresponding formula name as these can all differ.
+    {
+      # flag name         sub-directory      formula name
+      "ada"           => ["ada",             "ada-url"],
+      "brotli"        => ["brotli",          "brotli"],
+      "cares"         => ["cares",           "c-ares"],
+      "hdr-histogram" => ["histogram",       "hdrhistogram_c"],
+      "http-parser"   => ["llhttp",          "llhttp"],
+      "libuv"         => ["uv",              "libuv"],
+      "nghttp2"       => ["nghttp2",         "libnghttp2"],
+      "nghttp3"       => ["ngtcp2/nghttp3",  "libnghttp3"],
+      "ngtcp2"        => ["ngtcp2",          "libngtcp2"],
+      "openssl"       => ["openssl/openssl", "openssl@3"],
+      "simdjson"      => ["simdjson",        "simdjson"],
+      "sqlite"        => ["sqlite",          "sqlite"],
+      "uvwasi"        => ["uvwasi",          "uvwasi"],
+      "zlib"          => ["zlib",            ("zlib-ng-compat" unless OS.mac?)],
+      "zstd"          => ["zstd",            "zstd"],
+    }.each do |flag, (subdir, formula)|
+      rm_r(buildpath/"deps"/subdir)
+      args << "--shared-#{flag}"
+      if formula
+        args << "--shared-#{flag}-includes=#{Formula[formula].include}"
+        args << "--shared-#{flag}-libpath=#{Formula[formula].lib}"
+      end
+    end
+
+    # TODO: Try to devendor these libraries.
+    # - `--shared-gtest` is only used for building the test suite, which we don't run here.
+    # - `--shared-merve` is not available as dependency in Homebrew.
+    # - `--shared-nbytes` is not available as dependency in Homebrew.
+    # - `--shared-simdutf` seems to result in build failures.
+    # - `--shared-temporal_capi` is only used when building with `--v8-enable-temporal-support`
+    # - `--shared-lief` is not available as dependency in Homebrew.
+    ignored_shared_flags = %w[
+      gtest
+      merve
+      nbytes
+      simdutf
+      temporal_capi
+      lief
+    ].map { |library| "--shared-#{library}" }
+
+    configure_help = Utils.safe_popen_read("./configure", "--help")
+    shared_flag_regex = /\[(--shared-[^ \]]+)\]/
+    configure_help.scan(shared_flag_regex) do |matches|
+      matches.each do |flag|
+        next if args.include?(flag) || ignored_shared_flags.include?(flag)
+
+        message = "Unused `--shared-*` flag: #{flag}"
+        if build.head?
+          opoo message
+        else
+          odie message
+        end
+      end
+    end
+
     # Enabling LTO errors on Linux with:
     # terminate called after throwing an instance of 'std::out_of_range'
-    # Pre-Catalina macOS also can't build with LTO
+    # macOS also can't build with LTO when using LLVM Clang
     # LTO is unpleasant if you have to build from source.
-    args << "--enable-lto" if OS.mac? && MacOS.version >= :catalina && build.bottle?
+    # FIXME: re-enable me, currently crashes sequoia runner after 6 hours
+    # args << "--enable-lto" if OS.mac? && DevelopmentTools.clang_build_version > 1699 && build.bottle?
 
     system "./configure", *args
     system "make", "install"
@@ -102,17 +179,22 @@ class Node < Formula
     # in `cached_download` npm resource, which breaks `npm -g outdated npm`.
     # This copies back over the vanilla `package.json` to fix this issue.
     cp bootstrap/"package.json", libexec/"lib/node_modules/npm"
-    # These symlinks are never used & they've caused issues in the past.
-    share_dir = libexec/"share"
-    rm_r share_dir if share_dir.exist?
 
-    bash_completion.install bootstrap/"lib/utils/completion.sh" => "npm"
+    # These symlinks are never used & they've caused issues in the past.
+    rm_r libexec/"share" if (libexec/"share").exist?
+
+    # Create temporary npm and npx symlinks until post_install is done.
+    ln_s libexec/"lib/node_modules/npm/bin/npm-cli.js", bin/"npm"
+    ln_s libexec/"lib/node_modules/npm/bin/npx-cli.js", bin/"npx"
+
+    # Use the _npm completion included in Zsh rather than generating broken completion
+    generate_completions_from_executable(bin/"npm", "completion", shells: [:bash], shell_parameter_format: :none)
   end
 
   def post_install
     node_modules = HOMEBREW_PREFIX/"lib/node_modules"
     node_modules.mkpath
-    # Kill npm but preserve all other modules across node updates/upgrades.
+    # Remove npm but preserve all other modules across node updates/upgrades.
     rm_r node_modules/"npm" if (node_modules/"npm").exist?
 
     cp_r libexec/"lib/node_modules/npm", node_modules
@@ -139,9 +221,6 @@ class Node < Formula
   end
 
   test do
-    # Make sure Mojave does not have `CC=llvm_clang`.
-    ENV.clang if OS.mac?
-
     path = testpath/"test.js"
     path.write "console.log('hello');"
 
@@ -157,13 +236,75 @@ class Node < Formula
     ENV.prepend_path "PATH", opt_bin
     ENV.delete "NVM_NODEJS_ORG_MIRROR"
     assert_equal which("node"), opt_bin/"node"
-    assert_predicate HOMEBREW_PREFIX/"bin/npm", :exist?, "npm must exist"
+    assert_path_exists HOMEBREW_PREFIX/"bin/npm", "npm must exist"
     assert_predicate HOMEBREW_PREFIX/"bin/npm", :executable?, "npm must be executable"
     npm_args = ["-ddd", "--cache=#{HOMEBREW_CACHE}/npm_cache", "--build-from-source"]
     system HOMEBREW_PREFIX/"bin/npm", *npm_args, "install", "npm@latest"
-    system HOMEBREW_PREFIX/"bin/npm", *npm_args, "install", "ref-napi" unless head?
-    assert_predicate HOMEBREW_PREFIX/"bin/npx", :exist?, "npx must exist"
+    system HOMEBREW_PREFIX/"bin/npm", *npm_args, "install", "nan"
+    assert_path_exists HOMEBREW_PREFIX/"bin/npx", "npx must exist"
     assert_predicate HOMEBREW_PREFIX/"bin/npx", :executable?, "npx must be executable"
     assert_match "< hello >", shell_output("#{HOMEBREW_PREFIX}/bin/npx --yes cowsay hello")
+
+    # Test `uvwasi` is linked correctly
+    (testpath/"wasi-smoke-test.mjs").write <<~JAVASCRIPT
+      import { WASI } from 'node:wasi';
+
+      // Minimal WASM that:
+      //   - imports wasi proc_exit(i32)->()
+      //   - exports memory (required by Node's WASI binding)
+      //   - exports _start which calls proc_exit(42)
+      const wasmBytes = new Uint8Array([
+        // \0asm + version
+        0x00,0x61,0x73,0x6d, 0x01,0x00,0x00,0x00,
+
+        // Type section: 2 types: (i32)->() and ()->()
+        0x01,0x08, 0x02,
+          0x60,0x01,0x7f,0x00,
+          0x60,0x00,0x00,
+
+        // Import section: wasi_snapshot_preview1.proc_exit : func(type 0)
+        0x02,0x24, 0x01,
+          0x16, // module name len = 22
+            0x77,0x61,0x73,0x69,0x5f,0x73,0x6e,0x61,0x70,0x73,0x68,0x6f,0x74,0x5f,0x70,0x72,0x65,0x76,0x69,0x65,0x77,0x31,
+          0x09, // name len = 9
+            0x70,0x72,0x6f,0x63,0x5f,0x65,0x78,0x69,0x74,
+          0x00, // import kind = func
+          0x00, // type index 0
+
+        // Function section: 1 function (type index 1 = ()->())
+        0x03,0x02, 0x01, 0x01,
+
+        // Memory section: one memory with min=1 page; export later
+        0x05,0x03, 0x01, 0x00, 0x01,
+
+        // Export section: export "_start" (func 1) and "memory" (mem 0)
+        0x07,0x13, 0x02,
+          0x06, 0x5f,0x73,0x74,0x61,0x72,0x74, 0x00, 0x01,
+          0x06, 0x6d,0x65,0x6d,0x6f,0x72,0x79, 0x02, 0x00,
+
+        // Code section: body for func 1: i32.const 42; call 0; end
+        0x0a,0x08, 0x01,
+          0x06, 0x00, 0x41,0x2a, 0x10,0x00, 0x0b
+      ]);
+
+      const wasi = new WASI({
+        version: 'preview1',
+        returnOnExit: true
+      });
+
+      const { instance } = await WebAssembly.instantiate(wasmBytes, wasi.getImportObject());
+
+      // This should return 42 if uvwasi is correctly linked & wired.
+      const rc = wasi.start(instance);
+      if (rc === 42) {
+        console.log('PASS: uvwasi proc_exit(42) worked (exitCode=42)');
+        process.exit(0);
+      } else {
+        console.error('FAIL: unexpected return', rc);
+        process.exit(2);
+      }
+    JAVASCRIPT
+
+    system bin/"node", "wasi-smoke-test.mjs"
   end
 end

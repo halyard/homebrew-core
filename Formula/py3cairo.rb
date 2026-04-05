@@ -1,15 +1,16 @@
 class Py3cairo < Formula
   desc "Python 3 bindings for the Cairo graphics library"
   homepage "https://cairographics.org/pycairo/"
-  url "https://github.com/pygobject/pycairo/releases/download/v1.26.1/pycairo-1.26.1.tar.gz"
-  sha256 "a11b999ce55b798dbf13516ab038e0ce8b6ec299b208d7c4e767a6f7e68e8430"
+  url "https://github.com/pygobject/pycairo/releases/download/v1.29.0/pycairo-1.29.0.tar.gz"
+  sha256 "f3f7fde97325cae80224c09f12564ef58d0d0f655da0e3b040f5807bd5bd3142"
   license any_of: ["LGPL-2.1-only", "MPL-1.1"]
+  compatibility_version 1
 
-
-  depends_on "pkg-config" => :build
-  depends_on "python-setuptools" => :build
-  depends_on "python@3.11" => [:build, :test]
-  depends_on "python@3.12" => [:build, :test]
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "pkgconf" => :build
+  depends_on "python@3.13" => [:build, :test]
+  depends_on "python@3.14" => [:build, :test]
   depends_on "cairo"
 
   def pythons
@@ -18,9 +19,20 @@ class Py3cairo < Formula
         .map { |f| f.opt_libexec/"bin/python" }
   end
 
+  def site_packages(python)
+    prefix/Language::Python.site_packages(python)
+  end
+
   def install
     pythons.each do |python|
-      system python, "-m", "pip", "install", *std_pip_args, "."
+      python_version = Language::Python.major_minor_version(python)
+      builddir = "build#{python_version}"
+      system "meson", "setup", builddir, "-Dpython=#{python}",
+                                         "-Dpython.platlibdir=#{site_packages(python)}",
+                                         "-Dpython.purelibdir=#{site_packages(python)}",
+                                         *std_meson_args
+      system "meson", "compile", "-C", builddir
+      system "meson", "install", "-C", builddir
     end
   end
 

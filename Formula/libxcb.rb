@@ -4,16 +4,16 @@ class Libxcb < Formula
   url "https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.17.0.tar.xz"
   sha256 "599ebf9996710fea71622e6e184f3a8ad5b43d0e5fa8c4e407123c88a59a6d55"
   license "MIT"
+  compatibility_version 1
 
-
-  depends_on "pkg-config" => :build
-  depends_on "python@3.12" => :build # match version in `xcb-proto`
+  depends_on "pkgconf" => :build
+  depends_on "python@3.14" => :build # match version in `xcb-proto`
   depends_on "xcb-proto" => :build
   depends_on "libxau"
   depends_on "libxdmcp"
 
   def install
-    python3 = "python3.12"
+    python3 = "python3.14"
 
     args = %W[
       --sysconfdir=#{etc}
@@ -29,13 +29,13 @@ class Libxcb < Formula
       PYTHON=#{python3}
     ]
 
-    system "./configure", *std_configure_args, *args
+    system "./configure", *args, *std_configure_args
     system "make"
     system "make", "install"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <string.h>
@@ -80,7 +80,7 @@ class Libxcb < Formula
         xcb_disconnect(connection);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-o", "test", "-I#{include}", "-L#{lib}", "-lxcb"
     system "./test"
     assert_equal 0, $CHILD_STATUS.exitstatus

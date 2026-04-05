@@ -1,8 +1,8 @@
 class Asciidoctor < Formula
   desc "Text processor and publishing toolchain for AsciiDoc"
   homepage "https://asciidoctor.org/"
-  url "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.23.tar.gz"
-  sha256 "72d271de1fccd3610e6f12bba29be1a3b6c8c813c5b2f3a12491ffc423090518"
+  url "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.26.tar.gz"
+  sha256 "25c22b934bc0ae2448f2d73d4b2eba0c59e0521cf5e893fb0b0ad54a461bf066"
   license "MIT"
 
   # Some gems require >= ruby 2.7

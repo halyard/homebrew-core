@@ -1,9 +1,10 @@
 class TreeSitter < Formula
-  desc "Parser generator tool and incremental parsing library"
+  desc "Incremental parsing library"
   homepage "https://tree-sitter.github.io/"
-  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.22.6.tar.gz"
-  sha256 "e2b687f74358ab6404730b7fb1a1ced7ddb3780202d37595ecd7b20a8f41861f"
+  url "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.26.8.tar.gz"
+  sha256 "e6826b7533ec3a885aba598377a6d20b5a6321ff3db76968e960c2352d3a5077"
   license "MIT"
+  compatibility_version 1
   head "https://github.com/tree-sitter/tree-sitter.git", branch: "master"
 
   livecheck do
@@ -11,49 +12,20 @@ class TreeSitter < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-
-  depends_on "rust" => :build
-  depends_on "node" => :test
-
   def install
     system "make", "install", "AMALGAMATED=1", "PREFIX=#{prefix}"
-    system "cargo", "install", *std_cargo_args(path: "cli")
+  end
+
+  def caveats
+    <<~EOS
+      This formula now installs only the `tree-sitter` library (`libtree-sitter`).
+      To install the CLI tool:
+        brew install tree-sitter-cli
+    EOS
   end
 
   test do
-    # a trivial tree-sitter test
-    assert_equal "tree-sitter #{version}", shell_output("#{bin}/tree-sitter --version").strip
-
-    # test `tree-sitter generate`
-    (testpath/"grammar.js").write <<~EOS
-      module.exports = grammar({
-        name: 'YOUR_LANGUAGE_NAME',
-        rules: {
-          source_file: $ => 'hello'
-        }
-      });
-    EOS
-    system bin/"tree-sitter", "generate", "--abi=latest"
-
-    # test `tree-sitter parse`
-    (testpath/"test/corpus/hello.txt").write <<~EOS
-      hello
-    EOS
-    parse_result = shell_output("#{bin}/tree-sitter parse #{testpath}/test/corpus/hello.txt").strip
-    assert_equal("(source_file [0, 0] - [1, 0])", parse_result)
-
-    # test `tree-sitter test`
-    (testpath/"test"/"corpus"/"test_case.txt").write <<~EOS
-      =========
-        hello
-      =========
-      hello
-      ---
-      (source_file)
-    EOS
-    system bin/"tree-sitter", "test"
-
-    (testpath/"test_program.c").write <<~EOS
+    (testpath/"test_program.c").write <<~C
       #include <stdio.h>
       #include <string.h>
       #include <tree_sitter/api.h>
@@ -79,7 +51,7 @@ class TreeSitter < Formula
         ts_parser_delete(parser);
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test_program.c", "-L#{lib}", "-ltree-sitter", "-o", "test_program"
     assert_equal "tree creation failed", shell_output("./test_program")
   end

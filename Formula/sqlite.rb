@@ -1,10 +1,11 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
   homepage "https://sqlite.org/index.html"
-  url "https://www.sqlite.org/2024/sqlite-autoconf-3460000.tar.gz"
-  version "3.46.0"
-  sha256 "6f8e6a7b335273748816f9b3b62bbdc372a889de8782d7f048c653a447417a7d"
+  url "https://sqlite.org/2026/sqlite-autoconf-3510300.tar.gz"
+  version "3.51.3"
+  sha256 "81f5be397049b0cae1b167f2225af7646fc0f82e4a9b3c48c9ea3a533e21d77a"
   license "blessing"
+  compatibility_version 1
 
   livecheck do
     url :homepage
@@ -14,12 +15,15 @@ class Sqlite < Formula
     end
   end
 
+  no_autobump! because: :incompatible_version_format
 
   keg_only :provided_by_macos
 
   depends_on "readline"
 
-  uses_from_macos "zlib"
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
 
   def install
     # Default value of MAX_VARIABLE_NUMBER is 999 which is too low for many
@@ -31,6 +35,7 @@ class Sqlite < Formula
       -DSQLITE_ENABLE_FTS3=1
       -DSQLITE_ENABLE_FTS3_PARENTHESIS=1
       -DSQLITE_ENABLE_FTS5=1
+      -DSQLITE_ENABLE_GEOPOLY=1
       -DSQLITE_ENABLE_JSON1=1
       -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1
       -DSQLITE_ENABLE_RTREE=1
@@ -40,16 +45,16 @@ class Sqlite < Formula
       -DSQLITE_USE_URI=1
     ].join(" ")
 
-    args = %W[
-      --prefix=#{prefix}
-      --disable-dependency-tracking
-      --enable-dynamic-extensions
-      --enable-readline
-      --disable-editline
-      --enable-session
+    args = [
+      "--enable-readline",
+      "--disable-editline",
+      "--enable-session",
+      "--with-readline-cflags=-I#{Formula["readline"].opt_include}",
+      "--with-readline-ldflags=-L#{Formula["readline"].opt_lib} -lreadline",
     ]
+    args << "--soname=legacy" if OS.linux?
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
 
     # Avoid rebuilds of dependants that hardcode this path.
@@ -58,13 +63,13 @@ class Sqlite < Formula
 
   test do
     path = testpath/"school.sql"
-    path.write <<~EOS
+    path.write <<~SQL
       create table students (name text, age integer);
       insert into students (name, age) values ('Bob', 14);
       insert into students (name, age) values ('Sue', 12);
       insert into students (name, age) values ('Tim', 13);
       select name from students order by age asc;
-    EOS
+    SQL
 
     names = shell_output("#{bin}/sqlite3 < #{path}").strip.split("\n")
     assert_equal %w[Sue Tim Bob], names

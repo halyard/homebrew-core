@@ -12,17 +12,16 @@ class Unzip < Formula
     regex(%r{url=.*?(?:%20)?v?(\d+(?:\.\d+)+)/unzip\d+\.t}i)
   end
 
-
   keg_only :provided_by_macos
 
   uses_from_macos "zip" => :test
   uses_from_macos "bzip2"
 
   # Upstream is unmaintained so we use the Ubuntu patchset:
-  # https://packages.ubuntu.com/kinetic/unzip
+  # https://packages.ubuntu.com/noble/unzip
   patch do
-    url "http://archive.ubuntu.com/ubuntu/pool/main/u/unzip/unzip_6.0-27ubuntu1.debian.tar.xz"
-    sha256 "9249780437220a5dc81518f2e4c5213b502bf56899c03992572cf9bb5caf724e"
+    url "https://archive.ubuntu.com/ubuntu/pool/main/u/unzip/unzip_6.0-28ubuntu4.1.debian.tar.xz"
+    sha256 "d123c8e6972dbdd17ba1a4920fb57ed2ede9237dbae149dcbf55df829c77baf3"
     apply %w[
       patches/01-manpages-in-section-1-not-in-section-1l.patch
       patches/02-this-is-debian-unzip.patch
@@ -67,16 +66,22 @@ class Unzip < Formula
       -DUTF8_MAYBE_NATIVE
       -DNO_WORKING_ISPRINT
     ]
+    cflags = ENV.cflags.to_s.split
+    cflags << "-DNO_LCHMOD" unless OS.mac?
     args = %W[
       CC=#{ENV.cc}
+      CFLAGS=#{cflags.join(" ")}
       LOC=#{loc_macros.join(" ")}
       D_USE_BZ2=-DUSE_BZIP2
       L_BZ2=-lbz2
-      macosx
     ]
-    args << "LFLAGS1=-liconv" if OS.mac?
+    if OS.mac?
+      args << "LFLAGS1=-liconv" << "macosx"
+    else
+      args << "unzips"
+    end
     system "make", "-f", "unix/Makefile", *args
-    system "make", "prefix=#{prefix}", "MANDIR=#{man1}", "install"
+    system "make", "-f", "unix/Makefile", "prefix=#{prefix}", "MANDIR=#{man1}", "install"
   end
 
   test do
@@ -91,12 +96,12 @@ class Unzip < Formula
     end
     %w[test1 test2 test3].each do |f|
       rm f
-      refute_predicate testpath/f, :exist?, "Text files should have been removed!"
+      refute_path_exists testpath/f, "Text files should have been removed!"
     end
 
     system bin/"unzip", "test.zip"
     %w[test1 test2 test3].each do |f|
-      assert_predicate testpath/f, :exist?, "Failure unzipping test.zip!"
+      assert_path_exists testpath/f, "Failure unzipping test.zip!"
     end
 
     assert_match "Hello!", File.read(testpath/"test1")

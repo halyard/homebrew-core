@@ -1,21 +1,23 @@
 class Socat < Formula
   desc "SOcket CAT: netcat on steroids"
   homepage "http://www.dest-unreach.org/socat/"
-  url "http://www.dest-unreach.org/socat/download/socat-1.8.0.0.tar.gz"
-  sha256 "6010f4f311e5ebe0e63c77f78613d264253680006ac8979f52b0711a9a231e82"
+  url "https://distfiles.alpinelinux.org/distfiles/edge/socat-1.8.1.1.tar.gz"
+  mirror "http://www.dest-unreach.org/socat/download/socat-1.8.1.1.tar.gz"
+  sha256 "f68b602c80e94b4b7498d74ec408785536fe33534b39467977a82ab2f7f01ddb"
   license "GPL-2.0-only"
+  compatibility_version 1
 
   livecheck do
     url "http://www.dest-unreach.org/socat/download/"
     regex(/href=.*?socat[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-
   depends_on "openssl@3"
-  depends_on "readline"
 
   def install
-    system "./configure", *std_configure_args, "--mandir=#{man}"
+    # NOTE: readline must be disabled as the license is incompatible with GPL-2.0-only,
+    # https://www.gnu.org/licenses/gpl-faq.html#AllCompatibility
+    system "./configure", "--disable-readline", *std_configure_args
     system "make", "install"
   end
 

@@ -1,16 +1,23 @@
 class Gnupg < Formula
-  desc "GNU Pretty Good Privacy (PGP) package"
+  desc "GNU Privacy Guard (OpenPGP)"
   homepage "https://gnupg.org/"
-  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.5.tar.bz2"
-  sha256 "f68f7d75d06cb1635c336d34d844af97436c3f64ea14bcb7c869782f96f44277"
+  url "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.5.18.tar.bz2"
+  sha256 "0dbd64e0322fe1a4813360d46539d5f8daf4a8fa235cf5fce464e8b0214a7e4f"
   license "GPL-3.0-or-later"
+  compatibility_version 1
 
+  # GnuPG usually indicates stable releases with an even-numbered minor but
+  # can declare an odd-numbered minor stable. e.g. 2.5 was stable since 2.5.16,
+  # see https://lists.gnupg.org/pipermail/gnupg-announce/2025q4/000500.html.
+  # The livecheck scrapes the version from the templated homepage which is
+  # manually updated by upstream when a new release series is stable, e.g.
+  # https://dev.gnupg.org/rD18a889b403c7a5934d5080be140a4d79e1c83332
   livecheck do
-    url "https://gnupg.org/ftp/gcrypt/gnupg/"
-    regex(/href=.*?gnupg[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :homepage
+    regex(/The current version of GnuPG is v?(\d+(?:\.\d+)+)\. /i)
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "gnutls"
   depends_on "libassuan"
   depends_on "libgcrypt"
@@ -23,23 +30,32 @@ class Gnupg < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "openldap"
-  uses_from_macos "sqlite", since: :catalina
-  uses_from_macos "zlib"
+  uses_from_macos "sqlite"
 
   on_macos do
     depends_on "gettext"
   end
+
+  on_linux do
+    depends_on "zlib-ng-compat"
+  end
+
+  conflicts_with cask: "gpg-suite"
+  conflicts_with cask: "gpg-suite-no-mail"
+  conflicts_with cask: "gpg-suite-pinentry"
+  conflicts_with cask: "gpg-suite@nightly"
 
   def install
     libusb = Formula["libusb"]
     ENV.append "CPPFLAGS", "-I#{libusb.opt_include}/libusb-#{libusb.version.major_minor}"
 
     mkdir "build" do
-      system "../configure", *std_configure_args,
-                             "--disable-silent-rules",
-                             "--sysconfdir=#{etc}",
+      system "../configure", "--disable-silent-rules",
                              "--enable-all-tests",
-                             "--with-pinentry-pgm=#{Formula["pinentry"].opt_bin}/pinentry"
+                             "--sysconfdir=#{etc}",
+                             "--with-pinentry-pgm=#{Formula["pinentry"].opt_bin}/pinentry",
+                             "--with-readline=#{Formula["readline"].opt_prefix}",
+                             *std_configure_args
       system "make"
       system "make", "check"
       system "make", "install"
@@ -49,9 +65,9 @@ class Gnupg < Formula
     # https://dev.gnupg.org/T5415#145864
     if OS.mac?
       # write to buildpath then install to ensure existing files are not clobbered
-      (buildpath/"scdaemon.conf").write <<~EOS
+      (buildpath/"scdaemon.conf").write <<~CONF
         disable-ccid
-      EOS
+      CONF
       pkgetc.install "scdaemon.conf"
     end
   end
@@ -62,7 +78,7 @@ class Gnupg < Formula
   end
 
   test do
-    (testpath/"batch.gpg").write <<~EOS
+    (testpath/"batch.gpg").write <<~GPG
       Key-Type: RSA
       Key-Length: 2048
       Subkey-Type: RSA
@@ -72,7 +88,8 @@ class Gnupg < Formula
       Expire-Date: 1d
       %no-protection
       %commit
-    EOS
+    GPG
+
     begin
       system bin/"gpg", "--batch", "--gen-key", "batch.gpg"
       (testpath/"test.txt").write "Hello World!"
