@@ -10,13 +10,13 @@ class Rustup < Formula
   keg_only "it conflicts with rust"
 
   depends_on "rust" => :build
+  depends_on "openssl@3"
 
   uses_from_macos "curl"
   uses_from_macos "xz"
 
   on_linux do
     depends_on "pkgconf" => :build
-    depends_on "openssl@3"
   end
 
   def install
