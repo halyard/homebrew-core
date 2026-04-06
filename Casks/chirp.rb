@@ -9,8 +9,6 @@ cask "chirp" do
   desc "Tool for programming amateur radio"
   homepage "https://chirp.danplanet.com/projects/chirp/wiki/Home"
 
-  disable! date: "2025-08-05", because: "cannot be reliably fetched due to Cloudflare protections"
-
   app "CHIRP.app"
 
   zap trash: "~/.chirp"
