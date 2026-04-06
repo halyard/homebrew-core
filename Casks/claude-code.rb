@@ -2,11 +2,11 @@ cask "claude-code" do
   arch arm: "arm64", intel: "x64"
   os macos: "darwin", linux: "linux"
 
-  version "2.1.84"
-  sha256 arm:          "c02d911ff13f8ceccb1f6662bf211f3cd9f29d5a46f031c3cc40654eb759aa29",
-         x86_64:       "da5ed2ee1b0bcf65c2088e79bc65388ec85edc41041fc6ca7c27330f2e201085",
-         x86_64_linux: "c6872aa8db94f303bc6a4482664e40d3288dfc989c89ba268473ed32e3055878",
-         arm64_linux:  "5c868174b44439e51c74ff084c306856c41779615250d5bbdaa5d10056362814"
+  version "2.1.92"
+  sha256 arm:          "6d1b9657727dce81332b3cda11bfe0a8c83e2392e3c062a31022e10b0e71cdd1",
+         x86_64:       "d422b5cc974b3bc4b28f698144fd0316f3e17774babe0bc1eb76c2bb0858d0aa",
+         x86_64_linux: "e22324514967ff2d5e9f91f0ee37e4675bf8b6dfec27fafb19cb25cc5b23fcaf",
+         arm64_linux:  "08deb3d56477496eb92e624f492e25b123f4527dd5674f71afff58a48eccd953"
 
   url "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/#{version}/#{os}-#{arch}/claude",
       verified: "storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/"
@@ -15,7 +15,7 @@ cask "claude-code" do
   homepage "https://www.anthropic.com/claude-code"
 
   livecheck do
-    url "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/stable"
+    url "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/latest"
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
@@ -33,10 +33,7 @@ cask "claude-code" do
       rmdir: "~/.claude"
 
   caveats <<~EOS
-    This cask tracks the stable release channel. In-app update notifications
-    default to the latest channel regardless. To align notifications with this
-    cask, set the auto-update channel to "stable" via /config or in
-    ~/.claude/settings.json:
-      https://code.claude.com/docs/en/setup#configure-release-channel
+    Note: the in-app upgrade command shown in update notifications is hardcoded to
+    "brew upgrade claude-code" rather than "brew upgrade claude-code@latest".
   EOS
 end
