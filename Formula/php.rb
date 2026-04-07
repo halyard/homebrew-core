@@ -62,6 +62,7 @@ class Php < Formula
   depends_on "openldap"
   depends_on "openssl@3"
   depends_on "pcre2"
+  depends_on "rtmpdump"
   depends_on "sqlite"
   depends_on "tidy-html5"
   depends_on "unixodbc"
