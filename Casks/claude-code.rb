@@ -2,20 +2,20 @@ cask "claude-code" do
   arch arm: "arm64", intel: "x64"
   os macos: "darwin", linux: "linux"
 
-  version "2.1.92"
-  sha256 arm:          "6d1b9657727dce81332b3cda11bfe0a8c83e2392e3c062a31022e10b0e71cdd1",
-         x86_64:       "d422b5cc974b3bc4b28f698144fd0316f3e17774babe0bc1eb76c2bb0858d0aa",
-         x86_64_linux: "e22324514967ff2d5e9f91f0ee37e4675bf8b6dfec27fafb19cb25cc5b23fcaf",
-         arm64_linux:  "08deb3d56477496eb92e624f492e25b123f4527dd5674f71afff58a48eccd953"
+  version "2.1.197"
+  sha256 arm:          "8cc0c4d1e4eb1dca3b0cc92ab02ee3505de764e023f8c901761c167b72041fb8",
+         x86_64:       "5e8a57cc7a92377f0744fa4c79191cf93d4b26c79cb919b07a407511fed1be26",
+         arm64_linux:  "fb48473c467c27615ac799a754f4ef0b68c363e4596cefbb59c3815d51a0cc8a",
+         x86_64_linux: "f54e69cbc89b2da61a415700af7ff52a147e862517d4f1b0eecf768448cf7f83"
 
-  url "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/#{version}/#{os}-#{arch}/claude",
-      verified: "storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/"
+  url "https://downloads.claude.ai/claude-code-releases/#{version}/#{os}-#{arch}/claude",
+      verified: "downloads.claude.ai/claude-code-releases/"
   name "Claude Code"
   desc "Terminal-based AI coding assistant"
-  homepage "https://www.anthropic.com/claude-code"
+  homepage "https://claude.com/product/claude-code"
 
   livecheck do
-    url "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/latest"
+    url "https://downloads.claude.ai/claude-code-releases/stable"
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
@@ -31,9 +31,4 @@ cask "claude-code" do
         "~/Library/Caches/claude-cli-nodejs",
       ],
       rmdir: "~/.claude"
-
-  caveats <<~EOS
-    Note: the in-app upgrade command shown in update notifications is hardcoded to
-    "brew upgrade claude-code" rather than "brew upgrade claude-code@latest".
-  EOS
 end
