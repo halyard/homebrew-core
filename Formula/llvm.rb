@@ -403,7 +403,7 @@ class Llvm < Formula
       (xctoolchain/"usr").install_symlink [bin, include, lib, libexec, share]
 
       # Install a major-versioned symlink that can be used across minor/patch version upgrades.
-      xctoolchain.parent.install_symlink xctoolchain.basename.to_s => [27;1:3u"LLVM#{soversion}.xctoolchain"
+      xctoolchain.parent.install_symlink xctoolchain.basename.to_s => "LLVM#{soversion}.xctoolchain"
 
       # Write config files for each macOS major version so that this works across OS upgrades.
       MacOSVersion::SYMBOLS.each_value do |v|
