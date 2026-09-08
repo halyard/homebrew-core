@@ -1,20 +1,20 @@
 class Llvm < Formula
   desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
-  # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
-  compatibility_version 1
+  compatibility_version 2
   head "https://github.com/llvm/llvm-project.git", branch: "main"
 
   stable do
-    url "https://github.com/llvm/llvm-project/releases/download/llvmorg-22.1.2/llvm-project-22.1.2.src.tar.xz"
-    sha256 "62f2f13ff25b1bb28ea507888e858212d19aafb65e8e72b4a65ee0629ec4ae0c"
+    url "https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.0/llvm-project-23.1.0.src.tar.xz"
+    sha256 "ab1f0e3ec52448c33e8782eaf0422504b87c7b016b22514653ee0d8fcee479ff"
 
     # Fix triple config loading for clang-cl
-    # https://github.com/llvm/llvm-project/pull/111397
     patch do
       url "https://github.com/llvm/llvm-project/compare/1381ad497b9a6d3da630cbef53cbfa9ddf117bb6...40a8c7c0ff3f688b690e4c74db734de67f0f89e9.diff"
       sha256 "f6dafd762737eb79761ab7ef814a9fc802ec4bb8d20f46691f07178053b0eb36"
+      type :unofficial
+      resolves "https://github.com/llvm/llvm-project/pull/111397"
     end
   end
 
@@ -28,24 +28,22 @@ class Llvm < Formula
   # https://llvm.org/docs/GettingStarted.html#requirement
   depends_on "cmake" => :build
   depends_on "ninja" => :build
-  depends_on "swig" => :build # for lldb
-  depends_on "python@3.14"
-  depends_on "xz" # for lldb
-  depends_on "z3"
+  depends_on "python@3.14" => [:build, :test]
   depends_on "zstd"
 
   uses_from_macos "libedit"
   uses_from_macos "libffi"
-  uses_from_macos "ncurses" # for lldb
+
+  # Z3 needs C++20 std::format which is only available in Xcode 15.3 or later.
+  # To avoid a dependency loop, we disable Z3 support on older macOS.
+  on_system :linux, macos: :sonoma_or_newer do
+    depends_on "z3"
+  end
 
   on_linux do
     depends_on "binutils" => :build # needed for LLVMgold plugin
     depends_on "pkgconf" => :build
     depends_on "zlib-ng-compat"
-  end
-
-  def python3
-    "python3.14"
   end
 
   def clang_config_file_dir
@@ -69,22 +67,17 @@ class Llvm < Formula
       libcxx
       libcxxabi
       libunwind
+      openmp
     ]
 
     unless versioned_formula?
-      projects << "lldb"
-
-      if OS.mac?
-        runtimes << "openmp"
-      else
-        projects << "openmp"
-      end
+      odie "Remove Z3 solver!" if build.stable? && version >= "24"
+      enable_z3 = deps.map(&:name).include?("z3")
     end
 
     python_versions = Formula.names
                              .select { |name| name.start_with? "python@" }
                              .map { |py| py.delete_prefix("python@") }
-    site_packages = Language::Python.site_packages(python3).delete_prefix("lib/")
 
     # compiler-rt has some iOS simulator features that require i386 symbols
     # I'm assuming the rest of clang needs support too for 32-bit compilation
@@ -93,9 +86,6 @@ class Llvm < Formula
     # can almost be treated as an entirely different build from llvm.
     ENV.permit_arch_flags
 
-    # we install the lldb Python module into libexec to prevent users from
-    # accidentally importing it with a non-Homebrew Python or a Homebrew Python
-    # in a non-default prefix. See https://lldb.llvm.org/resources/caveats.html
     args = %W[
       -DLLVM_ENABLE_PROJECTS=#{projects.join(";")}
       -DLLVM_ENABLE_RUNTIMES=#{runtimes.join(";")}
@@ -105,19 +95,15 @@ class Llvm < Formula
       -DLLVM_ENABLE_EH=OFF
       -DLLVM_ENABLE_FFI=ON
       -DLLVM_ENABLE_RTTI=ON
+      -DLLVM_ENABLE_Z3_SOLVER=#{enable_z3 ? "ON" : "OFF"}
+      -DLLVM_INCLUDE_BENCHMARKS=OFF
       -DLLVM_INCLUDE_DOCS=OFF
       -DLLVM_INCLUDE_TESTS=OFF
       -DLLVM_INSTALL_UTILS=ON
-      -DLLVM_ENABLE_Z3_SOLVER=#{versioned_formula? ? "OFF" : "ON"}
       -DLLVM_OPTIMIZED_TABLEGEN=ON
       -DLLVM_TARGETS_TO_BUILD=all
       -DLLVM_USE_RELATIVE_PATHS_IN_FILES=ON
       -DLLVM_SOURCE_PREFIX=.
-      -DLLDB_USE_SYSTEM_DEBUGSERVER=ON
-      -DLLDB_ENABLE_PYTHON=ON
-      -DLLDB_ENABLE_LUA=OFF
-      -DLLDB_ENABLE_LZMA=ON
-      -DLLDB_PYTHON_RELATIVE_PATH=libexec/#{site_packages}
       -DLIBOMP_INSTALL_ALIASES=OFF
       -DLIBCXX_INSTALL_MODULES=ON
       -DCLANG_PYTHON_BINDINGS_VERSIONS=#{python_versions.join(";")}
@@ -139,7 +125,7 @@ class Llvm < Formula
     builtins_cmake_args = []
 
     if OS.mac?
-      macos_sdk = MacOS.sdk_path_if_needed
+      macos_sdk = MacOS.sdk_path
       args << "-DFFI_INCLUDE_DIR=#{macos_sdk}/usr/include/ffi"
       args << "-DFFI_LIBRARY_DIR=#{macos_sdk}/usr/lib"
 
@@ -160,15 +146,17 @@ class Llvm < Formula
       clt_sdk_support_flags = %w[I WATCH TV].map { |os| "-DCOMPILER_RT_ENABLE_#{os}OS=OFF" }
       builtins_cmake_args += clt_sdk_support_flags
     else
-      args << "-DFFI_INCLUDE_DIR=#{Formula["libffi"].opt_include}"
-      args << "-DFFI_LIBRARY_DIR=#{Formula["libffi"].opt_lib}"
+      args << "-DFFI_INCLUDE_DIR=#{formula_opt_include("libffi")}"
+      args << "-DFFI_LIBRARY_DIR=#{formula_opt_lib("libffi")}"
 
+      # Disable OMPD gdb plugin to avoid Python linkage
+      args << "-DLIBOMP_OMPD_GDB_SUPPORT=OFF"
       # Disable `libxml2` which isn't very useful.
       args << "-DLLVM_ENABLE_LIBXML2=OFF"
       args << "-DLLVM_ENABLE_LIBCXX=OFF"
       args << "-DCLANG_DEFAULT_CXX_STDLIB=libstdc++"
       # Enable llvm gold plugin for LTO
-      args << "-DLLVM_BINUTILS_INCDIR=#{Formula["binutils"].opt_include}"
+      args << "-DLLVM_BINUTILS_INCDIR=#{formula_opt_include("binutils")}"
       # Parts of Polly fail to correctly build with PIC when being used for DSOs.
       args << "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
       runtimes_cmake_args += %w[
@@ -200,9 +188,8 @@ class Llvm < Formula
     end
 
     # Skip the PGO build on HEAD installs, non-bottle source builds, or versioned formulae.
-    # Also skip Intel macOS which is slow and will be reduced to Tier 3 in Sept 2026.
     # TODO: Fix Linux PGO build which is currently dead code
-    pgo_build = build.stable? && build.bottle? && OS.mac? && Hardware::CPU.arm? && !versioned_formula?
+    pgo_build = build.stable? && build.bottle? && OS.mac? && !versioned_formula?
     lto_build = pgo_build && OS.mac?
 
     if ENV.cflags.present?
@@ -283,7 +270,7 @@ class Llvm < Formula
       if OS.linux?
         # Make sure brewed glibc will be used if it is installed.
         linux_library_paths = [
-          Formula["glibc"].opt_lib,
+          formula_opt_lib("glibc"),
           HOMEBREW_PREFIX/"lib",
         ]
         linux_linker_flags = linux_library_paths.map { |path| "-L#{path} -Wl,-rpath,#{path}" }
@@ -416,7 +403,7 @@ class Llvm < Formula
       (xctoolchain/"usr").install_symlink [bin, include, lib, libexec, share]
 
       # Install a major-versioned symlink that can be used across minor/patch version upgrades.
-      xctoolchain.parent.install_symlink xctoolchain.basename.to_s => "LLVM#{soversion}.xctoolchain"
+      xctoolchain.parent.install_symlink xctoolchain.basename.to_s => [27;1:3u"LLVM#{soversion}.xctoolchain"
 
       # Write config files for each macOS major version so that this works across OS upgrades.
       MacOSVersion::SYMBOLS.each_value do |v|
@@ -435,6 +422,15 @@ class Llvm < Formula
 
     # Install Emacs modes
     elisp.install llvmpath.glob("utils/emacs/*.el") + share.glob("clang/*.el")
+
+    # Install C/Fortran header. This is supposed to be installed by Flang to be used by Clang;
+    # however, Homebrew's layout results in it getting installed to an incompatible location.
+    # Fedora packages the header in `clang-libs` and Debian in `libclang-common-*-dev` so
+    # it is likely safe to install even when Flang is not installed.
+    unless versioned_formula?
+      resource_dir = Pathname(Utils.safe_popen_read(bin/"clang", "-print-resource-dir").chomp)
+      (resource_dir/"include").install "flang/include/flang/ISO_Fortran_binding.h"
+    end
 
     return unless lto_build
 
@@ -462,42 +458,18 @@ class Llvm < Formula
   # We use the extra layer of indirection in `arch` because the FormulaAudit/OnSystemConditionals
   # doesn't want to let us use `Hardware::CPU.arch` outside of `install` or `post_install` blocks.
   def write_config_files(macos_version, kernel_version, arch)
-    clang_config_file_dir.mkpath
+    require "utils/clang"
 
-    arches = Set.new([:arm64, :x86_64, :aarch64])
-    arches << arch
-
-    sysroot = if macos_version.blank? || MacOS.version > macos_version
-      "#{MacOS::CLT::PKG_PATH}/SDKs/MacOSX.sdk"
-    else
-      "#{MacOS::CLT::PKG_PATH}/SDKs/MacOSX#{macos_version}.sdk"
-    end
-
-    {
-      darwin: kernel_version,
-      macosx: macos_version,
-    }.each do |system, version|
-      arches.each do |target_arch|
-        config_file = "#{target_arch}-apple-#{system}#{version}.cfg"
-        (clang_config_file_dir/config_file).atomic_write <<~CONFIG
-          -isysroot #{sysroot}
-        CONFIG
-      end
-    end
+    Utils::Clang.write_system_config_files(
+      config_dir:     clang_config_file_dir,
+      macos_version:,
+      kernel_version:,
+      arch:,
+    )
   end
 
-  def post_install
-    return unless OS.mac?
-
-    config_files = {
-      darwin: OS.kernel_version.major,
-      macosx: MacOS.version,
-    }.map do |system, version|
-      clang_config_file_dir/"#{Hardware::CPU.arch}-apple-#{system}#{version}.cfg"
-    end
-    return if config_files.all?(&:exist?)
-
-    write_config_files(MacOS.version, OS.kernel_version.major, Hardware::CPU.arch)
+  post_install_steps do
+    configure_clang_system
   end
 
   def caveats
@@ -505,8 +477,12 @@ class Llvm < Formula
       CLANG_CONFIG_FILE_SYSTEM_DIR: #{clang_config_file_dir}
       CLANG_CONFIG_FILE_USER_DIR:   ~/.config/clang
 
-      LLD is now provided in a separate formula:
+      LLD and LLDB are now provided in separate formulae:
         brew install lld
+        brew install lldb
+
+      Z3 solver support will be removed in LLVM 24 as it is unsupported upstream,
+      see https://github.com/llvm/llvm-project/pull/205370
     EOS
 
     on_macos do
@@ -775,10 +751,7 @@ class Llvm < Formula
         }
       C
 
-      rpath_flag = "-Wl,-rpath,#{lib/Utils.safe_popen_read(bin/"clang", "--print-target-triple").chomp}" if OS.linux?
-      system bin/"clang", "-L#{lib}", "-fopenmp", "-nobuiltininc",
-                          "-I#{lib}/clang/#{llvm_version_major}/include",
-                          rpath_flag.to_s, "omptest.c", "-o", "omptest"
+      system bin/"clang", "-fopenmp", "omptest.c", "-o", "omptest"
       testresult = shell_output("./omptest")
 
       sorted_testresult = testresult.split("\n").sort.join("\n")
@@ -799,17 +772,7 @@ class Llvm < Formula
           return 0;
         }
       C
-      system bin/"clang", "--analyze", "-Xanalyzer", "-analyzer-constraints=z3", "unreachable.c"
-
-      # Check that lldb can use Python
-      lldb_script_interpreter_info = JSON.parse(shell_output("#{bin}/lldb --print-script-interpreter-info"))
-      assert_equal "python", lldb_script_interpreter_info["language"]
-      python_test_cmd = "import pathlib, sys; print(pathlib.Path(sys.prefix).resolve())"
-      assert_match shell_output("#{python3} -c '#{python_test_cmd}'"),
-                   pipe_output("#{bin}/lldb", <<~EOS)
-                     script
-                     #{python_test_cmd}
-                   EOS
+      system bin/"clang", "--analyze", "-Xanalyzer", "-analyzer-constraints=unsupported-z3", "unreachable.c"
     end
 
     # Ensure LLVM did not regress output of `llvm-config --system-libs` which for a time
